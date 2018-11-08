@@ -41,6 +41,5 @@ end
 function game.exit()
 end
 
+
 fantasy.start(game)
-
-

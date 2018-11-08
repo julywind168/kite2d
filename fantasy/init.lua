@@ -16,13 +16,7 @@ local mouse_event = {
 	'MOVE'
 }
 
-local key_event = {
-	'PRESS',
-	'RELEASE'
-}
-
-
-local keyboard = {
+local key_name = {
 
 	[32] = 'space',
 	[48] = '0', [49] = '1', [50] = '2',
@@ -47,7 +41,10 @@ local keyboard = {
 
 }
 
-
+local key_event = {
+	'PRESS',
+	'RELEASE'
+}
 
 function M.start(callback)
 	fantasy.init = assert(callback.init)
@@ -60,7 +57,7 @@ function M.start(callback)
 	end
 
 	fantasy.keyboard = function(key, what)
-		key = keyboard[key]
+		key = key_name[key]
 		if not key then 
 			return
 		end
