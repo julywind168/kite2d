@@ -5,12 +5,12 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <stdbool.h>
-#include <glad/glad.h>
-#include <glfw/glfw3.h>
 
+#include "common.h"
 #include "lua.h"
 #include "lauxlib.h"
 #include "lualib.h"
+
 
 
 
@@ -21,6 +21,7 @@ typedef struct
 	int height;
 	double time;
 	GLFWwindow *window;
+	GLuint program;
 	lua_State *L;
 } Game;
 

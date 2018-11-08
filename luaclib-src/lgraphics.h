@@ -1,5 +1,5 @@
-#ifndef LSYSTEM_H
-#define LSYSTEM_H
+#ifndef LGRAPHICS_H
+#define LGRAPHICS_H
 
 #include "lua.h"
 #include "lauxlib.h"
@@ -9,7 +9,7 @@
 
 
 int
-lib_system(lua_State *L);
+lib_graphics(lua_State *L);
 
 
 

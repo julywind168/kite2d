@@ -1,6 +1,4 @@
-#include <glfw/glfw3.h>
 #include "lsystem.h"
-
 
 
 static int

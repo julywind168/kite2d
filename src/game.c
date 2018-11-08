@@ -1,14 +1,16 @@
 #include "util.h"
 #include "game.h"
 #include "lsystem.h"
+#include "lgraphics.h"
 
-#define FANTASY_UPDATE 1
-#define FANTASY_DRAW 2
-#define FANTASY_MOUSE 3
-#define FANTASY_KEYBOARD 4
-#define FANTASY_PAUSE 5 
-#define FANTASY_RESUME 6
-#define FANTASY_EXIT 7
+#define FANTASY_INIT 1
+#define FANTASY_UPDATE 2
+#define FANTASY_DRAW 3
+#define FANTASY_MOUSE 4
+#define FANTASY_KEYBOARD 5
+#define FANTASY_PAUSE 6
+#define FANTASY_RESUME 7
+#define FANTASY_EXIT 8
 
 
 #define MOUSE_PRESS 1
@@ -85,7 +87,6 @@ fantasy_exit() {
 	}
 }
 
-
 void
 fantasy_update(double dt) {
 	lua_State *L = G->L;
@@ -108,6 +109,16 @@ fantasy_draw() {
 }
 
 void
+fantasy_init() {
+	lua_State *L = G->L;
+	lua_pushvalue(L, FANTASY_INIT);
+	if (lua_pcall(L, 0, 0, 0) != LUA_OK) {
+		fprintf(stderr, "lua error: %s\n", lua_tostring(L, -1));
+		lua_pop(L, 1);
+	}
+}
+
+void
 game_start(Game *game) {
 	double now, dt;
 	GLFWwindow *window = game->window;
@@ -116,16 +127,35 @@ game_start(Game *game) {
 	glfwSetKeyCallback(window, fantasy_keyboard);
 	glfwSetMouseButtonCallback(window, fantasy_mouse);
 	glfwSetCursorPosCallback(window, fantasy_cursor);
-
+	fantasy_init();
 	game->time = glfwGetTime();
 	while(!glfwWindowShouldClose(window)) {
 		
 		now = glfwGetTime();
 		dt = now - game->time;
 		game->time = now;
-
 		fantasy_update(dt);
+
+		//draw start
+		glClear(GL_COLOR_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		fantasy_draw();
+			/*
+			glBindVertexArray(fantasy->VAO);
+				vao:[
+					0,	 0
+					0,	 960
+					640, 960
+					640, 0
+				]
+			
+
+			glBindTexture(GL_TEXTURE_2D, fantasy->texture[0]);
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+			*/
+		//draw end
+
+
 		glfwPollEvents();
 		glfwSwapBuffers(window);
 	}
@@ -149,6 +179,8 @@ create_lua(Game *game, const char *filename) {
 
 	luaL_requiref(L, "system.core", lib_system, 0);
 	lua_pop(L, 1);
+	luaL_requiref(L, "graphics.core", lib_graphics, 0);
+	lua_pop(L, 1);
 
 
 	lua_newtable(L);
@@ -162,13 +194,10 @@ create_lua(Game *game, const char *filename) {
 	}
 
 	lua_getglobal(L, "fantasy");
+
 	lua_pushstring(L, "init");
 	lua_gettable(L, -2);
-	if (lua_pcall(L, 0, 0, 0)) {
-		lua_close(L);
-		return 1;	
-	}
-
+	lua_setfield(L, LUA_REGISTRYINDEX, "FANTASY_INIT");
 	lua_pushstring(L, "update");
 	lua_gettable(L, -2);
 	lua_setfield(L, LUA_REGISTRYINDEX, "FANTASY_UPDATE");
@@ -192,6 +221,7 @@ create_lua(Game *game, const char *filename) {
 	lua_setfield(L, LUA_REGISTRYINDEX, "FANTASY_EXIT");
 	lua_pop(L, 1);
 
+	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_INIT");
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_UPDATE");
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_DRAW");
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_MOUSE");
@@ -233,6 +263,9 @@ init_opengl(Game *game) {
 
 	GLuint program = create_program();
 	glUseProgram(program);
+	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+
+	game->program = program;
 
 	return 0;
 }

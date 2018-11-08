@@ -1,4 +1,7 @@
 #include "util.h"
+#include "game.h"
+#include "common.h"
+
 
 int filesize(FILE*stream)
 {

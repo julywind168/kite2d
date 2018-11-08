@@ -1,23 +1,28 @@
 local fantasy = require "fantasy"
 local window = require "fantasy.window"
 local system = require "fantasy.system"
+local graphics = require "graphics.core"
+
 
 local game = {}
 
 
+local sp, texture
+
+
 function game.init()
-	window('title', 'My First Game')
-	window('width', 960)
-	window('height', 640)
+	sp = graphics.sprite()
+	texture = graphics.texture("examples/asset/bg.bmp");
 end
 
 
 function game.update(dt)
-	print('update', dt)
+	-- print('update', dt)
 end
 
 
 function game.draw()
+	graphics.draw(sp, texture)
 end
 
 
@@ -41,5 +46,9 @@ end
 function game.exit()
 end
 
+
+window('width', 800)
+window('height', 600)
+window('title', 'Hello Sprite')
 
 fantasy.start(game)

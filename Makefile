@@ -9,7 +9,7 @@ SRC := \
 
 LUACLIB := \
 	luaclib-src/lsystem.c \
-
+	luaclib-src/lgraphics.c \
 
 LUASRC := \
 	lua/lapi.c \
