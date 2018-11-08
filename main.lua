@@ -12,7 +12,7 @@ local sp, texture
 
 function game.init()
 	sp = graphics.sprite()
-	texture = graphics.texture("examples/asset/bg.bmp");
+	texture = graphics.texture("examples/asset/bg.jpg");
 end
 
 

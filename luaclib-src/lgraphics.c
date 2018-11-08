@@ -1,5 +1,7 @@
 #include "lgraphics.h"
 #include "game.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
 /*
     default:    0,0, 0,1, 1,1, 1,0
     texcoord:   0,0, 0,1, 1,1, 1,0   
@@ -28,6 +30,7 @@ lsprite(lua_State *L)
         0,1,2,
         2,3,0
     };
+
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -70,6 +73,30 @@ ltexture(lua_State *L)
 }
 
 
+static int
+ltexture2(lua_State *L)
+{
+    const char *filename = luaL_checkstring(L, 1);
+    stbi_set_flip_vertically_on_load(true);
+
+    GLuint texture;
+    int width, height, channel;
+    unsigned char *data = stbi_load(filename, &width, &height, &channel, 0);
+
+    glGenTextures(1, &texture);
+    glBindTexture(GL_TEXTURE_2D, texture);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    stbi_image_free(data);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    lua_pushinteger(L, texture);
+    return 1;
+}
+
 
 static int
 ldraw(lua_State *L) {
@@ -98,10 +125,11 @@ int
 lib_graphics(lua_State *L)
 {
 	luaL_Reg l[] = {
-		{ "sprite", lsprite},
-        { "texture", ltexture},
-        { "draw", ldraw},
-		{ NULL, NULL }
+		{"sprite", lsprite},
+        {"texture2", ltexture},
+        {"texture", ltexture2},
+        {"draw", ldraw},
+		{NULL, NULL}
 	};
 	luaL_newlib(L, l);
 	return 1;
