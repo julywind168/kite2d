@@ -250,6 +250,8 @@ on_window_resize(GLFWwindow *window, int width, int height) {
 }
 
 
+
+
 int
 init_opengl(Game *game) {
 	glfwMakeContextCurrent(game->window);
@@ -263,10 +265,11 @@ init_opengl(Game *game) {
 
 	GLuint program = create_program();
 	glUseProgram(program);
+
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
-
+	glUniform2ui(glGetUniformLocation(program, "display"), game->width, game->height);
+	glUniform2ui(glGetUniformLocation(program, "camera"),  (uint32_t)game->width/2, (uint32_t)game->height/2);
 	game->program = program;
-
 	return 0;
 }
 

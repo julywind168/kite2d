@@ -32,5 +32,9 @@ ASSERT(int ok, const char * msg) {
 	}
 }
 
+#define R(color) (float)(color>>24) & 0xFF 
+#define G(color) (float)(color>>16) & 0xFF 
+#define B(color) (float)(color>>8) & 0xFF 
+#define A(color) (float)(color) & 0xFF 
 
 #endif

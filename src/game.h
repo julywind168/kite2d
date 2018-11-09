@@ -22,6 +22,8 @@ typedef struct
 	double time;
 	GLFWwindow *window;
 	GLuint program;
+	GLuint transform;
+
 	lua_State *L;
 } Game;
 

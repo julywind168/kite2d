@@ -2,6 +2,8 @@
 #include "game.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
+#include <math.h>
+
 /*
     default:    0,0, 0,1, 1,1, 1,0
     texcoord:   0,0, 0,1, 1,1, 1,0   
@@ -13,24 +15,59 @@
 */
 extern Game *G;
 
+// layout (location = 0) in vec2 origin;
+// layout (location = 1) in vec2 texcoord;
+// layout (location = 2) in vec4 color;
+// layout (location = 3) in vec2 position;
+// layout (location = 4) in vec2 scale;
+// layout (location = 5) in vec1 rotate;
+
+// #define R(color) (float)(color>>24) & 0xFF 
+// #define G(color) (float)(color>>16) & 0xFF 
+// #define B(color) (float)(color>>8) & 0xFF 
+// #define A(color) (float)(color) & 0xFF 
+
 static int
 lsprite(lua_State *L)
 {
+    uint32_t color;
+    float x, y, w, h, r, g, b, a, xs, ys, ro;
     GLuint EBO, VAO, VBO;
 
+    x = luaL_checknumber(L, 1);
+    y = luaL_checknumber(L, 2);
+    w = luaL_checknumber(L, 3);
+    h = luaL_checknumber(L, 4);
+    color = luaL_checkinteger(L, 5);
+    xs = luaL_checknumber(L, 6);
+    ys = luaL_checknumber(L, 7);
+    ro = luaL_checknumber(L, 8) * (M_PI/180);
+
+    r = (color>>24) & 0xFF;
+    g = (color>>16) & 0xFF;
+    b = (color>> 8) & 0xFF;
+    a = (color>> 0) & 0xFF;
+
     float vertices[] = {
-    //  position        texcoord
-        0.0f, 0.0f,     0.0f, 0.0f,
-        0.0f, 1.0f,     0.0f, 1.0f,
-        1.0f, 1.0f,     1.0f, 1.0f,
-        1.0f, 0.0f,     1.0f, 0.0f
+    //  direction     wh    texcoord    color     position  scale   rotate
+        -1.0f,-1.0f,  w,h,  0.0f,0.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
+        -1.0f, 1.0f,  w,h,  0.0f,1.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
+         1.0f, 1.0f,  w,h,  1.0f,1.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
+         1.0f,-1.0f,  w,h,  1.0f,0.0f,  r,g,b,a,  x,y,      xs,ys,  ro
     };
+    
+    // float vertices[] = {
+    // //  direction     texcoord    color     position  scale   rotate
+    //     -1.0f,-1.0f,  0.0f,0.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
+    //     -1.0f, 1.0f,  0.0f,1.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
+    //     1.0f, 1.0f,  1.0f,1.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
+    //     1.0f, -1.0f,  1.0f,0.0f,  r,g,b,a,  x,y,      xs,ys,  ro
+    // };
 
     GLuint indices[] = {
         0,1,2,
         2,3,0
     };
-
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -43,18 +80,41 @@ lsprite(lua_State *L)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    // pos
-    glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,4*sizeof(float),NULL);
+    static uint32_t step = 15 * sizeof(float);
+
+    // direction
+    glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,step,NULL);
     glEnableVertexAttribArray(0);
 
-    // tex
-    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,4*sizeof(float),(void*)(2*sizeof(float)));
+    // wh
+    glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,step,(void*)(2*sizeof(float)));
     glEnableVertexAttribArray(1);
+
+    // texcoord
+    glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,step,(void*)(4*sizeof(float)));
+    glEnableVertexAttribArray(2);
+
+    // color
+    glVertexAttribPointer(3,4,GL_FLOAT,GL_FALSE,step,(void*)(6*sizeof(float)));
+    glEnableVertexAttribArray(3);
+
+    // position
+    glVertexAttribPointer(4,2,GL_FLOAT,GL_FALSE,step,(void*)(10*sizeof(float)));
+    glEnableVertexAttribArray(4);
+
+    // scale
+    glVertexAttribPointer(5,2,GL_FLOAT,GL_FALSE,step,(void*)(12*sizeof(float)));
+    glEnableVertexAttribArray(5);
+
+    // rotate
+    glVertexAttribPointer(6,1,GL_FLOAT,GL_FALSE,step,(void*)(14*sizeof(float)));
+    glEnableVertexAttribArray(6);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
     lua_pushinteger(L, VAO);
+
     return 1;
 }
 
@@ -98,22 +158,20 @@ ltexture2(lua_State *L)
 }
 
 
+static float transform[] = {
+    1, 0, 0, -0.5,
+    0, 1, 0, -0.5,
+    0, 0, 1, 0,
+    0, 0, 0, 1,
+};
+
 static int
 ldraw(lua_State *L) {
     GLuint vao, texture;
     vao = luaL_checkinteger(L, 1);
     texture = luaL_checkinteger(L, 2);
 
-    float transform[] = {
-        1, 0, 0, -0.5,
-        0, 1, 0, -0.5,
-        0, 0, 1, 0,
-        0, 0, 0, 1,
-    };
-
-    glUniformMatrix4fv(glGetUniformLocation(G->program, "transform"), 1, GL_TRUE, transform);
-
-
+    glUniformMatrix4fv(G->transform, 1, GL_TRUE, transform);
     glBindVertexArray(vao);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
