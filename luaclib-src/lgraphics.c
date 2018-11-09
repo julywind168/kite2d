@@ -4,28 +4,9 @@
 #include "stb_image.h"
 #include <math.h>
 
-/*
-    default:    0,0, 0,1, 1,1, 1,0
-    texcoord:   0,0, 0,1, 1,1, 1,0   
 
-    1. width, height
-    2. textureID
-    3. texture_coord
-
-*/
 extern Game *G;
 
-// layout (location = 0) in vec2 origin;
-// layout (location = 1) in vec2 texcoord;
-// layout (location = 2) in vec4 color;
-// layout (location = 3) in vec2 position;
-// layout (location = 4) in vec2 scale;
-// layout (location = 5) in vec1 rotate;
-
-// #define R(color) (float)(color>>24) & 0xFF 
-// #define G(color) (float)(color>>16) & 0xFF 
-// #define B(color) (float)(color>>8) & 0xFF 
-// #define A(color) (float)(color) & 0xFF 
 
 static int
 lsprite(lua_State *L)
@@ -55,14 +36,6 @@ lsprite(lua_State *L)
          1.0f, 1.0f,  w,h,  1.0f,1.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
          1.0f,-1.0f,  w,h,  1.0f,0.0f,  r,g,b,a,  x,y,      xs,ys,  ro
     };
-    
-    // float vertices[] = {
-    // //  direction     texcoord    color     position  scale   rotate
-    //     -1.0f,-1.0f,  0.0f,0.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
-    //     -1.0f, 1.0f,  0.0f,1.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
-    //     1.0f, 1.0f,  1.0f,1.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
-    //     1.0f, -1.0f,  1.0f,0.0f,  r,g,b,a,  x,y,      xs,ys,  ro
-    // };
 
     GLuint indices[] = {
         0,1,2,
@@ -122,20 +95,6 @@ lsprite(lua_State *L)
 static int
 ltexture(lua_State *L)
 {
-    const char *imagename = luaL_checkstring(L, 1);
-    GLuint tx = loadbmp(imagename);
-    if (tx == 0 || tx == 0xFFFFFFFF) {
-        return 0;
-    }
-
-    lua_pushinteger(L, tx);
-    return 1;
-}
-
-
-static int
-ltexture2(lua_State *L)
-{
     const char *filename = luaL_checkstring(L, 1);
     stbi_set_flip_vertically_on_load(true);
 
@@ -158,20 +117,12 @@ ltexture2(lua_State *L)
 }
 
 
-static float transform[] = {
-    1, 0, 0, -0.5,
-    0, 1, 0, -0.5,
-    0, 0, 1, 0,
-    0, 0, 0, 1,
-};
-
 static int
 ldraw(lua_State *L) {
     GLuint vao, texture;
     vao = luaL_checkinteger(L, 1);
     texture = luaL_checkinteger(L, 2);
 
-    glUniformMatrix4fv(G->transform, 1, GL_TRUE, transform);
     glBindVertexArray(vao);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -184,8 +135,7 @@ lib_graphics(lua_State *L)
 {
 	luaL_Reg l[] = {
 		{"sprite", lsprite},
-        {"texture2", ltexture},
-        {"texture", ltexture2},
+        {"texture", ltexture},
         {"draw", ldraw},
 		{NULL, NULL}
 	};

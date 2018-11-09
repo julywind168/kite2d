@@ -7,31 +7,25 @@ local graphics = require "graphics.core"
 local game = {}
 
 
-local sp1, sp2, texture
+local texture
 local sprites = {}
 
 
 function game.init()
-	for i=1,2000 do
-		sprites[i] = graphics.sprite(480, 320, 960, 640, 0xFF0000FF, 1, 1, 0)
-	end
+	sprites[1] = graphics.sprite(480, 320, 960, 640, 0xFF0000FF, 1, 1, 0)
 	texture = graphics.texture("examples/asset/bg.jpg");
 end
 
 
 function game.update(dt)
-	print('fps:', 1//dt)
+	-- print('fps:', 1//dt)
 end
 
 
 function game.draw()
-
-
 	for _,sp in ipairs(sprites) do
 		graphics.draw(sp, texture)	
 	end
-	
-	-- graphics.draw(sp2, texture)
 end
 
 
@@ -58,6 +52,6 @@ end
 
 window('width', 960)
 window('height', 640)
-window('title', 'Fantasy 5000 draw')
+window('title', 'Hello Sprite')
 
 fantasy.start(game)

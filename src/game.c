@@ -254,6 +254,8 @@ on_window_resize(GLFWwindow *window, int width, int height) {
 
 int
 init_opengl(Game *game) {
+	GLuint program, display, camera;
+
 	glfwMakeContextCurrent(game->window);
 	if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		fprintf(stderr, "%s\n", "failed to init glad");
@@ -263,13 +265,18 @@ init_opengl(Game *game) {
 	glViewport(0, 0, game->width, game->height);
 	glfwSetFramebufferSizeCallback(game->window, on_window_resize);
 
-	GLuint program = create_program();
+	program = create_program();
 	glUseProgram(program);
+	display = glGetUniformLocation(program, "display");
+	camera = glGetUniformLocation(program, "camera");
 
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
-	glUniform2ui(glGetUniformLocation(program, "display"), game->width, game->height);
-	glUniform2ui(glGetUniformLocation(program, "camera"),  (uint32_t)game->width/2, (uint32_t)game->height/2);
+	glUniform2ui(display, game->width, game->height);
+	glUniform2ui(camera, (uint32_t)game->width/2, (uint32_t)game->height/2);
+
 	game->program = program;
+	game->display = display;
+	game->camera = camera;
 	return 0;
 }
 

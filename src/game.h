@@ -17,12 +17,13 @@
 
 typedef struct
 {
-	int width;
-	int height;
+	uint32_t width;
+	uint32_t height;
 	double time;
 	GLFWwindow *window;
 	GLuint program;
-	GLuint transform;
+	GLuint display;
+	GLuint camera;
 
 	lua_State *L;
 } Game;

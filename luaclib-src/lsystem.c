@@ -1,5 +1,7 @@
 #include "lsystem.h"
+#include "game.h"
 
+extern Game * G;
 
 static int
 ldisplay(lua_State *L)
@@ -25,12 +27,21 @@ ldisplay(lua_State *L)
 }
 
 
+static int
+ltime(lua_State *L) {
+    lua_pushnumber(L, G->time);
+    return 1;
+}
+
+
+
 int
 lib_system(lua_State *L)
 {
 	luaL_Reg l[] = {
-		{ "display", ldisplay},
-		{ NULL, NULL }
+		{"display", ldisplay},
+        {"time", ltime},
+		{NULL, NULL}
 	};
 	luaL_newlib(L, l);
 	return 1;
