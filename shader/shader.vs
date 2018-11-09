@@ -18,20 +18,19 @@ out vec2 texcoord0;
 
 const vec4 default_v = vec4(0.0, 0.0, 0.0, 1.0);
 
+mat4 trans_mat = mat4(1.0);
+mat4 rota_mat = mat4(1.0);
+
 void main() {
+	
+	trans_mat[0][3] = 2*(position.x + scale.x*direction.x*wh.x/2 - camera.x)/display.x;
+	trans_mat[1][3] = 2*(position.y + scale.y*direction.y*wh.y/2 - camera.y)/display.y;
 
-
-	// 位移
-	mat4 trans_mat = mat4(1.0,  0.0,  0.0,  2*(position.x + scale.x*direction.x*wh.x/2 - camera.x)/display.x,
-					  	  0.0,  1.0,  0.0,  2*(position.y + scale.y*direction.y*wh.y/2 - camera.y)/display.y,
-					  	  0.0,  0.0,  1.0,  0.0,
-					  	  0.0,  0.0,  0.0,  1.0);		 		
-
-	// 旋转
-	mat4 rota_mat = mat4(cos(rotate),  -sin(rotate),  0.0,  0.0,
-					  	 sin(rotate),   cos(rotate),  0.0,  0.0,
-					  	 		 0.0,           0.0,  1.0,  0.0,
-					  	 		 0.0, 		    0.0,  0.0,  1.0);
+	rota_mat[0][0] = cos(rotate);
+	rota_mat[0][1] = -sin(rotate);
+	rota_mat[1][0] = sin(rotate);
+	rota_mat[1][1] = cos(rotate);
+	
 
 	gl_Position = default_v * trans_mat * rota_mat;
 	
