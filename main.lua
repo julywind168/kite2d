@@ -12,10 +12,9 @@ local sprites = {}
 
 
 function game.init()
-	for i=1,5000 do
+	for i=1,1 do
 		sprites[i] = graphics.sprite(480, 320, 960, 640, 0xFF0000FF, 1, 1, 0)
 	end
-	sprites[1] = graphics.sprite(480, 320, 960, 640, 0xFF0000FF, 1, 1, 0)
 	texture = graphics.texture("examples/asset/bg.jpg");
 end
 
