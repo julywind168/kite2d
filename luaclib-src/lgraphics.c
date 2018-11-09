@@ -11,7 +11,7 @@ extern Game *G;
 static int
 lsprite(lua_State *L)
 {
-    uint32_t color;
+    uint32_t c;
     float x, y, w, h, r, g, b, a, xs, ys, ro;
     GLuint EBO, VAO, VBO;
 
@@ -19,15 +19,15 @@ lsprite(lua_State *L)
     y = luaL_checknumber(L, 2);
     w = luaL_checknumber(L, 3);
     h = luaL_checknumber(L, 4);
-    color = luaL_checkinteger(L, 5);
+    c = luaL_checkinteger(L, 5);
     xs = luaL_checknumber(L, 6);
     ys = luaL_checknumber(L, 7);
     ro = luaL_checknumber(L, 8) * (M_PI/180);
 
-    r = (color>>24) & 0xFF;
-    g = (color>>16) & 0xFF;
-    b = (color>> 8) & 0xFF;
-    a = (color>> 0) & 0xFF;
+    r = (c>>24) & 0xFF;
+    g = (c>>16) & 0xFF;
+    b = (c>> 8) & 0xFF;
+    a = (c>> 0) & 0xFF;
 
     float vertices[] = {
     //  direction     wh    texcoord    color     position  scale   rotate
@@ -53,7 +53,7 @@ lsprite(lua_State *L)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    static uint32_t step = 15 * sizeof(float);
+    const static uint32_t step = 15 * sizeof(float);
 
     // direction
     glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,step,NULL);
