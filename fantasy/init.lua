@@ -1,6 +1,6 @@
-require 'fantasy.system'
-require 'fantasy.window'
-
+local core = require "fantasy.core"
+local window = require "fantasy.window"
+local camera = require "fantasy.camera"
 
 local M = {}
 
@@ -46,7 +46,11 @@ local key_event = {
 	'RELEASE'
 }
 
-function M.start(callback)
+function M.start(config, callback)
+	window.init(config.window.width, config.window.height, config.window.title)
+	camera.init(config.camera.x, config.camera.y)
+
+	fantasy.config = config
 	fantasy.init = assert(callback.init)
 	fantasy.draw = assert(callback.draw)
 	fantasy.update = assert(callback.update)

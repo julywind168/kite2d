@@ -1,31 +1,24 @@
-fantasy.window = {
-	x = 0,
-	y = 0,
-	width = 1024,
-	height = 768,
-	title = 'Fantasy',
+local window = {
+	width = nil,
+	height = nil,
+	title = nil,
 }
 
-
-local function set(key, value)
-	assert(fantasy.window[key], string.format("window don't have property:%s.", tostring(key)))
-	assert(type(fantasy.window[key]) == type(value), string.format("invalid type:%s.", type(value)))
-	fantasy.window[key] = value
+fantasy.window = window
+window.__index = window
+window.__newindex = function (_, k, v)
+	-- body
 end
 
 
-local function get(key)
-	return fantasy.window[key]
+
+local M = {}
+
+function M.init(width, height, title)
+	window.width = width
+	window.height = height
+	window.title = title
 end
 
 
-local function window(key, value1, ...)
-	if value1 then
-		set(key, value1, ...)
-	else
-		return get(key)
-	end
-end
-
-
-return window
+return setmetatable(M, window)

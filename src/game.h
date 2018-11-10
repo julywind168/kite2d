@@ -12,19 +12,20 @@
 #include "lualib.h"
 
 
-
-
-
 typedef struct
 {
-	uint32_t width;
-	uint32_t height;
-	double time;
-	GLFWwindow *window;
-	GLuint program;
-	GLuint display;
-	GLuint camera;
+	uint32_t win_width;
+	uint32_t win_height;
+	GLFWwindow *win_handle;
 
+	GLuint program;
+	GLuint camera;
+	GLuint display;
+	
+	uint32_t camera_x;
+	uint32_t camera_y;
+
+	double time;
 	lua_State *L;
 } Game;
 

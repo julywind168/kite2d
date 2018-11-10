@@ -9,34 +9,110 @@ extern Game *G;
 
 
 static int
+lsprite_xy(lua_State *L)
+{
+    GLuint VBO;
+    float xy[2];
+    VBO = luaL_checkinteger(L, 1);
+    xy[0] = luaL_checknumber(L, 2);
+    xy[1] = luaL_checknumber(L, 3);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    for (int i = 0; i < 4; ++i) {
+        glBufferSubData(GL_ARRAY_BUFFER, (i*9+2)*sizeof(float), 2*sizeof(float), &xy);
+    }    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return 0;
+}
+
+
+static int
+lsprite_scale(lua_State *L)
+{
+    GLuint VBO;
+    float scale[2];
+    VBO = luaL_checkinteger(L, 1);
+    scale[0] = luaL_checknumber(L, 2);
+    scale[1] = luaL_checknumber(L, 3);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    for (int i = 0; i < 4; ++i) {
+        glBufferSubData(GL_ARRAY_BUFFER, (i*9+4)*sizeof(float), 2*sizeof(float), &scale);
+    }    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return 0;
+}
+
+
+static int
+lsprite_rotate(lua_State *L)
+{
+    GLuint VBO;
+    float rotate;
+    VBO = luaL_checkinteger(L, 1);
+    rotate = luaL_checknumber(L, 2)*(M_PI/180);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    for (int i = 0; i < 4; ++i) {
+        glBufferSubData(GL_ARRAY_BUFFER, (i*9+5)*sizeof(float), sizeof(float), &rotate);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return 0;
+}
+
+
+static int
+lsprite_texcoord(lua_State *L)
+{
+    GLuint VBO;
+    float texcoord[8];
+    VBO = luaL_checkinteger(L, 1);
+    for (int i = 0; i < 8; ++i) {
+        texcoord[i] = luaL_checknumber(L, i+2);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    for (int i = 0; i < 4; ++i) {
+        glBufferSubData(GL_ARRAY_BUFFER, (i*9+7)*sizeof(float), 2*sizeof(float), &texcoord+i*2);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return 0;
+}
+
+
+static int
 lsprite(lua_State *L)
 {
-    uint32_t c;
-    float x, y, w, h, r, g, b, a, xs, ys, ro;
+    float x, y, sx, sy, ro;
+    float texcoord[8];
     GLuint EBO, VAO, VBO;
 
-    x = luaL_checknumber(L, 1);
-    y = luaL_checknumber(L, 2);
-    w = luaL_checknumber(L, 3);
-    h = luaL_checknumber(L, 4);
-    c = luaL_checkinteger(L, 5);
-    xs = luaL_checknumber(L, 6);
-    ys = luaL_checknumber(L, 7);
-    ro = luaL_checknumber(L, 8) * (M_PI/180);
+    x = luaL_checkinteger(L, 1);
+    y = luaL_checkinteger(L, 2);
+    sx = luaL_checknumber(L, 3);
+    sy = luaL_checknumber(L, 4);
+    ro = luaL_checknumber(L, 5) * (M_PI/180);
 
-    r = (c>>24) & 0xFF;
-    g = (c>>16) & 0xFF;
-    b = (c>> 8) & 0xFF;
-    a = (c>> 0) & 0xFF;
+    texcoord[0] = luaL_optnumber(L, 6, 0.0f);
+    texcoord[1] = luaL_optnumber(L, 7, 0.0f);
+
+    texcoord[2] = luaL_optnumber(L, 8, 0.0f);
+    texcoord[3] = luaL_optnumber(L, 9, 1.0f);
+    
+    texcoord[4] = luaL_optnumber(L, 10, 1.0f);
+    texcoord[5] = luaL_optnumber(L, 11, 1.0f);
+    
+    texcoord[6] = luaL_optnumber(L, 12, 1.0f);
+    texcoord[7] = luaL_optnumber(L, 13, 0.0f);
+
 
     float vertices[] = {
-    //  direction     wh    texcoord    color     position  scale   rotate
-        -1.0f,-1.0f,  w,h,  0.0f,0.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
-        -1.0f, 1.0f,  w,h,  0.0f,1.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
-         1.0f, 1.0f,  w,h,  1.0f,1.0f,  r,g,b,a,  x,y,      xs,ys,  ro,
-         1.0f,-1.0f,  w,h,  1.0f,0.0f,  r,g,b,a,  x,y,      xs,ys,  ro
+    //  direction     position   scale   rotate texcoord
+        -1.0f,-1.0f,  x,y,       sx,sy,  ro,    texcoord[0],texcoord[1],
+        -1.0f, 1.0f,  x,y,       sx,sy,  ro,    texcoord[2],texcoord[3],
+         1.0f, 1.0f,  x,y,       sx,sy,  ro,    texcoord[4],texcoord[5],
+         1.0f,-1.0f,  x,y,       sx,sy,  ro,    texcoord[6],texcoord[7]  
     };
-
+    
     GLuint indices[] = {
         0,1,2,
         2,3,0
@@ -47,48 +123,40 @@ lsprite(lua_State *L)
 
     glGenBuffers(1, &VBO);
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_DYNAMIC_DRAW);
 
     glGenBuffers(1, &EBO);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
-    const static uint32_t step = 15 * sizeof(float);
+    const static uint32_t step = 9 * sizeof(float);
 
     // direction
     glVertexAttribPointer(0,2,GL_FLOAT,GL_FALSE,step,NULL);
     glEnableVertexAttribArray(0);
 
-    // wh
+    // transform
     glVertexAttribPointer(1,2,GL_FLOAT,GL_FALSE,step,(void*)(2*sizeof(float)));
     glEnableVertexAttribArray(1);
 
-    // texcoord
+    // scale
     glVertexAttribPointer(2,2,GL_FLOAT,GL_FALSE,step,(void*)(4*sizeof(float)));
     glEnableVertexAttribArray(2);
 
-    // color
-    glVertexAttribPointer(3,4,GL_FLOAT,GL_FALSE,step,(void*)(6*sizeof(float)));
+    // rotate
+    glVertexAttribPointer(3,1,GL_FLOAT,GL_FALSE,step,(void*)(6*sizeof(float)));
     glEnableVertexAttribArray(3);
 
-    // position
-    glVertexAttribPointer(4,2,GL_FLOAT,GL_FALSE,step,(void*)(10*sizeof(float)));
+    // texcoord
+    glVertexAttribPointer(4,2,GL_FLOAT,GL_FALSE,step,(void*)(7*sizeof(float)));
     glEnableVertexAttribArray(4);
-
-    // scale
-    glVertexAttribPointer(5,2,GL_FLOAT,GL_FALSE,step,(void*)(12*sizeof(float)));
-    glEnableVertexAttribArray(5);
-
-    // rotate
-    glVertexAttribPointer(6,1,GL_FLOAT,GL_FALSE,step,(void*)(14*sizeof(float)));
-    glEnableVertexAttribArray(6);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
     lua_pushinteger(L, VAO);
-
-    return 1;
+    lua_pushinteger(L, VBO);
+    return 2;
 }
 
 
@@ -134,7 +202,11 @@ int
 lib_graphics(lua_State *L)
 {
 	luaL_Reg l[] = {
-		{"sprite", lsprite},
+        {"sprite_xy", lsprite_xy},
+        {"sprite_scale", lsprite_scale},
+        {"sprite_rotate", lsprite_rotate},
+        {"sprite_texcoord", lsprite_texcoord},
+        {"sprite", lsprite},
         {"texture", ltexture},
         {"draw", ldraw},
 		{NULL, NULL}

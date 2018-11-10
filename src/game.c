@@ -2,6 +2,7 @@
 #include "game.h"
 #include "lsystem.h"
 #include "lgraphics.h"
+#include "lfantasy.h"
 
 #define FANTASY_INIT 1
 #define FANTASY_UPDATE 2
@@ -121,7 +122,7 @@ fantasy_init() {
 void
 game_start(Game *game) {
 	double now, dt;
-	GLFWwindow *window = game->window;
+	GLFWwindow *window = game->win_handle;
 
 
 	glfwSetKeyCallback(window, fantasy_keyboard);
@@ -177,11 +178,12 @@ create_lua(Game *game, const char *filename) {
 	lua_State *L = luaL_newstate();
 	luaL_openlibs(L);
 
+	luaL_requiref(L, "fantasy.core", lib_fantasy, 0);
+	lua_pop(L, 1);
 	luaL_requiref(L, "system.core", lib_system, 0);
 	lua_pop(L, 1);
 	luaL_requiref(L, "graphics.core", lib_graphics, 0);
 	lua_pop(L, 1);
-
 
 	lua_newtable(L);
 	lua_setglobal(L, "fantasy");
@@ -238,6 +240,7 @@ create_lua(Game *game, const char *filename) {
 static void
 init_glfw() {
 	glfwInit();
+	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
@@ -256,24 +259,25 @@ int
 init_opengl(Game *game) {
 	GLuint program, display, camera;
 
-	glfwMakeContextCurrent(game->window);
+	glfwMakeContextCurrent(game->win_handle);
 	if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
 		fprintf(stderr, "%s\n", "failed to init glad");
 		return 1;
 	}
 
-	glViewport(0, 0, game->width, game->height);
-	glfwSetFramebufferSizeCallback(game->window, on_window_resize);
+	glViewport(0, 0, game->win_width, game->win_height);
+	glfwSetFramebufferSizeCallback(game->win_handle, on_window_resize);
 
 	program = create_program();
 	glUseProgram(program);
+	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
+
 	display = glGetUniformLocation(program, "display");
 	camera = glGetUniformLocation(program, "camera");
 
-	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
-	glUniform2ui(display, game->width, game->height);
-	glUniform2ui(camera, (uint32_t)game->width/2, (uint32_t)game->height/2);
-
+	glUniform2ui(display, game->win_width, game->win_height);
+	glUniform2ui(camera, (GLuint)game->win_width/2, (GLuint)game->win_height/2);
+	
 	game->program = program;
 	game->display = display;
 	game->camera = camera;
@@ -330,9 +334,9 @@ create_window(Game *game) {
 	const GLFWvidmode *display = glfwGetVideoMode(monitor[0]);
 	glfwSetWindowPos(window, display->width/2 + x - width/2, display->height/2 + y - height/2);
 
-	game->width = width;
-	game->height = height;
-	game->window = window;
+	game->win_width = width;
+	game->win_height = height;
+	game->win_handle = window;
 	return 0;
 }
 

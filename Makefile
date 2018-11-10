@@ -8,6 +8,7 @@ SRC := \
 
 
 LUACLIB := \
+	luaclib-src/lfantasy.c \
 	luaclib-src/lsystem.c \
 	luaclib-src/lgraphics.c \
 

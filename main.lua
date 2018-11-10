@@ -1,44 +1,42 @@
 local fantasy = require "fantasy"
-local window = require "fantasy.window"
-local system = require "fantasy.system"
-local graphics = require "graphics.core"
+local ecs = require "ecs"
+local render_system = require "ecs.systems.Render"
+local Node = require "ecs.components.Node"
+local Sprite = require "ecs.components.Sprite"
 
+local world
 
 local game = {}
 
-
-local texture
-local sprites = {}
-
-
 function game.init()
-	for i=1,1 do
-		sprites[i] = graphics.sprite(480, 320, 960, 640, 0xFF0000FF, 1, 1, 0)
-	end
-	texture = graphics.texture("examples/asset/bg.jpg");
+
+	world = ecs.world('game')
+
+	local bg = ecs.entity()
+	bg('add', Node, {x=480, y=320, width=960, height=640})
+	bg('add', Sprite, {texture='examples/asset/bg.jpg'})
+
+	local tree = {bg}
+
+	world.add_system(render_system(tree))
 end
 
 
 function game.update(dt)
-	print('fps:', 1//dt)
+	world('update', dt)
 end
 
 
 function game.draw()
-	for _,sp in ipairs(sprites) do
-		graphics.draw(sp, texture)	
-	end
+	world('draw')
 end
 
 
 function game.mouse(what, x, y, who) -- 'PRESS'/'RELEASE/MOVE' 0, 0, 'LEFT'/'RIGHT'(on windows)
-	if what == 'MOVE' then return end
-	print('mouse:', what, x, y, who)
 end
 
 
 function game.keyboard(key, what)	-- 'a', 'PRESS'/'RELEASE'
-	print('key', key, what)
 end
 
 
@@ -52,8 +50,16 @@ function game.exit()
 end
 
 
-window('width', 960)
-window('height', 640)
-window('title', 'Hello Sprite')
+local config = {
+	window = {
+		width = 960,
+		height = 640,
+		title = 'Hello ECS'
+	},
+	camera = {
+		x = 480,
+		y = 320
+	}
+}
 
-fantasy.start(game)
+fantasy.start(config, game)
