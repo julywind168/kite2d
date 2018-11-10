@@ -10,7 +10,7 @@ out vec2 texcoord0;
 
 
 uniform uvec2 display;	// 屏幕宽高
-uniform uvec2 camera;	// 相机位置
+uniform vec2 camera;	// 相机位置
 
 
 mat4 scale_mat = mat4(1.0);

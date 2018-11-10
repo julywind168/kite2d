@@ -141,21 +141,6 @@ game_start(Game *game) {
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		fantasy_draw();
-			/*
-			glBindVertexArray(fantasy->VAO);
-				vao:[
-					0,	 0
-					0,	 960
-					640, 960
-					640, 0
-				]
-			
-
-			glBindTexture(GL_TEXTURE_2D, fantasy->texture[0]);
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-			*/
-		//draw end
-
 
 		glfwPollEvents();
 		glfwSwapBuffers(window);
@@ -258,6 +243,21 @@ on_window_resize(GLFWwindow *window, int width, int height) {
 int
 init_opengl(Game *game) {
 	GLuint program, display, camera;
+	float camera_x, camera_y;
+
+	lua_State *L = game->L;
+	lua_getglobal(L, "fantasy");
+	lua_pushliteral(L, "camera");
+	lua_gettable(L, -2);
+	lua_pushliteral(L, "x");
+	lua_gettable(L, -2);
+	camera_x = lua_tonumber(L, -1);
+	lua_pop(L, 1);
+
+	lua_pushliteral(L, "y");
+	lua_gettable(L, -2);
+	camera_y = lua_tonumber(L, -1);
+	lua_pop(L, 3);
 
 	glfwMakeContextCurrent(game->win_handle);
 	if(!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
@@ -276,7 +276,7 @@ init_opengl(Game *game) {
 	camera = glGetUniformLocation(program, "camera");
 
 	glUniform2ui(display, game->win_width, game->win_height);
-	glUniform2ui(camera, (GLuint)game->win_width/2, (GLuint)game->win_height/2);
+	glUniform2f(camera, camera_x, camera_y);
 	
 	game->program = program;
 	game->display = display;

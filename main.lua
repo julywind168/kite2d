@@ -11,14 +11,16 @@ local game = {}
 function game.init()
 
 	world = ecs.world('game')
+	world.add_system(render_system())
 
-	local bg = ecs.entity()
-	bg('add', Node, {x=480, y=320, width=960, height=640})
-	bg('add', Sprite, {texture='examples/asset/bg.jpg'})
+	world.join(ecs.entity()
+		('add',Node,{x=480,y=320,width=960,height=640})
+		('add',Sprite,{texture='examples/asset/bg.jpg'}))
 
-	local tree = {bg}
+	world.join(ecs.entity()
+		('add',Node,{x=480,y=320,width=300,height=300})
+		('add',Sprite,{texture='examples/asset/smlie.jpg'}))
 
-	world.add_system(render_system(tree))
 end
 
 

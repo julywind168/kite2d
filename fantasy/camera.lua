@@ -16,6 +16,7 @@ local M = {}
 function M.init(x,y)
 	camera.x = x
 	camera.y = y
+	print('camera',x,y)
 end
 
 

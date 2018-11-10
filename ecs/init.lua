@@ -58,6 +58,7 @@ function ecs.entity(e, name)
 			local node_name, node = comp(e, ...)
 			assert(e[node_name] == nil, 'already has this component: '..tostring(node_name))
 			e[node_name] = node
+			return e
 		end
 	}
 
