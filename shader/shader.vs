@@ -22,8 +22,8 @@ void main() {
 	scale_mat[0][0] = scale.x;
 	scale_mat[1][1] = scale.y;
 
-	trans_mat[0][3] = 2*(position.x - camera.x)/display.x;
-	trans_mat[1][3] = 2*(position.y - camera.y)/display.y;
+	trans_mat[0][3] = 2*(floor(position.x) - camera.x)/display.x;
+	trans_mat[1][3] = 2*(floor(position.y) - camera.y)/display.y;
 
 	rota_mat[0][0] = cos(rotate);
 	rota_mat[0][1] = -sin(rotate);

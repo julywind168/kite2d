@@ -9,17 +9,16 @@ extern Game *G;
 
 
 static int
-lsprite_xy(lua_State *L)
+lsprite_x(lua_State *L)
 {
     GLuint VBO;
-    float xy[2];
+    float x;
     VBO = luaL_checkinteger(L, 1);
-    xy[0] = luaL_checknumber(L, 2);
-    xy[1] = luaL_checknumber(L, 3);
+    x = luaL_checknumber(L, 2);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     for (int i = 0; i < 4; ++i) {
-        glBufferSubData(GL_ARRAY_BUFFER, (i*9+2)*sizeof(float), 2*sizeof(float), &xy);
+        glBufferSubData(GL_ARRAY_BUFFER, (i*9+2)*sizeof(float), sizeof(float), &x);
     }    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     return 0;
@@ -27,21 +26,55 @@ lsprite_xy(lua_State *L)
 
 
 static int
-lsprite_scale(lua_State *L)
+lsprite_y(lua_State *L)
 {
     GLuint VBO;
-    float scale[2];
+    float y;
     VBO = luaL_checkinteger(L, 1);
-    scale[0] = luaL_checknumber(L, 2);
-    scale[1] = luaL_checknumber(L, 3);
+    y = luaL_checknumber(L, 2);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     for (int i = 0; i < 4; ++i) {
-        glBufferSubData(GL_ARRAY_BUFFER, (i*9+4)*sizeof(float), 2*sizeof(float), &scale);
+        glBufferSubData(GL_ARRAY_BUFFER, (i*9+3)*sizeof(float), sizeof(float), &y);
     }    
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     return 0;
 }
+
+
+static int
+lsprite_scalex(lua_State *L)
+{
+    GLuint VBO;
+    float scalex;
+    VBO = luaL_checkinteger(L, 1);
+    scalex = luaL_checknumber(L, 2);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    for (int i = 0; i < 4; ++i) {
+        glBufferSubData(GL_ARRAY_BUFFER, (i*9+4)*sizeof(float), sizeof(float), &scalex);
+    }    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return 0;
+}
+
+
+static int
+lsprite_scaley(lua_State *L)
+{
+    GLuint VBO;
+    float scaley;
+    VBO = luaL_checkinteger(L, 1);
+    scaley = luaL_checknumber(L, 2);
+
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
+    for (int i = 0; i < 4; ++i) {
+        glBufferSubData(GL_ARRAY_BUFFER, (i*9+5)*sizeof(float), sizeof(float), &scaley);
+    }    
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    return 0;
+}
+
 
 
 static int
@@ -168,7 +201,7 @@ ltexture(lua_State *L)
 
     GLuint texture;
     int width, height, channel;
-    unsigned char *data = stbi_load(filename, &width, &height, &channel, 0);
+    unsigned char *data = stbi_load(filename, &width, &height, &channel, STBI_rgb_alpha);
 
     glGenTextures(1, &texture);
     glBindTexture(GL_TEXTURE_2D, texture);
@@ -176,7 +209,13 @@ ltexture(lua_State *L)
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+
+    // if (channel == 3){
+    //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+    // } else if (channel == 4) {
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    // } else
+    //     ASSERT(0, filename);
     stbi_image_free(data);
     glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -202,8 +241,10 @@ int
 lib_graphics(lua_State *L)
 {
 	luaL_Reg l[] = {
-        {"sprite_xy", lsprite_xy},
-        {"sprite_scale", lsprite_scale},
+        {"sprite_x", lsprite_x},
+        {"sprite_y", lsprite_y},
+        {"sprite_scalex", lsprite_scalex},
+        {"sprite_scaley", lsprite_scaley},
         {"sprite_rotate", lsprite_rotate},
         {"sprite_texcoord", lsprite_texcoord},
         {"sprite", lsprite},

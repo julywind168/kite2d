@@ -27,6 +27,7 @@ function ecs.world(name)
 	
 	function self.join(e)
 		dispatch('entity_join', e)
+		return e
 	end
 
 	function self.leave(e)

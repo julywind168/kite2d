@@ -2,13 +2,6 @@ local graphics = require "fantasy.graphics"
 local window = require "fantasy.window"
 
 
-
---[[
-	--system.render
-	记录node 上次的信息
-	draw 的时候检查属性是否变化
-
-]]
 return function()
 
 	local self = {}
@@ -19,14 +12,15 @@ return function()
 	-- 事件处理
 	local handler = {}
 
-	function handler.draw()
+	function handler.update(dt)
 		for _,sp in ipairs(sprites) do
-			graphics.draw(sp('vao'), sp('texture'))
+			sp.node.x = sp.node.x + dt*sp.speed.x
+			sp.node.y = sp.node.y + dt*sp.speed.y
 		end
 	end
 
 	function handler.entity_join(e)
-		if e('vao') then
+		if e.speed then
 			table.insert(sprites, e)
 		end
 	end

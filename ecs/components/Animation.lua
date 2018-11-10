@@ -2,10 +2,16 @@ local graphics = require "fantasy.graphics"
 local window = require "fantasy.window"
 
 
-return function (entity, comp)
-
+return function (entity, t)
+	local meta = {
+		frames = assert(t.frames),
+		isloop = assert(t.isloop),
+		interval = assert(t.interval)
+	}
+ 	
+ 	local animation = {'frames', 'isloop', 'interval'}
+	
 	local node = assert(entity.node, 'must need node component')
-
 	local vao, vbo = graphics.sprite(
 		node.x, node.y,
 		node.scalex*node.width/window.width,
@@ -14,14 +20,11 @@ return function (entity, comp)
 		texcoord and table.unpack(texcoord))
 
 
-	local sprite = {
-		texture = graphics.texture(comp.texture),
-		texcoord = comp.texcoord or {0,0, 0,1, 1,1, 1,0} ,
-	}
-
 	entity('vao', vao)
 	entity('vbo', vbo)
-	entity('texture', sprite.texture)
+	entity('texture', t.frames[1])
 
-	return 'sprite', sprite
+	return 'animation', setmetatable(animation, {__index = meta, __newindex = function (_, k, v)
+		meta[k] = v
+	end})
 end

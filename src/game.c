@@ -234,6 +234,7 @@ init_glfw() {
 
 static void
 on_window_resize(GLFWwindow *window, int width, int height) {
+	printf("window resize %d %d\n", width, height);
 	glViewport(0, 0, width, height);
 }
 
@@ -264,6 +265,8 @@ init_opengl(Game *game) {
 		fprintf(stderr, "%s\n", "failed to init glad");
 		return 1;
 	}
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glViewport(0, 0, game->win_width, game->win_height);
 	glfwSetFramebufferSizeCallback(game->win_handle, on_window_resize);

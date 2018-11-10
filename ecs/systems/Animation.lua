@@ -2,32 +2,36 @@ local graphics = require "fantasy.graphics"
 local window = require "fantasy.window"
 
 
-
---[[
-	--system.render
-	记录node 上次的信息
-	draw 的时候检查属性是否变化
-
-]]
 return function()
 
 	local self = {}
 
 	local sprites = {}
+	local infos = {}
 
 
 	-- 事件处理
 	local handler = {}
 
-	function handler.draw()
+	function handler.update(dt)
 		for _,sp in ipairs(sprites) do
-			graphics.draw(sp('vao'), sp('texture'))
+			local info = infos[sp]
+			info.dt = info.dt + dt
+			if info.dt >= sp.animation.interval then
+				info.dt = info.dt - sp.animation.interval
+				info.current = info.current + 1
+				if info.current > #sp.animation.frames then
+					info.current = 1
+				end
+				sp('texture', sp.animation.frames[info.current])
+			end
 		end
 	end
 
 	function handler.entity_join(e)
-		if e('vao') then
+		if e.animation then
 			table.insert(sprites, e)
+			infos[e] = {dt = 0, current = 1}
 		end
 	end
 
