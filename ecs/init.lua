@@ -1,13 +1,11 @@
 local idpool = require "ecs.idpool"
+local flag = require "ecs.flag"
 
 local ecs = {
 	worlds = {}
 }
 
 
-
--- new a world
--- call is mean send event
 function ecs.world(name)
 	local self = {
 		name = name,
@@ -21,17 +19,34 @@ function ecs.world(name)
 		end
 	end
 
-	function self.add_system(sys)
-		table.insert(self.systems, sys)
+	function self.add_system(create_sys, ...)
+		table.insert(self.systems, create_sys(...))
+	end
+
+	function self.remove_system(system)
+		for _,sys in ipairs(self.systems) do
+			if sys == system then
+				table.remove(self.systems, i)
+				break
+			end
+		end
 	end
 	
-	function self.join(e)
-		dispatch('entity_join', e)
+	function self.add_entity(e)
+		table.insert(self.entities, e)
+		e.world = self.name
+		dispatch('e_join', e)
+		for _,com in ipairs(e.components) do
+			dispatch(com.type..'_create', com, e)
+		end
 		return e
 	end
 
-	function self.leave(e)
-		dispatch('entity_leave', e)
+	function self.remove_entity(e)
+		dispatch('e_leave', e)
+		for _,com in ipairs(e.components) do
+			dispatch(com.type..'_destroy', com, e)
+		end
 	end
 
 	ecs.worlds[name] = self
@@ -42,39 +57,33 @@ function ecs.world(name)
 end
 
 
--- new a entity
---[[
-	local hero = ecs.entity({}, 'hero')
-	hero('add', Node, {x=0,y=0})
-]]
-function ecs.entity(e, name)
-
+function ecs.entity(name, e)
 	e = e or {}
+	e.id = idpool.get_one()
+	e.name = name
+	e.world = nil
 
-	local meta = {
-		id = idpool.get_one(),
-		name = name,
-		world = nil,
-		add = function (comp, ...)
-			local node_name, node = comp(e, ...)
-			assert(e[node_name] == nil, 'already has this component: '..tostring(node_name))
-			e[node_name] = node
-			return e
-		end
-	}
+	e.components = {}
+	e.named = {}
 
-	return setmetatable(e, {__call = function (_, k, v, ...) 
-		local what = meta[k]
-		if what and type(what) == 'function' then
-			return what(v, ...)
-		else
-			if v then
-				meta[k] = v
-			else
-				return what
-			end
+	function e.add(com)
+		table.insert(e.components, com)
+		if com.name then
+			e.named[com.name] = com
 		end
-	end})
+
+		local world = e.world and ecs.worlds[e.world]
+		if world then
+			world(com.type..'_create', com)
+		end
+		return e
+	end
+
+	function e.find(com_name)
+		return e.named[com_name]
+	end
+
+	return e
 end
 
 

@@ -6,7 +6,7 @@ return function()
 
 	local self = {}
 
-	local sprites = {}
+	local entities = {}
 	local infos = {}
 
 
@@ -14,28 +14,37 @@ return function()
 	local handler = {}
 
 	function handler.update(dt)
-		for _,sp in ipairs(sprites) do
-			local info = infos[sp]
-			info.dt = info.dt + dt
-			if info.dt >= sp.animation.interval then
-				info.dt = info.dt - sp.animation.interval
-				info.current = info.current + 1
-				if info.current > #sp.animation.frames then
-					info.current = 1
+		
+		for e,_ in pairs(entities) do
+			for i=#e.components,1,-1 do
+				local ani = e.components[i]
+				if ani.type == 'animation' then
+					if ani.current == #ani.frames and ani.isloop == false then
+						-- pass
+					elseif ani.pause == true then
+						-- pass
+					else
+						ani.dt = ani.dt + dt
+						if ani.dt >= ani.interval then
+							ani.frames[ani.current].active = false
+							ani.current = ani.current + 1
+							ani.dt = ani.dt - ani.interval
+							if ani.current > #ani.frames then
+								ani.current = 1
+							end
+							ani.frames[ani.current].active = true
+						end
+					end			
 				end
-				sp('texture', sp.animation.frames[info.current])
 			end
 		end
 	end
 
-	function handler.entity_join(e)
-		if e.animation then
-			table.insert(sprites, e)
-			infos[e] = {dt = 0, current = 1}
-		end
+	function handler.animation_create(ani, e)
+		entities[e] = true
 	end
 
-	function handler.entity_leave(e)
+	function handler.animation_destroy(ani, e)
 	end
 
 	return setmetatable(self, {__call = function (_, event, ...)

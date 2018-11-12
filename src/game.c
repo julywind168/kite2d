@@ -3,6 +3,8 @@
 #include "lsystem.h"
 #include "lgraphics.h"
 #include "lfantasy.h"
+#include "lwindow.h"
+#include "lcamera.h"
 
 #define FANTASY_INIT 1
 #define FANTASY_UPDATE 2
@@ -169,6 +171,10 @@ create_lua(Game *game, const char *filename) {
 	lua_pop(L, 1);
 	luaL_requiref(L, "graphics.core", lib_graphics, 0);
 	lua_pop(L, 1);
+	luaL_requiref(L, "window.core", lib_window, 0);
+	lua_pop(L, 1);
+	luaL_requiref(L, "camera.core", lib_camera, 0);
+	lua_pop(L, 1);
 
 	lua_newtable(L);
 	lua_setglobal(L, "fantasy");
@@ -243,7 +249,7 @@ on_window_resize(GLFWwindow *window, int width, int height) {
 
 int
 init_opengl(Game *game) {
-	GLuint program, display, camera;
+	GLuint program, window, camera;
 	float camera_x, camera_y;
 
 	lua_State *L = game->L;
@@ -275,14 +281,16 @@ init_opengl(Game *game) {
 	glUseProgram(program);
 	glUniform1i(glGetUniformLocation(program, "texture0"), 0);
 
-	display = glGetUniformLocation(program, "display");
+	window = glGetUniformLocation(program, "window");
 	camera = glGetUniformLocation(program, "camera");
 
-	glUniform2ui(display, game->win_width, game->win_height);
+	glUniform2ui(window, game->win_width, game->win_height);
 	glUniform2f(camera, camera_x, camera_y);
 	
+	game->camera_x = camera_x;
+	game->camera_y = camera_y;
 	game->program = program;
-	game->display = display;
+	game->window = window;
 	game->camera = camera;
 	return 0;
 }
@@ -293,7 +301,9 @@ create_window(Game *game) {
 
 	const char *title;
 	int x, y;
-	int width, height;
+	int width, height, fullscreen;
+	GLFWmonitor *monitor0;
+	GLFWwindow *window;
 
 	lua_State *L = game->L;
 	lua_getglobal(L, "fantasy");
@@ -308,6 +318,11 @@ create_window(Game *game) {
 	lua_pushliteral(L, "height");
 	lua_gettable(L, -2);
 	height = luaL_optinteger(L, -1, 768);
+	lua_pop(L, 1);
+
+	lua_pushliteral(L, "fullscreen");
+	lua_gettable(L, -2);
+	fullscreen = lua_toboolean(L, -1);
 	lua_pop(L, 1);
 
 	lua_pushliteral(L, "x");
@@ -325,21 +340,42 @@ create_window(Game *game) {
 	title = luaL_optstring(L, -1, "Fantasy");
 	lua_pop(L, 3);
 
-	GLFWwindow *window = glfwCreateWindow(width, height, title, NULL, NULL);
+	int count;
+	GLFWmonitor **monitor =  glfwGetMonitors(&count);
+	assert(count > 0);
+	monitor0 = monitor[0];
+
+	const GLFWvidmode *display = glfwGetVideoMode(monitor0);
+
+	glfwWindowHint(GLFW_RED_BITS, display->redBits);
+	glfwWindowHint(GLFW_GREEN_BITS, display->greenBits);
+	glfwWindowHint(GLFW_BLUE_BITS, display->blueBits);
+	glfwWindowHint(GLFW_REFRESH_RATE, display->refreshRate);
+
+	if (fullscreen) {
+		width = display->width;
+		height = display->height;
+		window = glfwCreateWindow(width, height, title, monitor0, NULL);
+	} else
+		window = glfwCreateWindow(width, height, title, NULL, NULL);
+	
 	if (!window) {
 		fprintf(stderr, "%s\n", "failed to create window");
 		return 1;
 	}
 
-	int count;
-	GLFWmonitor **monitor =  glfwGetMonitors(&count);
-	assert(count > 0);
-	const GLFWvidmode *display = glfwGetVideoMode(monitor[0]);
 	glfwSetWindowPos(window, display->width/2 + x - width/2, display->height/2 + y - height/2);
 
+	game->display = display;
+	game->monitor = monitor0;
+
+	game->win_x = x;
+	game->win_y = y;
 	game->win_width = width;
 	game->win_height = height;
 	game->win_handle = window;
+
+	printf("window width:%d height:%d\n", width, height);
 	return 0;
 }
 
@@ -353,16 +389,18 @@ create_game(const char *filename) {
 		free(game);
 		return NULL;
 	}
-
+	printf("create lua success\n");
 	if(create_window(game)) {
 		destroy_game(game);
 		return NULL;
 	}
+	printf("create window success\n");
 
 	if(init_opengl(game)) {
 		destroy_game(game);
 		return NULL;
 	}
+	printf("inti opengl success\n");
 
 	G = game;
 	return game;

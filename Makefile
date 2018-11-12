@@ -9,6 +9,8 @@ SRC := \
 
 LUACLIB := \
 	luaclib-src/lfantasy.c \
+	luaclib-src/lwindow.c \
+	luaclib-src/lcamera.c \
 	luaclib-src/lsystem.c \
 	luaclib-src/lgraphics.c \
 

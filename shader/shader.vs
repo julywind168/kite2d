@@ -9,7 +9,7 @@ layout (location = 4) in vec2 texcoord;
 out vec2 texcoord0;
 
 
-uniform uvec2 display;	// 屏幕宽高
+uniform uvec2 window;	// 窗口宽高
 uniform vec2 camera;	// 相机位置
 
 
@@ -22,8 +22,8 @@ void main() {
 	scale_mat[0][0] = scale.x;
 	scale_mat[1][1] = scale.y;
 
-	trans_mat[0][3] = 2*(floor(position.x) - camera.x)/display.x;
-	trans_mat[1][3] = 2*(floor(position.y) - camera.y)/display.y;
+	trans_mat[0][3] = 2*(floor(position.x) - camera.x)/window.x;
+	trans_mat[1][3] = 2*(floor(position.y) - camera.y)/window.y;
 
 	rota_mat[0][0] = cos(rotate);
 	rota_mat[0][1] = -sin(rotate);

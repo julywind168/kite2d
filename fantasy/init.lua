@@ -2,9 +2,6 @@ local core = require "fantasy.core"
 local window = require "fantasy.window"
 local camera = require "fantasy.camera"
 
-local M = {}
-
-
 local mouse_name = {
 	'LEFT',
 	'RIGHT'
@@ -46,9 +43,9 @@ local key_event = {
 	'RELEASE'
 }
 
-function M.start(config, callback)
-	window.init(config.window.width, config.window.height, config.window.title)
-	camera.init(config.camera.x, config.camera.y)
+function fantasy.start(config, callback)
+	window.init(config.window)
+	camera.init(config.camera)
 
 	fantasy.config = config
 	fantasy.init = assert(callback.init)
@@ -73,4 +70,5 @@ function M.start(config, callback)
 end
 
 
-return M
+
+return setmetatable(fantasy, {__index = core})

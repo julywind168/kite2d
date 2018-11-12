@@ -12,7 +12,6 @@ ltime(lua_State *L) {
 }
 
 
-
 int
 lib_fantasy(lua_State *L)
 {

@@ -1,5 +1,4 @@
 local core = require "graphics.core"
-local display = fantasy.window
 
 
 local M = {}

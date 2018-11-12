@@ -1,12 +1,11 @@
-return function (entity, t)
-	local meta = {
+return function (t)
+	local speed = {
+		type = 'speed',
+		name = t.name,
 		x = t.x or 0,
-		y = t.y or 0,
+		y = t.y or 0
 	}
- 	
- 	local speed = {'x', 'y'}
 
-	return 'speed', setmetatable(speed, {__index = meta, __newindex = function (_, k, v)
-		meta[k] = v
-	end})
+
+	return speed
 end

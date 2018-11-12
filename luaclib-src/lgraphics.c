@@ -208,17 +208,10 @@ ltexture(lua_State *L)
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-
-    // if (channel == 3){
-    //     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
-    // } else if (channel == 4) {
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    // } else
-    //     ASSERT(0, filename);
-    stbi_image_free(data);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    
     glBindTexture(GL_TEXTURE_2D, 0);
-
+    stbi_image_free(data);
     lua_pushinteger(L, texture);
     return 1;
 }

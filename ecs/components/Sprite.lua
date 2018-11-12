@@ -2,26 +2,23 @@ local graphics = require "fantasy.graphics"
 local window = require "fantasy.window"
 
 
-return function (entity, comp)
-
-	local node = assert(entity.node, 'must need node component')
-
-	local vao, vbo = graphics.sprite(
-		node.x, node.y,
-		node.scalex*node.width/window.width,
-		node.scaley*node.height/window.height,
-		node.rotate,
-		texcoord and table.unpack(texcoord))
-
-
+return function (t)
 	local sprite = {
-		texture = graphics.texture(comp.texture),
-		texcoord = comp.texcoord or {0,0, 0,1, 1,1, 1,0} ,
+		type = 'sprite',
+		name = t.name,
+		active = (t.active ~= false) and true or false,
+		x = assert(t.x),
+		y = assert(t.y),
+		z = t.z or 1,
+		width = assert(t.width),
+		height = assert(t.height),
+		scalex = t.scalex or 1,
+		scaley = t.scaley or 1,
+		rotate = t.rotate or 0,
+		texname = t.texname,
+		texcoord = t.texcoord or {0,0, 0,1, 1,1, 1,0}
+		-- color = t.color or 0XFFFFFFFF,
 	}
 
-	entity('vao', vao)
-	entity('vbo', vbo)
-	entity('texture', sprite.texture)
-
-	return 'sprite', sprite
+	return sprite
 end

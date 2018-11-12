@@ -14,13 +14,17 @@
 
 typedef struct
 {
+	int win_x;
+	int win_y;
 	uint32_t win_width;
 	uint32_t win_height;
 	GLFWwindow *win_handle;
+	GLFWmonitor *monitor;
+	const GLFWvidmode *display;
 
 	GLuint program;
 	GLuint camera;
-	GLuint display;
+	GLuint window;
 	
 	uint32_t camera_x;
 	uint32_t camera_y;

@@ -6,26 +6,28 @@ return function()
 
 	local self = {}
 
-	local sprites = {}
+	local entities = {}
 
 
 	-- 事件处理
 	local handler = {}
 
 	function handler.update(dt)
-		for _,sp in ipairs(sprites) do
-			sp.node.x = sp.node.x + dt*sp.speed.x
-			sp.node.y = sp.node.y + dt*sp.speed.y
+		for e,speed in pairs(entities) do
+			for _,sp in ipairs(e.components) do
+				if sp.type == 'sprite' then
+					sp.x = sp.x + speed.x*dt
+					sp.y = sp.y + speed.y*dt
+				end
+			end
 		end
 	end
 
-	function handler.entity_join(e)
-		if e.speed then
-			table.insert(sprites, e)
-		end
+	function handler.speed_create(speed, e)
+		entities[e] = speed
 	end
 
-	function handler.entity_leave(e)
+	function handler.speed_destroy(speed, e)
 	end
 
 	return setmetatable(self, {__call = function (_, event, ...)

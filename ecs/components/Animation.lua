@@ -1,30 +1,23 @@
-local graphics = require "fantasy.graphics"
-local window = require "fantasy.window"
-
-
-return function (entity, t)
-	local meta = {
+return function (t)
+	local ani = {
+		type = 'animation',
+		name = t.name,
 		frames = assert(t.frames),
-		isloop = assert(t.isloop),
-		interval = assert(t.interval)
+		interval = assert(t.interval),
+		isloop = t.isloop or true,
+		pause = t.pause or false,
+		dt = 0,
+		current = t.current or 1
 	}
- 	
- 	local animation = {'frames', 'isloop', 'interval'}
-	
-	local node = assert(entity.node, 'must need node component')
-	local vao, vbo = graphics.sprite(
-		node.x, node.y,
-		node.scalex*node.width/window.width,
-		node.scaley*node.height/window.height,
-		node.rotate,
-		texcoord and table.unpack(texcoord))
 
+	for i,sp in ipairs(t.frames) do
+		if i ~= ani.current then
+			sp.active = false
+		else
+			sp.active = true
+		end
+	end
 
-	entity('vao', vao)
-	entity('vbo', vbo)
-	entity('texture', t.frames[1])
-
-	return 'animation', setmetatable(animation, {__index = meta, __newindex = function (_, k, v)
-		meta[k] = v
-	end})
+	return ani
 end
+

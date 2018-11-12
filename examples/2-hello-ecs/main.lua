@@ -6,7 +6,6 @@ local render_system = require "ecs.systems.Render"
 local move_system = require "ecs.systems.Move"
 local animation_system = require "ecs.systems.Animation"
 
-local Node = require "ecs.components.Node"
 local Sprite = require "ecs.components.Sprite"
 local Speed = require "ecs.components.Speed"
 local Animation = require 'ecs.components.Animation'
@@ -22,32 +21,32 @@ local game = {}
 function game.init()
 
 	world = ecs.world('game')
-	world.add_system(render_system())
-	world.add_system(move_system())
-	world.add_system(animation_system())
+	world.add_system(render_system)
+	world.add_system(move_system)
+	world.add_system(animation_system)
 
-	world.join(ecs.entity({}, 'bg')
-		('add',Node,{x=480,y=320,width=960,height=640})
-		('add',Sprite,{texture='examples/asset/bg.jpg'}))
+	world.add_entity(ecs.entity()
+		.add(Sprite {x=480,y=320,width=960,height=640,texname='examples/asset/bg.jpg'}))
 
-	for i=1,1 do
-		world.join(ecs.entity({}, 'smlie')
-			('add',Node,{x=480,y=320,width=100,height=100})
-			('add',Sprite,{texture='examples/asset/smlie.jpg'})
-			('add',Speed,{x=math.random(-100, 100), y=math.random(-100, 100)}))
+	math.randomseed(os.time())
+
+	for i=1,10 do
+		world.add_entity(ecs.entity()
+			.add(Sprite {x=480,y=320,width=100,height=100,texname='examples/asset/smlie.jpg'})
+			.add(Speed {x=math.random(-100, 100)*5, y=math.random(-100, 100)*5}))
 	end
 
+	
+	local bird0 = Sprite {x=48,y=320,width=96,height=96,texname='examples/asset/bird0_0.png'}
+	local bird1 = Sprite {x=48,y=320,width=96,height=96,texname='examples/asset/bird0_1.png'}
+	local bird2 = Sprite {x=48,y=320,width=96,height=96,texname='examples/asset/bird0_2.png'}
+	
+	local bird = ecs.entity()
+		.add(bird0).add(bird1).add(bird2)
+		.add(Animation {frames={bird0, bird1, bird2},isloop=true,interval=0.08,pause = false})
+		.add(Speed {x=100})
 
-	local bird_frames = {
-		graphics.texture('examples/asset/bird0_0.png'),
-		graphics.texture('examples/asset/bird0_1.png'),
-		graphics.texture('examples/asset/bird0_2.png'),
-	}
-
-	bird = world.join(ecs.entity({}, 'bird')
-		('add',Node,{x=480,y=320,width=96,height=96})
-		('add',Speed,{x=100,y=0})
-		('add',Animation,{frames = bird_frames, isloop = true, interval=0.08}))	
+	world.add_entity(bird)
 end
 
 
@@ -63,6 +62,8 @@ end
 
 
 function game.mouse(what, x, y, who) -- 'PRESS'/'RELEASE/MOVE' 0, 0, 'LEFT'/'RIGHT'(on windows)
+	if what == 'MOVE' then return end
+	print(x, y)
 end
 
 
