@@ -99,8 +99,8 @@ local config = {
 		title = 'Hello ECS'
 	},
 	camera = {
-		x = 960,
-		y = 640
+		x = 480,
+		y = 320
 	}
 }
 
