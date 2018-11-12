@@ -15,6 +15,8 @@ local function sprite_agent(sp)
 	local agent = {
 		x = sp.x,
 		y = sp.y,
+		scalex = sp.scalex,
+		scaley = sp.scaley,
 		vao = vao,
 		vbo = vbo,
 		texture = texture,
@@ -43,6 +45,15 @@ return function()
 			if sp.y ~= sp.self.y then
 				sp.y = sp.self.y
 				graphics.sprite_y(sp.vbo, sp.y)
+			end
+
+			if sp.scalex ~= sp.self.scalex then
+				sp.scalex = sp.self.scalex
+				graphics.sprite_scalex(sp.vbo, sp.scalex*sp.self.width/window.width)
+			end
+			if sp.scaley ~= sp.self.scaley then
+				sp.scaley = sp.self.scaley
+				graphics.sprite_scaley(sp.vbo, sp.scaley*sp.scaley*sp.self.height/window.height)
 			end
 		end
 	end

@@ -42,12 +42,12 @@ function game.draw()
 end
 
 
-function game.mouse(what, x, y, who) -- 'PRESS'/'RELEASE/MOVE' 0, 0, 'LEFT'/'RIGHT'(on windows)
+function game.mouse(what, x, y, who) -- 'press'/'release/move' 0, 0, 'left'/'right'(on windows)
 end
 
 
-function game.keyboard(key, what)	-- 'a', 'PRESS'/'RELEASE'
-	if what == 'RELEASE' then
+function game.keyboard(key, what)	-- 'a', 'press'/'release'
+	if what == 'release' then
 		if key == 'f' then
 			window.fullscreen = true
 		elseif key == 'w' then

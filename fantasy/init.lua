@@ -3,14 +3,14 @@ local window = require "fantasy.window"
 local camera = require "fantasy.camera"
 
 local mouse_name = {
-	'LEFT',
-	'RIGHT'
+	'left',
+	'right'
 }
 
 local mouse_event = {
-	'PRESS',
-	'RELEASE',
-	'MOVE'
+	'press',
+	'release',
+	'move'
 }
 
 local key_name = {
@@ -39,8 +39,8 @@ local key_name = {
 }
 
 local key_event = {
-	'PRESS',
-	'RELEASE'
+	'press',
+	'release'
 }
 
 function fantasy.start(config, callback)

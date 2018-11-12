@@ -5,10 +5,12 @@ local ecs = require "ecs"
 local render_system = require "ecs.systems.Render"
 local move_system = require "ecs.systems.Move"
 local animation_system = require "ecs.systems.Animation"
+local input_system = require "ecs.systems.Input"
 
 local Sprite = require "ecs.components.Sprite"
 local Speed = require "ecs.components.Speed"
 local Animation = require 'ecs.components.Animation'
+local Button = require "ecs.components.Button"
 
 
 local world
@@ -24,29 +26,39 @@ function game.init()
 	world.add_system(render_system)
 	world.add_system(move_system)
 	world.add_system(animation_system)
-
+	world.add_system(input_system)
+	-- background
 	world.add_entity(ecs.entity()
 		.add(Sprite {x=480,y=320,width=960,height=640,texname='examples/asset/bg.jpg'}))
 
+	-- smile
 	math.randomseed(os.time())
-
 	for i=1,10 do
 		world.add_entity(ecs.entity()
 			.add(Sprite {x=480,y=320,width=100,height=100,texname='examples/asset/smlie.jpg'})
 			.add(Speed {x=math.random(-100, 100)*5, y=math.random(-100, 100)*5}))
 	end
 
-	
+	-- bird
 	local bird0 = Sprite {x=48,y=320,width=96,height=96,texname='examples/asset/bird0_0.png'}
 	local bird1 = Sprite {x=48,y=320,width=96,height=96,texname='examples/asset/bird0_1.png'}
 	local bird2 = Sprite {x=48,y=320,width=96,height=96,texname='examples/asset/bird0_2.png'}
 	
-	local bird = ecs.entity()
+	local bird = world.add_entity(ecs.entity()
 		.add(bird0).add(bird1).add(bird2)
-		.add(Animation {frames={bird0, bird1, bird2},isloop=true,interval=0.08,pause = false})
-		.add(Speed {x=100})
+		.add(Animation {frames={bird0, bird1, bird2},isloop=true,interval=0.08,pause=true})
+		.add(Speed {x=0, y=0}))
 
-	world.add_entity(bird)
+	-- button
+	local btn_sp = Sprite {x=480,y=200,width=80,height=28,texname='examples/asset/button_ok.png'}
+	local ok = world.add_entity(ecs.entity()
+		.add(btn_sp)
+		.add(Button {sprite = btn_sp, scale = 1.1}))
+
+	ok.find('button').on('click', function ()
+		bird.find('speed').x = 100
+		bird.find('animation').pause = false
+	end)
 end
 
 
@@ -61,20 +73,12 @@ function game.draw()
 end
 
 
-function game.mouse(what, x, y, who) -- 'PRESS'/'RELEASE/MOVE' 0, 0, 'LEFT'/'RIGHT'(on windows)
-	if what == 'MOVE' then return end
-	print(x, y)
+function game.mouse(what, x, y, who) -- 'press'/'release/move' 0, 0, 'left'/'right'(on windows)
+	world('mouse', what, x, y, who)
 end
 
 
-function game.keyboard(key, what)	-- 'a', 'PRESS'/'RELEASE'
-	if what == 'PRESS' then
-		if key == 'left' then
-			bird.speed.x = -100
-		elseif key == 'right' then
-			bird.speed.x = 100
-		end
-	end
+function game.keyboard(key, what)	-- 'a', 'press'/'release'
 end
 
 

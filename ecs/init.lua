@@ -80,7 +80,14 @@ function ecs.entity(name, e)
 	end
 
 	function e.find(com_name)
-		return e.named[com_name]
+		local com = e.named[com_name]
+		if com then return com end
+
+		for _,c in ipairs(e.components) do
+			if c.type == com_name then
+				return c
+			end
+		end
 	end
 
 	return e
