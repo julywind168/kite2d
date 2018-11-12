@@ -2,6 +2,7 @@ local graphics = require "fantasy.graphics"
 local window = require "fantasy.window"
 local camera = require "fantasy.camera"
 local flag = require "ecs.flag"
+local spritelist = require "ecs.spritelist"
 
 local function sprite_agent(sp)
 
@@ -15,6 +16,7 @@ local function sprite_agent(sp)
 	local agent = {
 		x = sp.x,
 		y = sp.y,
+		z = sp.z,
 		scalex = sp.scalex,
 		scaley = sp.scaley,
 		vao = vao,
@@ -31,13 +33,18 @@ return function()
 	local self = {}
 
 	local sprites = {}
-	local agents = {}
+	local agents = spritelist()
 
 	-- 事件处理
 	local handler = {}
 
 	function handler.update()
-		for _,sp in ipairs(agents) do
+		
+		local sp = agents.self
+		while true do
+			sp = sp.next
+			if not sp then break end
+
 			if sp.x ~= sp.self.x then
 				sp.x = sp.self.x
 				graphics.sprite_x(sp.vbo, sp.x)
@@ -53,36 +60,58 @@ return function()
 			end
 			if sp.scaley ~= sp.self.scaley then
 				sp.scaley = sp.self.scaley
-				graphics.sprite_scaley(sp.vbo, sp.scaley*sp.scaley*sp.self.height/window.height)
+				graphics.sprite_scaley(sp.vbo, sp.scaley*sp.self.height/window.height)
 			end
 		end
 	end
 
 	function handler.draw()
-		for _,sp in ipairs(agents) do
+		local sp = agents.self
+
+		local cameraing = true
+		local tmp = {}
+		while true do
+			sp = sp.next
+			if not sp then break end
+
 			if sp.self.active then
+				if cameraing == true and sp.self.camera == false then
+					-- ui start
+					cameraing = false
+					tmp.x = camera.x
+					tmp.y = camera.y
+					camera.x = window.width/2
+					camera.y = window.height/2
+				end
 				graphics.draw(sp.vao, sp.texture)
 			end
+		end
+
+		-- start camera
+		if cameraing == false then
+			cameraing = true
+			camera.x = tmp.x
+			camera.y = tmp.y
 		end
 	end
 
 	function handler.sprite_create(sp)
 		if not sprites[sp] then
 			local a = sprite_agent(sp)
-			agents[#agents+1] = a
+			agents.add(a)
 			sprites[sp] = a
 		end
 	end
 
 	function handler.sprite_destroy(sp)
-		local a = sprites[sp]
-		for i=1,#agents do
-			if agents[i] == a then
-				table.remove(agents, i)
-				break
-			end
-		end
-		sprites[sp] = nil
+		-- local a = sprites[sp]
+		-- for i=1,#agents do
+		-- 	if agents[i] == a then
+		-- 		table.remove(agents, i)
+		-- 		break
+		-- 	end
+		-- end
+		-- sprites[sp] = nil
 	end
 
 	return setmetatable(self, {__call = function (_, event, ...)

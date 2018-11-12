@@ -50,7 +50,7 @@ function game.init()
 		.add(Speed {x=0, y=0}))
 
 	-- button
-	local btn_sp = Sprite {x=480,y=200,width=80,height=28,texname='examples/asset/button_ok.png'}
+	local btn_sp = Sprite {x=480,y=200,width=80,height=28,texname='examples/asset/button_ok.png', camera = false}
 	local ok = world.add_entity(ecs.entity()
 		.add(btn_sp)
 		.add(Button {sprite = btn_sp, scale = 1.1}))
@@ -99,8 +99,8 @@ local config = {
 		title = 'Hello ECS'
 	},
 	camera = {
-		x = 480,
-		y = 320
+		x = 960,
+		y = 640
 	}
 }
 

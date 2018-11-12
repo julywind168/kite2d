@@ -6,6 +6,7 @@ return function (t)
 	local sprite = {
 		type = 'sprite',
 		name = t.name,
+		camera = (t.camera ~= false) and true or false,
 		active = (t.active ~= false) and true or false,
 		x = assert(t.x),
 		y = assert(t.y),

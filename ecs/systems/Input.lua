@@ -53,7 +53,7 @@ return function()
 						local cb = btn.handle['click']
 						if cb then cb() end
 					else
-						local cb = btn.handle['cancel']
+						local cb = tmp_press and tmp_press.handle['cancel']
 						if cb then cb() end
 					end
 					btn.sprite.scalex = btn.sprite.scalex / btn.scale
