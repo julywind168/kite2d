@@ -13,6 +13,8 @@ A simple game framework for Lua
 ```
 1. ui (label, textfield, ...)
 2. editor(map, ui, ...)
+
+n. easy to create RPG and other type game
 ```
 
 ## Donation
@@ -26,3 +28,8 @@ A simple game framework for Lua
 1. first donor (no ID)	2018/11/13
 2. Cabrite 				2018/11/13
 ```
+
+## Also to see (my server framework for Lua)
+```
+https://github.com/HYbutterfly/scorpio
+``` 
