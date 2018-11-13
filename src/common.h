@@ -32,9 +32,9 @@ ASSERT(int ok, const char * msg) {
 	}
 }
 
-#define R(c) ((c>>24)&0xFF)/255
-#define G(c) ((c>>16)&0xFF)/255
-#define B(c) ((c>>8) &0xFF)/255
-#define A(c) (c      &0xFF)/255
+#define R(c) ((c>>24)&0xFF)/255.0f
+#define G(c) ((c>>16)&0xFF)/255.0f
+#define B(c) ((c>>8) &0xFF)/255.0f
+#define A(c) (c      &0xFF)/255.0f
 
 #endif

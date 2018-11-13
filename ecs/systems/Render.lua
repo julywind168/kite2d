@@ -6,17 +6,18 @@ local spritelist = require "ecs.spritelist"
 
 local function sprite_agent(sp)
 
-	local texture = graphics.texture(assert(sp.texname)) 
+	local texture = sp.texname and graphics.texture(sp.texname) 
 	local vao, vbo = graphics.sprite(
 		sp.x, sp.y,
 		sp.scalex*sp.width/window.width,
 		sp.scaley*sp.height/window.height,
-		sp.rotate, table.unpack(sp.texcoord))
+		sp.rotate, sp.texcoord and table.unpack(sp.texcoord))
 
 	local agent = {
 		x = sp.x,
 		y = sp.y,
 		z = sp.z,
+		color = sp.color,
 		scalex = sp.scalex,
 		scaley = sp.scaley,
 		vao = vao,
@@ -53,6 +54,9 @@ return function()
 				sp.y = sp.self.y
 				graphics.sprite_y(sp.vbo, sp.y)
 			end
+			if sp.z ~= sp.self.z then
+				agents.update_z(sp, sp.self.z)
+			end
 
 			if sp.scalex ~= sp.self.scalex then
 				sp.scalex = sp.self.scalex
@@ -83,6 +87,7 @@ return function()
 					camera.x = window.width/2
 					camera.y = window.height/2
 				end
+				graphics.set_color(sp.color)
 				graphics.draw(sp.vao, sp.texture)
 			end
 		end

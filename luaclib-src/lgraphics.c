@@ -218,11 +218,38 @@ ltexture(lua_State *L)
 
 
 static int
+lset_color(lua_State *L) {
+    uint32_t c;
+    float r, g, b, a;
+    c = luaL_checkinteger(L, 1);
+    r = R(c);
+    g = G(c);
+    b = B(c);
+    a = A(c);
+    glUniform4f(G->color, r, g, b, a);
+    return 0;
+}
+
+
+static int
+lset_additive(lua_State *L) {
+    uint32_t c;
+    float r, g, b, a;
+    c = luaL_checkinteger(L, 1);
+    r = R(c);
+    g = G(c);
+    b = B(c);
+    a = A(c);
+    glUniform4f(G->additive, r, g, b, a);
+    return 0;
+}
+
+
+static int
 ldraw(lua_State *L) {
     GLuint vao, texture;
     vao = luaL_checkinteger(L, 1);
-    texture = luaL_checkinteger(L, 2);
-
+    texture = luaL_optinteger(L, 2, 0);
     glBindVertexArray(vao);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -241,6 +268,8 @@ lib_graphics(lua_State *L)
         {"sprite_rotate", lsprite_rotate},
         {"sprite_texcoord", lsprite_texcoord},
         {"sprite", lsprite},
+        {"set_additive", lset_additive},
+        {"set_color", lset_color},
         {"texture", ltexture},
         {"draw", ldraw},
 		{NULL, NULL}

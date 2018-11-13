@@ -52,16 +52,20 @@ return function()
 					if btn == tmp_press then
 						local cb = btn.handle['click']
 						if cb then cb() end
-					else
-						local cb = tmp_press and tmp_press.handle['cancel']
-						if cb then cb() end
+						btn.sprite.scalex = btn.sprite.scalex / btn.scale
+						btn.sprite.scaley = btn.sprite.scaley / btn.scale
+						tmp_press = nil
 					end
-					btn.sprite.scalex = btn.sprite.scalex / btn.scale
-					btn.sprite.scaley = btn.sprite.scaley / btn.scale
-					tmp_press = nil
 				end
 				break
 			end
+		end
+		if what == 'release' and tmp_press then
+			local cb = tmp_press.handle["cancel"]
+			if cb then cb() end
+			tmp_press.sprite.scalex = tmp_press.sprite.scalex / tmp_press.scale
+			tmp_press.sprite.scaley = tmp_press.sprite.scaley / tmp_press.scale
+			tmp_press = nil
 		end
 	end
 

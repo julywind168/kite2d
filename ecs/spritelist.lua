@@ -42,7 +42,7 @@ return function ()
 		end
 	end
 
-	function self.on_update(sprite, z)
+	function self.update_z(sprite, z)
 		if z > sprite.z then
 			if sprite == tail or z < sprite.next.z then
 				sprite.z = z

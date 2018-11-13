@@ -22,9 +22,12 @@ typedef struct
 	GLFWmonitor *monitor;
 	const GLFWvidmode *display;
 
+	GLuint additive;
+	GLuint color;
 	GLuint program;
 	GLuint camera;
 	GLuint window;
+
 	
 	uint32_t camera_x;
 	uint32_t camera_y;

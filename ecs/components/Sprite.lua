@@ -16,9 +16,9 @@ return function (t)
 		scalex = t.scalex or 1,
 		scaley = t.scaley or 1,
 		rotate = t.rotate or 0,
-		texname = t.texname,
-		texcoord = t.texcoord or {0,0, 0,1, 1,1, 1,0}
-		-- color = t.color or 0XFFFFFFFF,
+		texname = t.texname or 'fantasy/asset/white.png',
+		texcoord = t.texcoord,
+		color = t.color or 0XFFFFFFFF,
 	}
 
 	return sprite

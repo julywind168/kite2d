@@ -14,7 +14,6 @@ local Button = require "ecs.components.Button"
 
 
 local world
-local bird
 
 
 local game = {}
@@ -31,14 +30,6 @@ function game.init()
 	world.add_entity(ecs.entity()
 		.add(Sprite {x=480,y=320,width=960,height=640,texname='examples/asset/bg.jpg'}))
 
-	-- smile
-	math.randomseed(os.time())
-	for i=1,10 do
-		world.add_entity(ecs.entity()
-			.add(Sprite {x=480,y=320,width=100,height=100,texname='examples/asset/smlie.jpg'})
-			.add(Speed {x=math.random(-100, 100)*5, y=math.random(-100, 100)*5}))
-	end
-
 	-- bird
 	local bird0 = Sprite {x=48,y=320,width=96,height=96,texname='examples/asset/bird0_0.png'}
 	local bird1 = Sprite {x=48,y=320,width=96,height=96,texname='examples/asset/bird0_1.png'}
@@ -48,6 +39,11 @@ function game.init()
 		.add(bird0).add(bird1).add(bird2)
 		.add(Animation {frames={bird0, bird1, bird2},isloop=true,interval=0.08,pause=true})
 		.add(Speed {x=0, y=0}))
+
+
+	-- color block
+	world.add_entity(ecs.entity()
+		.add(Sprite {x=480,y=320,width=200,height=200,color=0xff00ffff}))
 
 	-- button
 	local btn_sp = Sprite {x=480,y=200,width=80,height=28,texname='examples/asset/button_ok.png', camera = false}
@@ -96,7 +92,7 @@ local config = {
 	window = {
 		width = 960,
 		height = 640,
-		title = 'Hello ECS'
+		title = 'Fantasy ECS'
 	},
 	camera = {
 		x = 480,

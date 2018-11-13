@@ -249,7 +249,7 @@ on_window_resize(GLFWwindow *window, int width, int height) {
 
 int
 init_opengl(Game *game) {
-	GLuint program, window, camera;
+	GLuint program, window, camera, color, additive;
 	float camera_x, camera_y;
 
 	lua_State *L = game->L;
@@ -283,12 +283,18 @@ init_opengl(Game *game) {
 
 	window = glGetUniformLocation(program, "window");
 	camera = glGetUniformLocation(program, "camera");
+	color = glGetUniformLocation(program, "color");
+	additive = glGetUniformLocation(program, "additive");
 
 	glUniform2ui(window, game->win_width, game->win_height);
 	glUniform2f(camera, camera_x, camera_y);
+	glUniform4f(color, 1.0f, 1.0f, 1.0f, 1.0f);
+	glUniform4f(additive, 0.0f, 0.0f, 0.0f, 0.0f);
 	
 	game->camera_x = camera_x;
 	game->camera_y = camera_y;
+	game->color = color;
+	game->additive = additive;
 	game->program = program;
 	game->window = window;
 	game->camera = camera;
