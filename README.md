@@ -17,6 +17,10 @@ A simple game framework for Lua
 n. easy to create RPG and other type game
 ```
 
+## How to use (in China)
+* Read the doucment: https://github.com/HYbutterfly/Fantasy/wiki
+
+
 ## Donation
 <label>付款时可以留下 ID + 留言(或者你的项目链接等等)(可选), 捐赠前10名将会出现在捐赠人列表:)</label><br><br>
 <img src="https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/wechatpay.png" align="left" height="450" width="350">
