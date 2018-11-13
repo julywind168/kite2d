@@ -8,3 +8,7 @@ A simple game framework for Lua
 2. fan.exe examples/1-hello-world/main.lua
 3. fan.exe examples/2-hello-ecs/main.lua
 ```
+
+## Donation 
+![Image text](https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/wechatpay.png)
+![Image text](https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/alipay.jpg)
