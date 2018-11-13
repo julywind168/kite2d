@@ -9,6 +9,6 @@ A simple game framework for Lua
 3. fan.exe examples/2-hello-ecs/main.lua
 ```
 
-## Donation 
-![Image text](https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/wechatpay.png)
-![Image text](https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/alipay.jpg)
+## Donation
+<img src="https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/wechatpay.png", width="400", height="300"/>
+<img src="https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/alipay.jpg", width="400", height="300"/>
