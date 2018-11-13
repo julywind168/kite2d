@@ -10,8 +10,8 @@ A simple game framework for Lua
 ```
 
 ## Donation
-![Image text](https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/wechatpay.png | width=400)
-![Image text](https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/alipay.jpg =400x300)
+![Image text](https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/wechatpay.png)(:width="400px" height="300px")
+![Image text](https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/alipay.jpg)(:width="400px" height="300px")
 
 ## Donors (1-10)
 ```
