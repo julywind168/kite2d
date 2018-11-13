@@ -17,7 +17,7 @@ A simple game framework for Lua
 
 ## Donation
 <img src="https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/wechatpay.png" align="left" height="450" width="300">
-<img src="https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/alipay.jpg" height="450" width="300">
+<img src="https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/alipay.png" height="450" width="300">
 <label>付款时可以留下 ID + 留言(或者你的项目链接等等)(可选), 捐赠前10名将会出现在捐赠人列表</label>
 <br>
 
