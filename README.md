@@ -1,5 +1,5 @@
 # Fantasy
-A simple game framework for Lua
+A simple 2d game engine for Lua
 
 
 ## Build & Test (for windows mingw)
