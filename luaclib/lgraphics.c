@@ -31,6 +31,13 @@ ldraw_text(lua_State *L) {
 	n = luaL_len(L, 4);
 	c = luaL_optinteger(L, 5, 0xFFFFFFFF);
 
+	static float vertices[4][4] = {
+		{0.f, 0.f,	0.f, 0.f},
+		{0.f, 0.f,	0.f, 1.f},
+		{0.f, 0.f,	1.f, 1.f},
+		{0.f, 0.f,	1.f, 0.f},
+	};
+
 	G->opengl->use_tx_program();
 	glUniform4f(G->opengl->tx_shader_color, R(c), G(c), B(c), A(c));
 	for (int i = 1; i <= n; ++i) {
@@ -41,28 +48,23 @@ ldraw_text(lua_State *L) {
 		w = ch->width * scale;
 		h = ch->height * scale;
 
-		float vertices[6][4] = {
-			{ xpos,     ypos + h,   0.0, 0.0 },
-			{ xpos,     ypos,       0.0, 1.0 },
-			{ xpos + w, ypos,       1.0, 1.0 },
-
-			{ xpos,     ypos + h,   0.0, 0.0 },
-			{ xpos + w, ypos,       1.0, 1.0 },
-			{ xpos + w, ypos + h,   1.0, 0.0 }
-		};
+		// 左上 -> 左下 -> 右下 -> 右上 (逆时针)
+		vertices[0][0] = xpos; 		vertices[0][1] = ypos + h;
+		vertices[1][0] = xpos;		vertices[1][1] = ypos;
+		vertices[2][0] = xpos + w;	vertices[2][1] = ypos;
+		vertices[3][0] = xpos + w; 	vertices[3][1] = ypos + h;
 
 		glBindVertexArray(G->opengl->ft_vao);
 		glBindTexture(GL_TEXTURE_2D, ch->texture);
 		glBindBuffer(GL_ARRAY_BUFFER, G->opengl->ft_vbo);
 		glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(vertices), vertices);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
-		glDrawArrays(GL_TRIANGLES, 0, 6);
+		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		lua_pop(L, 1);
 		x = x + (ch->advancex >> 6) * scale;
 	}
 	glBindVertexArray(0);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	// printf("x:%f n:%d\n", x, n);
 	return 0;
 }
 
@@ -77,29 +79,26 @@ lsprite(lua_State *L) {
         0,1,2,
         0,2,3
     };
-	// position [x,y,z]
+	// 4piont position [x,y]
 	// 左上 -> 左下 -> 右下 -> 右上 (逆时针)
 	vertices[0][0] = luaL_checknumber(L, 1);
 	vertices[0][1] = luaL_checknumber(L, 2);
-
 	vertices[1][0] = luaL_checknumber(L, 3);
 	vertices[1][1] = luaL_checknumber(L, 4);
-
 	vertices[2][0] = luaL_checknumber(L, 5);
 	vertices[2][1] = luaL_checknumber(L, 6);
-
 	vertices[3][0] = luaL_checknumber(L, 7);
 	vertices[3][1] = luaL_checknumber(L, 8);
 
-	// texcoord (与positon y值上下翻转了, 因为加载的纹理是上下颠倒的)
+	// texcoord
 	vertices[0][2] = luaL_optnumber(L,  9, 0.f);
-	vertices[0][3] = luaL_optnumber(L, 10, 0.f);
+	vertices[0][3] = luaL_optnumber(L, 10, 1.f);
 	vertices[1][2] = luaL_optnumber(L, 11, 0.f);
-	vertices[1][3] = luaL_optnumber(L, 12, 1.f);
+	vertices[1][3] = luaL_optnumber(L, 12, 0.f);
 	vertices[2][2] = luaL_optnumber(L, 13, 1.f);
-	vertices[2][3] = luaL_optnumber(L, 14, 1.f);
+	vertices[2][3] = luaL_optnumber(L, 14, 0.f);
 	vertices[3][2] = luaL_optnumber(L, 15, 1.f);
-	vertices[3][3] = luaL_optnumber(L, 16, 0.f);
+	vertices[3][3] = luaL_optnumber(L, 16, 1.f);
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -130,6 +129,28 @@ lsprite(lua_State *L) {
 }
 
 
+static int
+lsprite_aabb(lua_State *L) {
+	GLuint vbo = luaL_checkinteger(L, 1);
+	static float p[8];
+	p[0] = luaL_checknumber(L, 2);
+	p[1] = luaL_checknumber(L, 3);
+	p[2] = luaL_checknumber(L, 4);
+	p[3] = luaL_checknumber(L, 5);
+	p[4] = luaL_checknumber(L, 6);
+	p[5] = luaL_checknumber(L, 7);
+	p[6] = luaL_checknumber(L, 8);
+	p[7] = luaL_checknumber(L, 9);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	for (int i = 0; i < 4; ++i) {
+		glBufferSubData(GL_ARRAY_BUFFER, i*4*sizeof(float), 2*sizeof(float), p + 2*i);
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	return 0;
+}
+
 
 static int
 ltexture(lua_State *L)
@@ -159,10 +180,11 @@ ltexture(lua_State *L)
 int
 lib_graphics(lua_State *L)
 {
-    // stbi_set_flip_vertically_on_load(true);
+    stbi_set_flip_vertically_on_load(true);
 	luaL_Reg l[] = {
 		{"draw_text", ldraw_text},
         {"draw_sprite", ldraw_sprite},
+        {"sprite_aabb", lsprite_aabb},
         {"sprite", lsprite},
         {"texture", ltexture},
 		{NULL, NULL}

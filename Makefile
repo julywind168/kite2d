@@ -1,5 +1,5 @@
-CFLAGS = -g -O0 -Wall -Isrc -Iluaclib -I3rd/include -I3rd/lua -L3rd/lib
-LINK = -lglfw3 -lgdi32 -lopengl32 -lfreetype
+CFLAGS = -g -O0 -Wall -Isrc -Iluaclib -I3rd/include -I3rd/lua 
+LINK = -L3rd/lib -lglfw3 -lgdi32 -lopengl32 -lfreetype
 
 SRC := \
 	src/main.c \
@@ -20,6 +20,7 @@ LUACLIB := \
 	luaclib/lfantasy.c \
 	luaclib/lgraphics.c \
 	luaclib/lfont.c \
+
 
 LUASRC := \
 	3rd/lua/lapi.c \

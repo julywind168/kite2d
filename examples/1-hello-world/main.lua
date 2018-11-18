@@ -1,35 +1,30 @@
 local fantasy = require "fantasy"
 local graphics = require "fantasy.graphics"
 
-local function new_sprite(texname, ...)
-	local texture = graphics.texture(texname)
-
-	local vao, vbo = graphics.sprite(...)
-
-	return function ()
-		graphics.draw_sprite(vao, texture)
-	end
-end
 
 
 local bg, smile
-
+local font = {arial = "examples/asset/font/arial.ttf",
+			  msyh = "examples/asset/font/msyh.ttc"}
 
 local game = {init = function()
-	bg = new_sprite("examples/asset/bg.jpg", 0, 640, 0, 0, 960, 0, 960, 640)
-	smile = new_sprite("examples/asset/smile.jpg", 300, 540, 300, 100, 860, 100, 860, 540)
+	bg = graphics.sprite {texname="examples/asset/bg.jpg", x=480, y=320, w=960, h=640}
+	smile = graphics.sprite {texname="examples/asset/smile.jpg", x=0, y=320, w=200, h=200} 
 end}
 
 
+
 function game.update(dt)
+	-- when call a component mean to set
+	smile('x', smile.x + 1)
 end
 
 
 function game.draw()
-	bg()
-	-- smile()
-	graphics.draw_text("examples/asset/font/arial.ttf", "Hello World! 123456789...",50, 550, 36, 0Xaa7733ff)
-	graphics.draw_text("examples/asset/font/msyh.ttc", "大家好 O(∩_∩)O",50, 550-100, 36, 0Xff2222ff)
+	bg.draw()
+	smile.draw()
+	graphics.draw_text(font.arial, "fps:"..fantasy.fps, 20, 600, 24, 0Xaa7733ff)
+	graphics.draw_text(font.msyh, "大家好 O(∩_∩)O", 20, 500, 24, 0Xff2222ff)
 end
 
 

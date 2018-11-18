@@ -42,13 +42,23 @@ local key_event = {
 }
 
 
-local fantasy = {}
+local fantasy = {
+	frame = 0,
+	fps = 60
+}
+
 
 function fantasy.start(config, callback)
 	local cb = {}
 	cb.init = assert(callback.init)
 	cb.draw = assert(callback.draw)
-	cb.update = assert(callback.update)
+	cb.update = function (dt)
+		fantasy.frame = fantasy.frame + 1
+		if fantasy.frame%60 == 0 then
+			fantasy.fps = math.floor(1//dt)
+		end
+		callback.update(dt)
+	end
 	
 	assert(callback.mouse)
 	cb.mouse = function(what, x, y, who)
@@ -68,6 +78,9 @@ function fantasy.start(config, callback)
 
 	core.inject(config, cb)
 end
+
+
+
 
 
 

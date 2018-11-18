@@ -37,15 +37,24 @@ void
 opengl_init() {
 	// freetype
 	FT_Library ft;
-	GLuint vao, vbo;
+	GLuint vao, vbo, ebo;
 	FT_Init_FreeType(&ft);
+	static GLuint indices[] = {
+		0,1,2,
+		0,2,3
+    };
 
 	glGenVertexArrays(1, &vao);
-	glGenBuffers(1, &vbo);
 	glBindVertexArray(vao);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*6*4, NULL, GL_DYNAMIC_DRAW);
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*4*4, NULL, GL_DYNAMIC_DRAW);
+
+	glGenBuffers(1, &ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 4*sizeof(float), 0);
 
