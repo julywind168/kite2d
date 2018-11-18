@@ -1,4 +1,4 @@
-CFLAGS = -g -O0 -Wall -I3rd/include -L3rd/lib -I3rd/lua -Iluaclib -Isrc
+CFLAGS = -g -O0 -Wall -Isrc -Iluaclib -I3rd/include -I3rd/lua -L3rd/lib
 LINK = -lglfw3 -lgdi32 -lopengl32 -lfreetype
 
 SRC := \
@@ -15,8 +15,11 @@ LUACLIB := \
 	luaclib/lgraphics.c \
 	luaclib/lfont.c \
 
-THIRD_PARTY := \
-	3rd/src/glad.c \
+
+LUACLIB := \
+	luaclib/lfantasy.c \
+	luaclib/lgraphics.c \
+	luaclib/lfont.c \
 
 LUASRC := \
 	3rd/lua/lapi.c \
@@ -52,6 +55,10 @@ LUASRC := \
 	3rd/lua/lutf8lib.c \
 	3rd/lua/lvm.c \
 	3rd/lua/lzio.c
+
+
+THIRD_PARTY := \
+	3rd/src/glad.c \
 
 
 .PHONY : fan
