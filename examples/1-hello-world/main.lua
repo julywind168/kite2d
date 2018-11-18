@@ -1,61 +1,43 @@
 local fantasy = require "fantasy"
 local graphics = require "fantasy.graphics"
-local window = require "fantasy.window"
 
+local function new_sprite(texname, ...)
+	local texture = graphics.texture(texname)
 
-local function create_sprite(x, y, width, height, scalex, scaley, rotate, image)
-	local vao, vbo = graphics.sprite(
-		x, y,
-		scalex*width/window.width,
-		scaley*height/window.height,
-		rotate)
+	local vao, vbo = graphics.sprite(...)
 
-	local texture = graphics.texture(image)
-
-	local self = {}
-	function self.draw()
-		graphics.draw(vao, texture)
+	return function ()
+		graphics.draw_sprite(vao, texture)
 	end
-	return self
 end
 
 
+local bg, smile
 
-local game = {}
 
-local bg, bird
-
-function game.init()
-	bg = create_sprite(480, 320, 960, 640, 1, 1, 0, "examples/asset/bg.jpg")
-	bird = create_sprite(480, 320, 48, 48, 1, 1, 0, "examples/asset/bird0_0.png")
-end
+local game = {init = function()
+	bg = new_sprite("examples/asset/bg.jpg", 0, 640, 0, 0, 960, 0, 960, 640)
+	smile = new_sprite("examples/asset/smile.jpg", 300, 540, 300, 100, 860, 100, 860, 540)
+end}
 
 
 function game.update(dt)
-	-- print('fps:', 1//dt)
 end
 
 
 function game.draw()
-	bg.draw()
-	bird.draw()
+	bg()
+	-- smile()
+	graphics.draw_text("examples/asset/font/arial.ttf", "Hello World! 123456789...",50, 550, 36, 0Xaa7733ff)
+	graphics.draw_text("examples/asset/font/msyh.ttc", "大家好 O(∩_∩)O",50, 550-100, 36, 0Xff2222ff)
 end
 
 
-function game.mouse(what, x, y, who) -- 'press'/'release/move' 0, 0, 'left'/'right'(on windows)
+function game.mouse(what, x, y, who)
 end
 
-
-function game.keyboard(key, what)	-- 'a', 'press'/'release'
-	if what == 'release' then
-		if key == 'f' then
-			window.fullscreen = true
-		elseif key == 'w' then
-			window.fullscreen = false
-		end
-	end
+function game.keyboard(key, what)
 end
-
 
 function game.resume()
 end
@@ -69,15 +51,14 @@ end
 
 local config = {
 	window = {
+		x = 1920/2,
+		y = 1080/2,
 		width = 960,
 		height = 640,
 		title = 'Hello World',
 		fullscreen = false
-	},
-	camera = {
-		x = 480,
-		y = 320
 	}
 }
+
 
 fantasy.start(config, game)

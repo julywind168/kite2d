@@ -1,23 +1,19 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdbool.h>
+#include "common.h"
 #include "game.h"
+
 
 
 int main(int argc, char const *argv[])
 {
+	Game *g;
 	if (argc != 2) {
-		fprintf(stderr, "usage fantasy.exe main.lua\n");
+		fprintf(stderr, "usage fant.exe main.lua\n");
 		return 1;
 	}
-	
-	Game *game = create_game(argv[1]);
-	if (game == NULL) {
-		return 1;
-	}
-	
-	game_start(game);
-	destroy_game(game);
-	printf("bye\n");
+
+	g = create_game(argv[1]);
+	g->init();
+	g->run();
+	g->destroy();
 	return 0;
 }

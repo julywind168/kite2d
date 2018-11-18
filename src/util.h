@@ -4,18 +4,12 @@
 #include "common.h"
 
 
+void
+mat4x4_projection(mat4x4 M, float left, float right, float bottom, float top);
+
 
 GLuint
-loadbmp(const char * imagepath);
-
-
-GLuint
-create_program();
-
-
-char*
-readfile(const char* name, int* sz);
-
+create_program(const char* vs_name, const char* fs_name);
 
 
 

@@ -1,6 +1,4 @@
 local core = require "fantasy.core"
-local window = require "fantasy.window"
-local camera = require "fantasy.camera"
 
 local mouse_name = {
 	'left',
@@ -43,30 +41,32 @@ local key_event = {
 	'release'
 }
 
-function fantasy.start(config, callback)
-	window.init(config.window)
-	camera.init(config.camera)
 
-	fantasy.config = config
-	fantasy.init = assert(callback.init)
-	fantasy.draw = assert(callback.draw)
-	fantasy.update = assert(callback.update)
+local fantasy = {}
+
+function fantasy.start(config, callback)
+	local cb = {}
+	cb.init = assert(callback.init)
+	cb.draw = assert(callback.draw)
+	cb.update = assert(callback.update)
 	
 	assert(callback.mouse)
-	fantasy.mouse = function(what, x, y, who)
+	cb.mouse = function(what, x, y, who)
 		return callback.mouse(mouse_event[what], x, y, who and mouse_name[who])
 	end
 
-	fantasy.keyboard = function(key, what)
+	cb.keyboard = function(key, what)
 		key = key_name[key]
 		if not key then 
 			return
 		end
 		return callback.keyboard(key, key_event[what])
 	end
-	fantasy.pause = assert(callback.pause)
-	fantasy.resume = assert(callback.resume)
-	fantasy.exit = assert(callback.exit)
+	cb.pause = assert(callback.pause)
+	cb.resume = assert(callback.resume)
+	cb.exit = assert(callback.exit)
+
+	core.inject(config, cb)
 end
 
 

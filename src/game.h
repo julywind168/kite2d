@@ -1,57 +1,27 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <assert.h>
-#include <stdbool.h>
-
-#include "common.h"
-#include "lua.h"
-#include "lauxlib.h"
-#include "lualib.h"
-
+#include "fant.h"
+#include "window.h"
+#include "opengl.h"
 
 typedef struct
 {
-	int win_x;
-	int win_y;
-	uint32_t win_width;
-	uint32_t win_height;
-	GLFWwindow *win_handle;
-	GLFWmonitor *monitor;
-	const GLFWvidmode *display;
+	Window *window;			// 窗口管理
+	Opengl *opengl;			// opengl管理
+	Fant *fant;				// lua逻辑管理
+	double time;			// 累计游戏时间
 
-	GLuint additive;
-	GLuint color;
-	GLuint program;
-	GLuint camera;
-	GLuint window;
-
-	
-	uint32_t camera_x;
-	uint32_t camera_y;
-
-	double time;
-	lua_State *L;
+	void (*init)(void);
+	void (*run)(void);
+	void (*destroy)(void);
 } Game;
 
 
 
-void
-game_start(Game *);
-
-
-void
-destroy_game(Game *);
-
 
 Game *
-create_game(const char *filename);
-
-
-
-
+create_game(const char *);
 
 
 
