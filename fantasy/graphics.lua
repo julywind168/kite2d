@@ -38,6 +38,14 @@ local function get_texture(texname)
 end
 
 
+local function rotate(x0, y0, x, y, a)
+	a = a * math.pi/180
+	local x1 = (x-x0)*math.cos(a) - (y-y0)*math.sin(a) + x0
+	local y1 = (x-x0)*math.sin(a) + (y-y0)*math.cos(a) + y0
+	return x1, y1
+end
+
+
 local M = {}
 
 
@@ -55,19 +63,20 @@ function M.sprite(t)
 		y = t.y or 0,
 		w = assert(t.w),
 		h = assert(t.h),
-		anchorx = t.anchorx,			--	0~1
-		anchory = t.anchory,			--	0~1
-		rotate = t.rotate or 0,			--  0~360
+		angle = t.angle or 0,			--  0~360
+		anchorx = t.anchorx or 0.5,		--	锚点:左下角(0,0) 右上角(1,1)
+		anchory = t.anchory or 0.5,
 		color = t.color	or 0xffffffff,
 		texname = t.texname or "resource/white.png",
 		texcoord = t.texcoord,
+		aabb = {{}, {}, {}, {}}
 	}
 
 	-- 4个点的世界坐标 [p1.xy p2.xy p3.xy p4.xy] 左上开始逆时针
-	self.aabb = {{x = self.x - self.w/2, y = self.y + self.h/2},	
-				 {x = self.x - self.w/2, y = self.y - self.h/2},
-				 {x = self.x + self.w/2, y = self.y - self.h/2},
-				 {x = self.x + self.w/2, y = self.y + self.h/2}}
+	self.aabb[1].x, self.aabb[1].y = rotate(self.x, self.y, self.x-self.anchorx*self.w, self.y+(1-self.anchory)*self.h, self.angle)
+	self.aabb[2].x, self.aabb[2].y = rotate(self.x, self.y, self.x-self.anchorx*self.w, self.y-self.anchory*self.h, self.angle)
+	self.aabb[3].x, self.aabb[3].y = rotate(self.x, self.y, self.x+(1-self.anchorx)*self.w, self.y-self.anchory*self.h, self.angle)
+	self.aabb[4].x, self.aabb[4].y = rotate(self.x, self.y, self.x+(1-self.anchorx)*self.w, self.y+(1-self.anchory)*self.h, self.angle)
 
 	local texture = get_texture(self.texname)
 	local vao, vbo = core.sprite(
@@ -78,14 +87,10 @@ function M.sprite(t)
 		self.texcoord and table.unpack(self.texcoord))
 
 	local function update_aabb()
-		self.aabb[1].x = self.x - self.w/2
-		self.aabb[1].y = self.y + self.h/2
-		self.aabb[2].x = self.x - self.w/2
-		self.aabb[2].y = self.y - self.h/2
-		self.aabb[3].x = self.x + self.w/2
-		self.aabb[3].y = self.y - self.h/2
-		self.aabb[4].x = self.x + self.w/2
-		self.aabb[4].y = self.y + self.h/2
+		self.aabb[1].x, self.aabb[1].y = rotate(self.x, self.y, self.x-self.anchorx*self.w, self.y+(1-self.anchory)*self.h, self.angle)
+		self.aabb[2].x, self.aabb[2].y = rotate(self.x, self.y, self.x-self.anchorx*self.w, self.y-self.anchory*self.h, self.angle)
+		self.aabb[3].x, self.aabb[3].y = rotate(self.x, self.y, self.x+(1-self.anchorx)*self.w, self.y-self.anchory*self.h, self.angle)
+		self.aabb[4].x, self.aabb[4].y = rotate(self.x, self.y, self.x+(1-self.anchorx)*self.w, self.y+(1-self.anchory)*self.h, self.angle)
 
 		core.sprite_aabb(vbo,
 			self.aabb[1].x, self.aabb[1].y,
