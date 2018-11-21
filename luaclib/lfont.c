@@ -43,6 +43,39 @@ lchar(lua_State *L) {
 	return 1;
 }
 
+static int
+lchars_length(lua_State *L) {
+    int n, length;
+    Character *ch;
+    float x, scale;
+    float first_width, end_width, first_x, end_x;
+
+    n = luaL_len(L, 1);
+    scale = luaL_checknumber(L, 2);
+
+    for (int i = 1; i <=n; ++i)
+    {
+        lua_rawgeti(L, 1, i);
+        ch = lua_touserdata(L, -1);
+
+        if (i == 1) {
+            first_width = ch->width * scale;
+            first_x = x + ch->offsetx * scale;
+            x += (ch->advancex >> 6) * scale;
+        } else if (i == n) {
+            end_width = ch->width * scale;
+            end_x = x + ch->offsetx * scale;
+        } else {
+            x += (ch->advancex >> 6) * scale;
+        }
+        lua_pop(L, 1);
+    }
+
+    length = ceil(end_x - first_x + (first_width + end_width)/2);
+
+    lua_pushinteger(L, length);
+    return 1;
+}
 
 static int
 lface(lua_State *L) {
@@ -67,6 +100,7 @@ int
 lib_font(lua_State *L)
 {
 	luaL_Reg l[] = {
+        {"chars_length", lchars_length},
         {"char", lchar},
         {"face", lface},
 		{NULL, NULL}

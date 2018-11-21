@@ -11,12 +11,22 @@ typedef struct
 	float height;
 	bool fullscreen;
 	char *title;
-} _Window;
+} __Window;
 
 
 typedef struct
 {
-	_Window window;
+	float x;
+	float y;
+	float scale;
+	float angle;
+} __Camera;
+
+
+typedef struct
+{
+	__Window window;
+	__Camera camera;
 } Conf;
 
 

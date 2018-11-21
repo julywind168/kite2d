@@ -15,6 +15,7 @@ game_run() {
 		dt = now - G->time;
 		G->time = now;
 		G->fant->update(dt);
+		
 		glClear(GL_COLOR_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		G->fant->draw();

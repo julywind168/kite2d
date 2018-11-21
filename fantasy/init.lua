@@ -1,4 +1,9 @@
 local core = require "fantasy.core"
+local graphics = require "graphics.core"
+
+local create_sprite = require "fantasy._sprite"
+local create_label = require "fantasy._label"
+
 
 local mouse_name = {
 	'left',
@@ -42,13 +47,48 @@ local key_event = {
 }
 
 
+
+
+
+------------------------------------------------------------------
+-- api
+
 local fantasy = {
 	frame = 0,
-	fps = 60
+	fps = 60,
+	config = nil,
+	_camera = nil
 }
 
 
+local function create_camera()
+	if fantasy._camera then return fantasy._camera end
+	
+	local self = {
+		x = assert(fantasy.config.camera.x),
+		y = assert(fantasy.config.camera.y),
+		scale = fantasy.config.camera.scale or 1
+	}
+
+	setmetatable(self, {__call = function (_, k, v)
+		assert(type(self[k]) == type(v))
+		self[k] = v
+		graphics.update_camera(self.x, self.y, self.scale)
+	end})
+
+	fantasy._camera = self
+	return fantasy._camera
+end
+
 function fantasy.start(config, callback)
+	
+	fantasy.config = config
+	-- component
+	fantasy.camera = create_camera
+	fantasy.sprite = create_sprite
+	fantasy.label = create_label
+
+	-- inject callback
 	local cb = {}
 	cb.init = assert(callback.init)
 	cb.draw = assert(callback.draw)
@@ -78,10 +118,6 @@ function fantasy.start(config, callback)
 
 	core.inject(config, cb)
 end
-
-
-
-
 
 
 return setmetatable(fantasy, {__index = core})

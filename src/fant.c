@@ -123,43 +123,94 @@ load_callback(lua_State *L) {
 
 
 void
+load_camera_conf(lua_State *L) {
+	float x, y, scale, angle;
+	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_CONFIG");
+	lua_pushliteral(L, "camera");
+	lua_gettable(L, -2);
+	
+	if lua_isnil(L, -1) {
+		x = fant->conf.window.x;
+		y = fant->conf.window.y;
+		scale = 1.f;
+		angle = 0.f;
+		lua_pop(L, 2);
+	} else {
+		lua_pushliteral(L, "x");
+		lua_gettable(L, -2);
+		x = luaL_optnumber(L, -1, fant->conf.window.x);
+		lua_pop(L, 1);
+
+		lua_pushliteral(L, "y");
+		lua_gettable(L, -2);
+		y = luaL_optnumber(L, -1, fant->conf.window.y);
+		lua_pop(L, 1);
+
+		lua_pushliteral(L, "scale");
+		lua_gettable(L, -2);
+		scale = luaL_optnumber(L, -1, 1.f);
+		lua_pop(L, 1);
+
+		lua_pushliteral(L, "angle");
+		lua_gettable(L, -2);
+		angle = luaL_optnumber(L, -1, 0.f) * (M_PI/180.f);
+		lua_pop(L, 3);
+
+		fant->conf.camera.x = x;
+		fant->conf.camera.y = y;
+		fant->conf.camera.scale = scale;
+		fant->conf.camera.angle = angle;
+	}
+}
+
+
+void
 load_window_conf(lua_State *L) {
 	const char *title;
+	float x, y, width, height;
+	bool fullscreen;
+
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_CONFIG");
 	lua_pushliteral(L, "window");
 	lua_gettable(L, -2);
 	
 	lua_pushliteral(L, "x");
 	lua_gettable(L, -2);
-	fant->conf.window.x = lua_tonumber(L, -1);
+	x = lua_tonumber(L, -1);
 	lua_pop(L, 1);
 
 	lua_pushliteral(L, "y");
 	lua_gettable(L, -2);
-	fant->conf.window.y = lua_tonumber(L, -1);
+	y = lua_tonumber(L, -1);
 	lua_pop(L, 1);
 
 	lua_pushliteral(L, "width");
 	lua_gettable(L, -2);
-	fant->conf.window.width = lua_tonumber(L, -1);
+	width = lua_tonumber(L, -1);
 	lua_pop(L, 1);
 
 	lua_pushliteral(L, "height");
 	lua_gettable(L, -2);
-	fant->conf.window.height = lua_tonumber(L, -1);
+	height = lua_tonumber(L, -1);
 	lua_pop(L, 1);
 
 	lua_pushliteral(L, "title");
 	lua_gettable(L, -2);
 	title = lua_tostring(L, -1);
-	fant->conf.window.title = malloc(strlen(title) + 1);
-	strcpy(fant->conf.window.title, title);
 	lua_pop(L, 1);
 
 	lua_pushliteral(L, "fullscreen");
 	lua_gettable(L, -2);
-	fant->conf.window.fullscreen = lua_toboolean(L, -1);
+	fullscreen = lua_toboolean(L, -1);
 	lua_pop(L, 3);
+
+	fant->conf.window.x = x;
+	fant->conf.window.y = y;
+	fant->conf.window.width = width;
+	fant->conf.window.height = height;
+	fant->conf.window.fullscreen = fullscreen;
+	fant->conf.window.title = malloc(strlen(title) + 1);
+	strcpy(fant->conf.window.title, title);
 }
 
 
@@ -198,6 +249,7 @@ create_fant(const char *filename) {
 	fant->keyboard = fant_keyboard;
 	fant->destroy = fant_destroy;
 	load_window_conf(L);
+	load_camera_conf(L);
 	load_callback(L);
 	return fant;
 }

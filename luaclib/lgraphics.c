@@ -8,10 +8,11 @@ extern Game *G;
 
 static int
 ldraw_sprite(lua_State *L) {
-    GLuint vao, texture;
+    GLuint vao, texture, camera;
     vao = luaL_checkinteger(L, 1);
-    texture = luaL_optinteger(L, 2, 0);
-    G->opengl->use_sp_program();
+    camera = lua_toboolean(L, 2);
+    texture = luaL_optinteger(L, 3, 0);
+    G->opengl->use_sp_program(camera);
     glBindVertexArray(vao);
     glBindTexture(GL_TEXTURE_2D, texture);
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
@@ -19,17 +20,25 @@ ldraw_sprite(lua_State *L) {
 }
 
 
+static void
+ROTATE(float x0, float y0, float a, float x1, float y1, float *x, float *y) {
+	*x = (x1 - x0)*cos(a) - (y1 - y0)*sin(a) + x0;
+	*y = (x1 - x0)*sin(a) + (y1 - y0)*cos(a) + y0;
+}
+
 static int
 ldraw_text(lua_State *L) {
-	uint32_t c, n;
-	float x, y, w, h, scale, xpos, ypos;
+	uint32_t n, camera;
+	float x, y, w, h, scale, xpos, ypos, angle;
+	float x0, y0;
 	Character *ch;
 
-	x = luaL_checknumber(L, 1);
-	y = luaL_checknumber(L, 2);
+	x0 = x = luaL_checknumber(L, 1);
+	y0 = y = luaL_checknumber(L, 2);
 	scale = luaL_checknumber(L, 3);
 	n = luaL_len(L, 4);
-	c = luaL_optinteger(L, 5, 0xFFFFFFFF);
+	angle = luaL_checknumber(L, 5) * (M_PI/180.f);
+	camera = lua_toboolean(L, 6);
 
 	static float vertices[4][4] = {
 		{0.f, 0.f,	0.f, 0.f},
@@ -38,8 +47,7 @@ ldraw_text(lua_State *L) {
 		{0.f, 0.f,	1.f, 0.f},
 	};
 
-	G->opengl->use_tx_program();
-	glUniform4f(G->opengl->tx_shader_color, R(c), G(c), B(c), A(c));
+	G->opengl->use_tx_program(camera);
 	for (int i = 1; i <= n; ++i) {
 		lua_rawgeti(L, 4, i);
 		ch = lua_touserdata(L, -1);
@@ -49,10 +57,10 @@ ldraw_text(lua_State *L) {
 		h = ch->height * scale;
 
 		// 左上 -> 左下 -> 右下 -> 右上 (逆时针)
-		vertices[0][0] = xpos; 		vertices[0][1] = ypos + h;
-		vertices[1][0] = xpos;		vertices[1][1] = ypos;
-		vertices[2][0] = xpos + w;	vertices[2][1] = ypos;
-		vertices[3][0] = xpos + w; 	vertices[3][1] = ypos + h;
+		ROTATE(x0, y0, angle, xpos, ypos+h, &vertices[0][0], &vertices[0][1]);
+		ROTATE(x0, y0, angle, xpos, ypos,   &vertices[1][0], &vertices[1][1]);
+		ROTATE(x0, y0, angle, xpos+w, ypos, &vertices[2][0], &vertices[2][1]);
+		ROTATE(x0, y0, angle, xpos+w, ypos+h, &vertices[3][0], &vertices[3][1]);
 
 		glBindVertexArray(G->opengl->ft_vao);
 		glBindTexture(GL_TEXTURE_2D, ch->texture);
@@ -112,13 +120,9 @@ lsprite(lua_State *L) {
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
 
 	const static uint32_t step = 4*sizeof(float);
-	// position
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, step, (void*)(0));
+	// pos + texcoord
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, step, (void*)(0));
 	glEnableVertexAttribArray(0);
-
-	// texcoord
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, step, (void*)(2*sizeof(float)));
-	glEnableVertexAttribArray(1);
 
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glBindVertexArray(0);
@@ -130,7 +134,7 @@ lsprite(lua_State *L) {
 
 
 static int
-lsprite_aabb(lua_State *L) {
+lupdate_sprite_aabb(lua_State *L) {
 	GLuint vbo = luaL_checkinteger(L, 1);
 	static float p[8];
 	p[0] = luaL_checknumber(L, 2);
@@ -147,6 +151,27 @@ lsprite_aabb(lua_State *L) {
 		glBufferSubData(GL_ARRAY_BUFFER, i*4*sizeof(float), 2*sizeof(float), p + 2*i);
 	}
 
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	return 0;
+}
+
+static int
+lupdate_sprite_texcoord(lua_State *L) {
+	GLuint vbo = luaL_checkinteger(L, 1);
+	static float coord[8];
+	coord[0] = luaL_checknumber(L, 2);
+	coord[1] = luaL_checknumber(L, 3);
+	coord[2] = luaL_checknumber(L, 4);
+	coord[3] = luaL_checknumber(L, 5);
+	coord[4] = luaL_checknumber(L, 6);
+	coord[5] = luaL_checknumber(L, 7);
+	coord[6] = luaL_checknumber(L, 8);
+	coord[7] = luaL_checknumber(L, 9);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
+	for (int i = 0; i < 4; ++i) {
+		glBufferSubData(GL_ARRAY_BUFFER, (i*4+2)*sizeof(float), 2*sizeof(float), coord + 2*i);
+	}
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	return 0;
 }
@@ -177,6 +202,37 @@ ltexture(lua_State *L)
 }
 
 
+
+static int
+lset_sp_color(lua_State *L) {
+	uint32_t c;
+	c = luaL_checkinteger(L, 1);
+	G->opengl->set_sp_color(c);
+	return 0;
+}
+
+
+static int
+lset_tx_color(lua_State *L) {
+	uint32_t c;
+	c = luaL_checkinteger(L, 1);
+	G->opengl->set_tx_color(c);
+	return 0;
+}
+
+
+static int
+lupdate_camera(lua_State *L) {
+	float x, y, scale;
+
+	x = luaL_checknumber(L, 1);
+	y = luaL_checknumber(L, 2);
+	scale = luaL_optnumber(L, 3, 1.f);
+	G->opengl->update_camera(x, y, scale);
+	return 0;
+}
+
+
 int
 lib_graphics(lua_State *L)
 {
@@ -184,7 +240,12 @@ lib_graphics(lua_State *L)
 	luaL_Reg l[] = {
 		{"draw_text", ldraw_text},
         {"draw_sprite", ldraw_sprite},
-        {"sprite_aabb", lsprite_aabb},
+        {"update_sprite_texcoord", lupdate_sprite_texcoord},
+        {"update_sprite_aabb", lupdate_sprite_aabb},
+
+        {"update_camera", lupdate_camera},
+        {"set_tx_color", lset_tx_color},
+        {"set_sp_color", lset_sp_color},
         {"sprite", lsprite},
         {"texture", ltexture},
 		{NULL, NULL}

@@ -57,11 +57,10 @@ GLuint create_shader(const char* file, GLenum type) {
 }
 
 GLuint
-create_program(const char* vs_name, const char* fs_name) {
-	GLuint program = glCreateProgram();
+create_program(const char *vs_name, const char *fs_name) {
 	GLuint vs = create_shader(vs_name, GL_VERTEX_SHADER);
 	GLuint fs = create_shader(fs_name, GL_FRAGMENT_SHADER);
-
+	GLuint program = glCreateProgram();
 	glAttachShader(program, fs);
 	glAttachShader(program, vs);
 	glLinkProgram(program);
@@ -77,14 +76,4 @@ create_program(const char* vs_name, const char* fs_name) {
     glDeleteShader(vs);
     glDeleteShader(fs);
     return program;
-}
-
-void
-mat4x4_projection(mat4x4 M, float left, float right, float bottom, float top) {
-	mat4x4_identity(M);
-	M[0][0] = 2.f / (right - left);
-	M[1][1] = 2.f / (top - bottom);
-	M[2][2] = -1.f;
-	M[3][0] = -(right + left) / (right - left);
-	M[3][1] = -(top + bottom) / (top - bottom);
 }
