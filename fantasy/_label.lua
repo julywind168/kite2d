@@ -61,7 +61,7 @@ local function label(t)
 
 	function self.draw()
 		set_tx_color(self.color)
-		graphics.draw_text(self.x - self.anchorx * self.w, self.y - (self.anchory - 0.5)*self.h, scale, chars, self.angle)
+		graphics.draw_text(self.x - self.anchorx * self.w, self.y - (self.anchory - 0.5)*self.h, scale, chars, self.angle, self.camera)
 	end
 
 

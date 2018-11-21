@@ -65,9 +65,11 @@ opengl_update_camera(float x, float y, float scale) {
 
 	opengl_use_sp_program(CURRENT_CAMERA);
 	glUniformMatrix4fv(opengl->sp_camera, 1, GL_FALSE, &opengl->camera_mat[WORLD_CAMERA][0][0]);
+	opengl->sp_cur_camera = WORLD_CAMERA;
 
 	opengl_use_tx_program(CURRENT_CAMERA);
 	glUniformMatrix4fv(opengl->tx_camera, 1, GL_FALSE, &opengl->camera_mat[WORLD_CAMERA][0][0]);
+	opengl->tx_cur_camera = WORLD_CAMERA;
 }
 
 
