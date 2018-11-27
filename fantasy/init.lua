@@ -34,6 +34,17 @@ local key_name = {
 	[86] = 'v', [87] = 'w', [88] = 'x',
 	[89] = 'y', [90] = 'z',
 
+	[256] = 'escape', [257] = 'enter', [258] = 'tab',
+	[259] = 'backspace', [260] = 'insert',[261] = 'delete',
+
+	[290] = 'f1', [291] = 'f2', [292] = 'f3',
+	[293] = 'f4', [294] = 'f5', [295] = 'f6',
+	[296] = 'f7', [297] = 'f8', [298] = 'f9',
+	[299] = 'f10', [300] = 'f11', [301] = 'f12',	
+
+	[340] = 'shift', [341] = 'ctrl', [342] = 'alt',
+	[344] = 'shift', [345] = 'ctrl', [346] = 'alt',
+
 	[262] = 'right',
 	[263] = 'left',
 	[264] = 'down',
@@ -45,9 +56,6 @@ local key_event = {
 	'press',
 	'release'
 }
-
-
-
 
 
 ------------------------------------------------------------------
@@ -70,13 +78,17 @@ local function create_camera()
 		scale = fantasy.config.camera.scale or 1
 	}
 
-	setmetatable(self, {__call = function (_, k, v)
-		assert(type(self[k]) == type(v))
+	local function set(_, k, v)
 		self[k] = v
-		graphics.update_camera(self.x, self.y, self.scale)
-	end})
+		graphics.update_camera(self.x, self.y, self.scale)		
+	end
 
-	fantasy._camera = self
+	local cam = setmetatable({}, {
+		__index = self,
+		__pairs = function() return pairs(self) end,
+		__newindex = set})
+
+	fantasy._camera = cam
 	return fantasy._camera
 end
 
@@ -88,13 +100,16 @@ function fantasy.start(config, callback)
 	fantasy.sprite = create_sprite
 	fantasy.label = create_label
 
+	-- functions
+	fantasy.clear = graphics.clear
+
 	-- inject callback
 	local cb = {}
 	cb.init = assert(callback.init)
 	cb.draw = assert(callback.draw)
 	cb.update = function (dt)
 		fantasy.frame = fantasy.frame + 1
-		if fantasy.frame%60 == 0 then
+		if fantasy.frame%30 == 0 then
 			fantasy.fps = math.floor(1//dt)
 		end
 		callback.update(dt)
@@ -102,6 +117,7 @@ function fantasy.start(config, callback)
 	
 	assert(callback.mouse)
 	cb.mouse = function(what, x, y, who)
+		y = fantasy.config.window.height - y
 		return callback.mouse(mouse_event[what], x, y, who and mouse_name[who])
 	end
 
@@ -112,6 +128,11 @@ function fantasy.start(config, callback)
 		end
 		return callback.keyboard(key, key_event[what])
 	end
+
+	cb.message = function (code)
+		return callback.message(utf8.char(code))
+	end
+
 	cb.pause = assert(callback.pause)
 	cb.resume = assert(callback.resume)
 	cb.exit = assert(callback.exit)

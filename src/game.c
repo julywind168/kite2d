@@ -16,8 +16,9 @@ game_run() {
 		G->time = now;
 		G->fant->update(dt);
 		
-		glClear(GL_COLOR_BUFFER_BIT);
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+		glDisable(GL_STENCIL_TEST);
+
 		G->fant->draw();
 
 		glfwPollEvents();

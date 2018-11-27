@@ -10,9 +10,10 @@ static Fant *fant;
 #define FANTASY_DRAW 3
 #define FANTASY_MOUSE 4
 #define FANTASY_KEYBOARD 5
-#define FANTASY_PAUSE 6
-#define FANTASY_RESUME 7
-#define FANTASY_EXIT 8
+#define FANTASY_MESSAGE 6
+#define FANTASY_PAUSE 7
+#define FANTASY_RESUME 8
+#define FANTASY_EXIT 9
 
 #define MOUSE_PRESS 1
 #define MOUSE_RELEASE 2
@@ -32,8 +33,21 @@ fant_init() {
 	}
 }
 
+
 void
-fant_keyboard(GLFWwindow* window, int key, int scancode, int action, int mods) {
+fant_message(GLFWwindow *window, uint32_t code) {
+	lua_State *L = fant->L;
+	lua_pushvalue(L, FANTASY_MESSAGE);
+	lua_pushinteger(L, code);
+	if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+		fprintf(stderr, "lua error: %s\n", lua_tostring(L, -1));
+		lua_pop(L, 1);
+	}
+}
+
+
+void
+fant_keyboard(GLFWwindow *window, int key, int scancode, int action, int mods) {
 	lua_State *L = fant->L;
 	if (action != 2) {
 		if (action == 0)
@@ -116,6 +130,7 @@ load_callback(lua_State *L) {
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_DRAW");
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_MOUSE");
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_KEYBOARD");
+	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_MESSAGE");
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_PAUSE");		
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_RESUME");
 	lua_getfield(L, LUA_REGISTRYINDEX, "FANTASY_EXIT");
@@ -247,6 +262,7 @@ create_fant(const char *filename) {
 	fant->_cursor = _fant_cursor; 
 	fant->mouse = fant_mouse;
 	fant->keyboard = fant_keyboard;
+	fant->message = fant_message;
 	fant->destroy = fant_destroy;
 	load_window_conf(L);
 	load_camera_conf(L);

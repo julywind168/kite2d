@@ -31,6 +31,9 @@ linject(lua_State *L) {
 	lua_pushstring(L, "keyboard");
 	lua_gettable(L, -2);
 	lua_setfield(L, LUA_REGISTRYINDEX, "FANTASY_KEYBOARD");
+	lua_pushstring(L, "message");
+	lua_gettable(L, -2);
+	lua_setfield(L, LUA_REGISTRYINDEX, "FANTASY_MESSAGE");
 	lua_pushstring(L, "pause");
 	lua_gettable(L, -2);
 	lua_setfield(L, LUA_REGISTRYINDEX, "FANTASY_PAUSE");

@@ -59,11 +59,13 @@ local function label(t)
 
 	self.w = font_core.chars_length(chars, scale)
 
-	function self.draw()
+
+	local lab = {}
+
+	function lab.draw()
 		set_tx_color(self.color)
 		graphics.draw_text(self.x - self.anchorx * self.w, self.y - (self.anchory - 0.5)*self.h, scale, chars, self.angle, self.camera)
 	end
-
 
 	local function set(_, k, v)
 		assert(self[k], "label don't has this property")
@@ -76,7 +78,10 @@ local function label(t)
 		end
 	end
 
-	return setmetatable(self, {__call = set})
+	return setmetatable(lab, {
+		__index = self,
+		__pairs = function () return pairs(self) end,
+		__newindex = set})
 end
 
 

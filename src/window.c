@@ -26,6 +26,7 @@ window_init() {
 	glfwSetKeyCallback(window->handle, G->fant->keyboard);
 	glfwSetMouseButtonCallback(window->handle, G->fant->mouse);
 	glfwSetCursorPosCallback(window->handle, G->fant->_cursor);
+	glfwSetCharCallback(window->handle, G->fant->message);
 }
 
 

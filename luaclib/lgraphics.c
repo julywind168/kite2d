@@ -233,21 +233,59 @@ lupdate_camera(lua_State *L) {
 }
 
 
+// 开始模板绘制 -> draw stencils(sprites) -> 结束模板绘制 -> draw sprites -> 清空模板
+static int
+lstart_stencil(lua_State *L) {
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 0XFF);
+	glStencilMask(0XFF);
+	return 0;
+}
+
+
+static int
+lstop_stencil(lua_State *L) {
+	glStencilFunc(GL_EQUAL, 1, 0xFF);
+	glStencilMask(0x00);
+	return 0;
+}
+
+
+static int
+lclear_stencil(lua_State *L) {
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+	return 0;
+}
+
+
+static int
+lclear(lua_State *L) {
+	uint32_t c;
+	c = luaL_checkinteger(L, 1);
+	glClearColor(R(c), G(c), B(c), A(c));
+	return 0;
+}
+
+
 int
 lib_graphics(lua_State *L)
 {
     stbi_set_flip_vertically_on_load(true);
 	luaL_Reg l[] = {
+		{"clear_stencil", lclear_stencil},
+		{"stop_stencil", lstop_stencil},
+		{"start_stencil", lstart_stencil},
 		{"draw_text", ldraw_text},
         {"draw_sprite", ldraw_sprite},
         {"update_sprite_texcoord", lupdate_sprite_texcoord},
         {"update_sprite_aabb", lupdate_sprite_aabb},
-
         {"update_camera", lupdate_camera},
         {"set_tx_color", lset_tx_color},
         {"set_sp_color", lset_sp_color},
         {"sprite", lsprite},
         {"texture", ltexture},
+        {"clear", lclear},
 		{NULL, NULL}
 	};
 	luaL_newlib(L, l);

@@ -42,6 +42,7 @@ typedef struct
 	void (*_cursor)(GLFWwindow*, double, double);
 	void (*mouse)(GLFWwindow*, int, int, int);
 	void (*keyboard)(GLFWwindow*, int, int, int, int);
+	void (*message)(GLFWwindow*, uint32_t);
 	void (*destroy)(void);
 } Fant;
 

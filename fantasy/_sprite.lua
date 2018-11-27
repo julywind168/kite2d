@@ -14,11 +14,11 @@ local function get_texture(texname)
 	return tex
 end
 
-local function rotate(x0, y0, x, y, a)
+local function rotate(x0, y0, x1, y1, a)
 	a = a * math.pi/180
-	local x1 = (x-x0)*math.cos(a) - (y-y0)*math.sin(a) + x0
-	local y1 = (x-x0)*math.sin(a) + (y-y0)*math.cos(a) + y0
-	return x1, y1
+	local x = (x1-x0)*math.cos(a) - (y1-y0)*math.sin(a) + x0
+	local y = (x1-x0)*math.sin(a) + (y1-y0)*math.cos(a) + y0
+	return x, y
 end
 
 
@@ -72,10 +72,6 @@ local function sprite(t)
 			self.aabb[4].x, self.aabb[4].y)
 	end
 
-	function self.draw()
-		set_sp_color(self.color)
-		graphics.draw_sprite(vao, self.camera, texture)
-	end
 
 	local set = {}
 
@@ -102,10 +98,19 @@ local function sprite(t)
 		update_aabb()
 	end
 
-	return setmetatable(self, {__call = function (_, k, v)
-		local f = set[k]
-		if f then f(v) end
-	end})
+
+	-- sprite
+	local sp = {}
+
+	function sp.draw()
+		set_sp_color(self.color)
+		graphics.draw_sprite(vao, self.camera, texture)
+	end
+
+	return setmetatable(sp, {
+		__index = self,
+ 		__pairs = function () return pairs(self) end,
+		__newindex = function (_, k, ...) local f = set[k] if f then f(...) end end})
 end
 
 return sprite

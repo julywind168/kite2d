@@ -19,10 +19,8 @@ end}
 
 
 function game.update(dt)
-	fps('text', 'fps:'..ft.fps)
-
-	-- move camera to right
-	camera('x', camera.x + 2)
+	fps.text = 'fps:'..ft.fps
+	camera.x = camera.x + 2
 end
 
 
@@ -55,7 +53,7 @@ local config = {
 		y = 1080/2,		-- screen pos
 		width = 960,
 		height = 640,
-		title = 'Hello World',
+		title = 'Hello Camera',
 		fullscreen = false
 	},
 	camera = {
