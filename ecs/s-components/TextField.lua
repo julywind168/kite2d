@@ -65,7 +65,7 @@ return function (e)
 
 
 	local dealy = 0
-	local dealy2 = 0
+	local back_dealy = 0
 	function self.update(dt)
 		if world.g.editing == e then
 			dealy = dealy + dt
@@ -74,9 +74,9 @@ return function (e)
 				cursor.node.active = not cursor.node.active
 			end
 
-			dealy2 = dealy2 + dt
-			if dealy2 > 0.05 then
-				dealy2 = 0
+			back_dealy = back_dealy + dt
+			if back_dealy > 0.05 then
+				back_dealy = 0
 				if world.g.keyboard.pressed == 'backspace' then
 					local len = #label.label.text 
 					if len > 0 then
