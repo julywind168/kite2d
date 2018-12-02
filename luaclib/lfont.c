@@ -72,9 +72,9 @@ lchars_length(lua_State *L) {
         lua_pop(L, 1);
     }
     if (n > 1)
-        length = ceil(end_x - first_x + end_width);     
+        length = ceil(end_x - first_x + end_width + 2);     
     else
-        length = ceil(first_width);        
+        length = ceil(first_width + 2);        
 
     lua_pushinteger(L, length);
     return 1;

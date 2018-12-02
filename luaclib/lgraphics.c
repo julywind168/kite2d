@@ -29,17 +29,18 @@ ROTATE(float x0, float y0, float a, float x1, float y1, float *x, float *y) {
 static int
 ldraw_text(lua_State *L) {
 	uint32_t n, camera;
-	float x, y, w, h, scale, xpos, ypos, angle;
-	float x0, y0;
+	float x0, y0, x, y, w, h, scale, xpos, ypos, angle;
 	Character *ch;
 
-	x0 = x = luaL_checknumber(L, 1);
-	y0 = y = luaL_checknumber(L, 2);
-	scale = luaL_checknumber(L, 3);
-	n = luaL_len(L, 4);
-	angle = luaL_checknumber(L, 5) * (M_PI/180.f);
-	camera = lua_toboolean(L, 6);
-
+	x0 = luaL_checknumber(L, 1);
+	y0 = luaL_checknumber(L, 2);
+	x = luaL_checknumber(L, 3);
+	y = luaL_checknumber(L, 4);
+	scale = luaL_checknumber(L, 5);
+	n = luaL_len(L, 6);
+	angle = luaL_checknumber(L, 7) * (M_PI/180.f);
+	camera = lua_toboolean(L, 8);
+	
 	static float vertices[4][4] = {
 		{0.f, 0.f,	0.f, 0.f},
 		{0.f, 0.f,	0.f, 1.f},
@@ -48,14 +49,15 @@ ldraw_text(lua_State *L) {
 	};
 
 	G->opengl->use_tx_program(camera);
+
+
 	for (int i = 1; i <= n; ++i) {
-		lua_rawgeti(L, 4, i);
+		lua_rawgeti(L, 6, i);
 		ch = lua_touserdata(L, -1);
+
 		xpos = x + ch->offsetx * scale;
 		ypos = y - (ch->height - ch->offsety) * scale;
 
-		// ypos = y - ch->height * scale;
-		// printf("y:%f, ypos:%f, height:%f, offsety:%f\n", y, ypos, ch->height, ch->offsety);
 		w = ch->width * scale;
 		h = ch->height * scale;
 

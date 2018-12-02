@@ -39,7 +39,7 @@ local function Label(e, t)
 	function self.draw()
 		if e.active then
 			graphics.set_tx_color(e.color)
-			graphics.draw_text(e.x - e.ax * e.w, e.y-(e.ay-0.24)*e.h, scale, chars, e.angle, e.camera)
+			graphics.draw_text(e.x, e.y, e.x - e.ax * e.w, e.y-(e.ay-0.24)*e.h, scale, chars, e.angle, e.camera)
 		end
 	end
 
