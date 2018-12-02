@@ -39,7 +39,8 @@ typedef struct
 	void (*init)(void);
 	void (*update)(double);
 	void (*draw)(void);
-	void (*_cursor)(GLFWwindow*, double, double);
+	void (*_cursor_enter)(GLFWwindow*, int);
+	void (*_cursor_move)(GLFWwindow*, double, double);
 	void (*mouse)(GLFWwindow*, int, int, int);
 	void (*keyboard)(GLFWwindow*, int, int, int, int);
 	void (*message)(GLFWwindow*, uint32_t);

@@ -1,112 +1,137 @@
 local ecs = require "ecs"
 local graphics = require "ecs.graphics"
+local function TextField(e, t)
+	local self = {
+		active = (t.active ~= false) and true or false,
+		camera = t.camera and true or false
+	}
 
-
-return function (e)
-
-	local world = ecs.current_world
-	local bg, mask, label, cursor, limit
-
-	local self = {}
+	local g = ecs.current_world.g
+	local background, mask, label, cursor
 
 	function self.init()
-		bg = e.group.find('background')
-		mask = e.group.find('mask')
-		label = e.group.find('label')
-		cursor = e.group.find('cursor')
-		limit = mask.node.width
-	end
+		assert(e.components['struct'])
+		background = assert(e.background)
+		mask = assert(e.mask)
+		label = assert(e.label)
+		cursor = assert(e.cursor)
 
-	function self.start()
-		label.node.anchor.x = 0
-		label.node.x = mask.node.x - mask.node.width * mask.node.anchor.x
-		cursor.node.anchor.x = 0
-		cursor.node.active = false
+		assert(background.components['sprite'] and mask.components['sprite']
+			and cursor.components['sprite'] and label.components['label'])
 
-		local mask_draw = mask.draw
-		local label_draw = label.draw
+		background.x = e.x
+		background.y = e.y
+		background.w = e.w
+		background.h = e.h
+		background.ax = e.ax
+		background.ay = e.ay
+		background.camera = e.camera
 
-		function mask.draw()
-			graphics.start_stencil()
-			mask_draw()
-			graphics.stop_stencil()
-		end
+		mask.x = e.x - 2
+		mask.y = e.y
+		mask.w = e.w - 8
+		mask.h = e.h - 4
+		mask.ax = e.ax
+		mask.ay = e.ay
+		mask.camera = e.camera
 
-		function label.draw()
-			label_draw()
-			graphics.clear_stencil()
-		end
+		label.ax = 0
+		label.ay = e.ay
+		label.x = mask.x - mask.w * mask.ax
+		label.y = e.y - 6
+		label.camera = e.camera
 
-		-- hook label.label (component)
-		local _label = label.label
+		cursor.x = label.x
+		cursor.y = e.y
+		cursor.w = 1
+		cursor.h = math.floor(e.h * 32/48)
+		cursor.ax = 0
+		cursor.ay = e.ay
+		cursor.camera = e.camera
+		cursor.active = false
 
-		local function set(k, v)
-			if k == 'text' then
-				_label.text = v
-				if _label.width <= limit and label.node.anchor.x ~= 0 then
-					label.node.anchor.x = 0
-					label.node.x = mask.node.x - mask.node.width * mask.node.anchor.x
-				elseif _label.width > limit and label.node.anchor.x ~= 1 then
-					label.node.anchor.x = 1
-					label.node.x = mask.node.x + mask.node.width * mask.node.anchor.x
+		background.init()
+		mask.init()
+		label.init()
+		cursor.init()
+
+		e.on('active', function ()
+			cursor.x = label.x + (1-label.ax) * label.w + 2
+			cursor.active = true
+		end)
+
+		e.on('focus', function ()
+			cursor.active = false
+		end)
+
+		e.on('key_release', function (key)
+			if key == 'backspace' then
+				local len = #label.text 
+				if len > 0 then
+					label.text = label.text:sub(1, len -1)
 				end
-				cursor.node.x = label.node.x + (1-label.node.anchor.x) * label.label.width + 2
-			else
-				_label[k] = v
 			end
-		end
+		end)
 
-		label.label = setmetatable({}, {
-				__index = _label,
-				__pairs = function () return pairs(_label) end,
-				__newindex = function (_,k,v) set(k, v) end
-			})
+		e.on('message', function (char)
+			label.text = label.text..char
+		end)
+
+		local after = getmetatable(label)
+		local label_set_text = after.set.text
+
+		function after.set.text()
+			label_set_text()
+			if label.w <= mask.w and label.ax ~= 0 then
+				label.ax = 0
+				label.x = mask.x - mask.w * mask.ax
+			elseif label.w > mask.w and label.ax ~= 1 then
+				label.ax = 1
+				label.x = mask.x + mask.w * mask.ax
+			end
+			cursor.x = label.x + (1-label.ax) * label.w + 2			
+		end
 	end
 
-
-	local dealy = 0
-	local dealy2 = 0
+	local delay1, delay2 = 0, 0
 	function self.update(dt)
-		if world.g.editing == e then
-			dealy = dealy + dt
-			if dealy > 0.5 then
-				dealy = 0
-				cursor.node.active = not cursor.node.active
-			end
+		if g.active_input ~= e then return end
 
-			dealy2 = dealy2 + dt
-			if dealy2 > 0.05 then
-				dealy2 = 0
-				if world.g.keyboard.pressed == 'backspace' then
-					local len = #label.label.text 
-					if len > 0 then
-						label.label.text = label.label.text:sub(1, len -1)
-					end
+		delay1 = delay1 + dt
+		if delay1 > 0.5 then
+			delay1 = 0
+			cursor.active = not cursor.active
+		end
+
+		if g.keyboard.lpressed == 'backspace' then
+			delay2 = delay2 + dt
+			if delay2 > 0.05 then
+				delay2 = 0
+				local len = #label.text 
+				if len > 0 then
+					label.text = label.text:sub(1, len -1)
 				end
 			end
 		end
 	end
 
-	-- 进入编辑状态
-	function self.active()
-		cursor.node.x = label.node.x + (1-label.node.anchor.x) * label.label.width + 2
-		cursor.node.active = true
-		return e
-	end
-
-	-- 退出编辑状态
-	function self.focus()
-		cursor.node.active = false
-	end
-
-	function self.keyboard(key)
-		if key == 'backspace' then
-			local len = #label.label.text 
-			if len > 0 then
-				label.label.text = label.label.text:sub(1, len -1)
-			end
+	function self.draw()
+		if e.active then
+			background.draw()
+			graphics.start_stencil()
+			mask.draw()
+			graphics.stop_stencil()
+			label.draw()
+			graphics.clear_stencil()
+			cursor.draw()
 		end
 	end
 
-	return 'textfield', self
+	return self
+end
+
+return function (t)
+	return function (e)
+		return 'textfield', TextField(e, t or {})
+	end
 end

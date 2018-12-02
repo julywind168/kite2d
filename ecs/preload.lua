@@ -1,7 +1,17 @@
-local M = {}
+function IN(v, t)
+	for _, _v in ipairs(t) do
+		if _v == v then
+			return true
+		end
+	end
+	return false
+end
 
+function printf(...)
+    print(string.format(...))
+end
 
-function M.dump(t)  
+function dump(t)  
     local print_r_cache={}
     local function sub_print_r(t,indent)
         if (print_r_cache[tostring(t)]) then
@@ -34,6 +44,3 @@ function M.dump(t)
     end
     print()
 end
-
-
-return M

@@ -1,100 +1,64 @@
 local ecs = require "ecs"
 local graphics = require "ecs.graphics"
-local util = require "ecs.util.node"
+local util = require "ecs.util.sprite"
 
 
-return function (e, t)
-	t = t or {}
-
+local function Sprite(e, t)
 	local self = {
-		texname = t.texname or "resource/white.png",
-		texcoord = t.texcoord or {0,1, 0,0, 1,0, 1,1},
+		active = (t.active ~= false) and true or false,
+		camera = (t.camera ~= false) and true or false,
 		color = t.color or 0xffffffff,
-		vao = nil,
-		vbo = nil,
-		tex = nil,
+
+		texname = t.texname or 'resource/white.png',
+		texcoord = t.texcoord or {0,1, 0,0, 1,0, 1,1},
+		aabb = {{},{},{},{}}
 	}
 
+	local vao, vbo, texture
+	local aabb
+
 	function self.init()
-		assert(e.node and not e.draw)
+		assert(e.components['transform'] and e.components['rectangle'])
+		aabb = e.aabb
+		util.e_calc_aabb(e)
 
-		self.tex = graphics.texture(self.texname)
-		self.vao, self.vbo = graphics.sprite(
-			e.node.aabb[1].x, e.node.aabb[1].y,
-			e.node.aabb[2].x, e.node.aabb[2].y,
-			e.node.aabb[3].x, e.node.aabb[3].y,
-			e.node.aabb[4].x, e.node.aabb[4].y,
-			table.unpack(self.texcoord))
+		texture = graphics.texture(e.texname)
+		vao, vbo = graphics.sprite(aabb[1].x, aabb[1].y, aabb[2].x, aabb[2].y, aabb[3].x, aabb[3].y, aabb[4].x, aabb[4].y,
+			table.unpack(e.texcoord))
 
-
-		function e.draw()
-			if e.node.active then
-				graphics.set_sp_color(self.color)
-				graphics.draw_sprite(self.vao, e.node.camera, self.tex)
-			end
+		-- hook
+		local function update_aabb()
+			util.e_calc_aabb(e)
+			graphics.update_sprite_aabb(vbo, aabb[1].x, aabb[1].y, aabb[2].x, aabb[2].y, aabb[3].x,	aabb[3].y, aabb[4].x, aabb[4].y)
 		end
 
-		table.insert(ecs.current_world.g.render_list, e)
+		local after = getmetatable(e)
 
-		-- hook nood
-		local node = e.node
-
-		local function on_node_update()
-			util.node_calc_aabb(node)
-			graphics.update_sprite_aabb(self.vbo,
-				node.aabb[1].x, node.aabb[1].y,
-				node.aabb[2].x, node.aabb[2].y,
-				node.aabb[3].x, node.aabb[3].y,
-				node.aabb[4].x, node.aabb[4].y)
+		for _,k in ipairs({'x', 'y', 'sx', 'sy', 'ax', 'ay', 'angle'}) do
+			after.set[k] = update_aabb
 		end
 
-		local set = {}
-
-		function set.x(x)
-			node.x = x
-			on_node_update()
+		function after.set.texname(name)
+			texture = graphics.texture(name)
 		end
 
-		function set.y(y)
-			node.y = y
-			on_node_update()
+		function after.set.texcoord(coord)
+			graphics.update_sprite_aabb(vbo, table.unpack(coord))
 		end
-
-		function set.angel(a)
-			node.a = a
-			on_node_update()
-		end
-
-		function set.active(active)
-			node.active = active
-		end
-
-
-		e.node = setmetatable({}, {
-				__index = node,
-				__pairs = function () return pairs(node) end,
-				__newindex = function (_,k,v) set[k](v) end
-			})
-
-		-- hook sprite
-		local sp_set = {}
-
-		function sp_set.texname(name)
-			self.texname = name
-			self.tex = assert(graphics.texture(name), 'failed to load texture '..tostring(name))
-		end
-
-		function sp_set.texcoord(coord)
-			self.texcoord = coord
-			graphics.update_sprite_texcoord(self.vbo, table.unpack(coord))			
-		end
-
-		e.sprite = setmetatable({}, {
-				__index = self,
-				__pairs = function () return pairs(self) end,
-				__newindex = function (_,k,v) sp_set[k](v) end
-			})
 	end
 
-	return 'sprite', self
+	function self.draw()
+		if e.active then
+			graphics.set_sp_color(e.color)
+			graphics.draw_sprite(vao, e.camera, texture)
+		end
+	end
+
+	return self
+end
+
+return function (t)
+	return function (e)
+		return 'sprite', Sprite(e, t or {})
+	end
 end

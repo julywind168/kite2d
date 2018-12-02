@@ -1,37 +1,39 @@
 local function Script(world)
 
-	local list = world.g.script_list
+	local scripts = world.g.scripts
 	
 	local self = {}	
 
-
-	local handle = {}
-
-	function handle._init()
-		for _,s in ipairs(list) do
+	function self.init()
+		for _,s in ipairs(scripts) do
 			if s.init then
 				s.init()
 			end
 		end
 
-		for _,s in ipairs(list) do
+		for _,s in ipairs(scripts) do
 			if s.start then
 				s.start()
 			end
 		end
-
 	end
 
-	function handle._update(dt)
-		for _,s in ipairs(list) do
+	function self.update(dt)
+		for _,s in ipairs(scripts) do
 			if s.update then
 				s.update(dt)
 			end
 		end
 	end
 
+	function self.ejoin(e)
+		if e.init or e.start or e.update or e.exit then
+			table.insert(scripts, e)
+		end
+	end
+
 	return setmetatable(self, {__call = function (_, event, ...)
-		local f = handle[event]
+		local f = self[event]
 		if f then
 			return f(...)
 		end

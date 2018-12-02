@@ -13,7 +13,9 @@ local mouse_name = {
 local mouse_event = {
 	'press',
 	'release',
-	'move'
+	'move',
+	'enter',
+	'leave'
 }
 
 local key_name = {
@@ -65,6 +67,7 @@ local fantasy = {
 	frame = 0,
 	fps = 60,
 	config = nil,
+	window = nil,
 	_camera = nil
 }
 
@@ -95,6 +98,7 @@ end
 function fantasy.start(config, callback)
 	
 	fantasy.config = config
+	fantasy.window = config.window
 	-- component
 	fantasy.camera = create_camera
 	fantasy.sprite = create_sprite
@@ -117,7 +121,9 @@ function fantasy.start(config, callback)
 	
 	assert(callback.mouse)
 	cb.mouse = function(what, x, y, who)
-		y = fantasy.config.window.height - y
+		if y then
+			y = fantasy.config.window.height - y
+		end
 		return callback.mouse(mouse_event[what], x, y, who and mouse_name[who])
 	end
 

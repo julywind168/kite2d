@@ -18,6 +18,8 @@ static Fant *fant;
 #define MOUSE_PRESS 1
 #define MOUSE_RELEASE 2
 #define MOUSE_MOVE 3
+#define MOUSE_ENTER 4
+#define MOUSE_LEAVE 5
 
 #define KEY_PRESS 1
 #define KEY_RELEASE 2
@@ -85,8 +87,23 @@ fant_mouse(GLFWwindow* window, int button, int action, int mods) {
 	}
 }
 
+void 
+_fant_cursor_enter(GLFWwindow* window, int entered) {
+	lua_State *L = fant->L;
+	if (entered)
+		entered = MOUSE_ENTER;
+	else
+		entered = MOUSE_LEAVE;
+	lua_pushvalue(L, FANTASY_MOUSE);
+	lua_pushinteger(L, entered);
+	if (lua_pcall(L, 1, 0, 0) != LUA_OK) {
+		fprintf(stderr, "lua error: %s\n", lua_tostring(L, -1));
+		lua_pop(L, 1);
+	}
+}
+
 void
-_fant_cursor(GLFWwindow* window, double x, double y) {
+_fant_cursor_move(GLFWwindow* window, double x, double y) {
 	lua_State *L = fant->L;
 	lua_pushvalue(L, FANTASY_MOUSE);
 	lua_pushinteger(L, MOUSE_MOVE);
@@ -259,7 +276,8 @@ create_fant(const char *filename) {
 	fant->init = fant_init;
 	fant->update = fant_update;
 	fant->draw = fant_draw;
-	fant->_cursor = _fant_cursor; 
+	fant->_cursor_move = _fant_cursor_move;
+	fant->_cursor_enter = _fant_cursor_enter; 
 	fant->mouse = fant_mouse;
 	fant->keyboard = fant_keyboard;
 	fant->message = fant_message;
