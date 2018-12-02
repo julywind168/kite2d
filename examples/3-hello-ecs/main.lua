@@ -43,7 +43,7 @@ local game = {init = function()
 		+ Struct {
 			ecs.entity('background') + Trans() + Rect() + Sprite{color=0x333333aa},
 			ecs.entity('mask') 		 + Trans() + Rect() + Sprite{texname='resource/null.png'},
-			ecs.entity('label') 	 + Trans() + Rect() + Label{text='hi...',color=0xffffffff, fontname=font.arial, fontsize=38},
+			ecs.entity('label') 	 + Trans() + Rect() + Label{text='hi...',color=0xffffffff, fontname=font.msyh, fontsize=24},
 			ecs.entity('cursor') 	 + Trans() + Rect() + Sprite{color=0xffffffff}
 		}
 		+ TextField()

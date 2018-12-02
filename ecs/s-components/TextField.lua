@@ -68,7 +68,7 @@ local function TextField(e, t)
 			if key == 'backspace' then
 				local len = #label.text 
 				if len > 0 then
-					label.text = label.text:sub(1, len -1)
+					label.text = label.text:sub(1, utf8.offset(label.text, utf8.len(label.text))-1)
 				end
 			end
 		end)
@@ -109,7 +109,7 @@ local function TextField(e, t)
 				delay2 = 0
 				local len = #label.text 
 				if len > 0 then
-					label.text = label.text:sub(1, len -1)
+					label.text = label.text:sub(1, utf8.offset(label.text, utf8.len(label.text))-1)
 				end
 			end
 		end
