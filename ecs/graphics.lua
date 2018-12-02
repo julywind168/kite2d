@@ -23,7 +23,7 @@ local fonts = {}
 local TX_CUR_COLOR = 0xffffffff
 
 local function get_font(name, size)
-	local size = size or 24
+	local size = size or 48
 	local font = fonts[name]
 	if font then return font end
 

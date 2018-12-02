@@ -40,7 +40,8 @@ lchar(lua_State *L) {
     ch->offsetx = face->glyph->bitmap_left;
     ch->offsety = face->glyph->bitmap_top;
     ch->advancex = face->glyph->advance.x;
-	return 1;
+
+    return 1;
 }
 
 static int
@@ -70,8 +71,10 @@ lchars_length(lua_State *L) {
         }
         lua_pop(L, 1);
     }
-
-    length = ceil(end_x - first_x + (first_width + end_width)/2);
+    if (n > 1)
+        length = ceil(end_x - first_x + end_width);     
+    else
+        length = ceil(first_width);        
 
     lua_pushinteger(L, length);
     return 1;
@@ -85,7 +88,7 @@ lface(lua_State *L) {
 	int size;
 
 	filename = luaL_checkstring(L, 1);
-	size = luaL_optinteger(L, 2, 48);
+	size = luaL_checkinteger(L, 2);
 
 	if (FT_New_Face(ft, filename, 0, &face)) {
 		return luaL_error(L, "failed to load font:%s", filename);

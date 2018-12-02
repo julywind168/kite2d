@@ -53,6 +53,9 @@ ldraw_text(lua_State *L) {
 		ch = lua_touserdata(L, -1);
 		xpos = x + ch->offsetx * scale;
 		ypos = y - (ch->height - ch->offsety) * scale;
+
+		// ypos = y - ch->height * scale;
+		// printf("y:%f, ypos:%f, height:%f, offsety:%f\n", y, ypos, ch->height, ch->offsety);
 		w = ch->width * scale;
 		h = ch->height * scale;
 

@@ -4,8 +4,8 @@
 ]]
 local ecs = require "ecs"
 
-local transform = require "ecs.d-components.Transform"
-local rectangle = require "ecs.d-components.Rectangle"
+local Trans = require "ecs.d-components.Transform"
+local Rect = require "ecs.d-components.Rectangle"
 local struct = require "ecs.d-components.Struct"
 
 local sprite = require "ecs.s-components.Sprite"
@@ -15,8 +15,18 @@ local textField = require "ecs.s-components.TextField"
 
 
 return {
-ecs.entity('bg')+transform{x=480,y=320,sx=1.000000,sy=1.000000,angle=0}+rectangle{w=960,h=640,ax=0.500000,ay=0.500000}+sprite{active=true,camera=true,color=0xffffffff,texname='examples/asset/bg.jpg'},
-ecs.entity('bird1')+transform{x=174,y=452,sx=1.000000,sy=1.000000,angle=0}+rectangle{w=48,h=48,ax=0.500000,ay=0.500000}+sprite{active=true,camera=true,color=0xffffffff,texname='examples/asset/bird0_0.png'},
-ecs.entity('bird2')+transform{x=250,y=416,sx=1.000000,sy=1.000000,angle=0}+rectangle{w=48,h=48,ax=0.500000,ay=0.500000}+sprite{active=true,camera=true,color=0xffffffff,texname='examples/asset/bird0_1.png'},
-ecs.entity('bird3')+transform{x=291,y=488,sx=1.000000,sy=1.000000,angle=0}+rectangle{w=48,h=48,ax=0.500000,ay=0.500000}+sprite{active=true,camera=true,color=0xffffffff,texname='examples/asset/bird0_2.png'}
+ecs.entity('m11')+Trans{x=150,y=490}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m1_1.jpg'},
+ecs.entity('m12')+Trans{x=450,y=490}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m1_2.jpg'},
+ecs.entity('m13')+Trans{x=750,y=490}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m1_3.jpg'},
+ecs.entity('m14')+Trans{x=1050,y=490}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m1_4.jpg'},
+
+ecs.entity('m21')+Trans{x=150,y=190}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m2_1.jpg'},
+ecs.entity('m22')+Trans{x=450,y=190}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m2_2.jpg'},
+ecs.entity('m23')+Trans{x=750,y=190}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m2_3.jpg'},
+ecs.entity('m24')+Trans{x=1050,y=190}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m2_4.jpg'},
+
+ecs.entity('m21')+Trans{x=150,y=-110}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m3_1.jpg'},
+ecs.entity('m22')+Trans{x=450,y=-110}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m3_2.jpg'},
+ecs.entity('m23')+Trans{x=750,y=-110}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m3_3.jpg'},
+ecs.entity('m24')+Trans{x=1050,y=-110}+Rect{w=300,h=300}+sprite{texname='examples/asset/map/m3_4.jpg'},
 }

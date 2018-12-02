@@ -17,7 +17,7 @@ local font = {
 
 -- 要编辑的ui列表
 local entities = require "examples.asset.entities"
-local outfile = 'examples/asset/entities.lua'
+local outfile = 'examples/asset/__entities.lua'
 
 
 local world

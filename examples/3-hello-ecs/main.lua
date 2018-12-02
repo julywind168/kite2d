@@ -32,8 +32,8 @@ local game = {init = function()
 
 	-- base
 	bg = ecs.entity() + Trans{x=480,y=320} + Rect{w=960,h=640} + Sprite{texname='examples/asset/bg.jpg'}
-	fps = ecs.entity() + Trans{x=20,y=620} + Rect{ax=0, ay=1} + Label{text='fps:60',color=0x554411ff, fontname=font.arial, fontsize=24}
-	hw = ecs.entity() + Trans{x=480,y=320} + Rect{} + Label{text='Hello World',color=0xff0000ff, fontname=font.arial, fontsize=48}
+	--fps = ecs.entity() + Trans{x=20,y=620} + Rect{ax=0, ay=1} + Label{text='fps:60',color=0x554411ff, fontname=font.arial, fontsize=24}
+	hw = ecs.entity() + Trans{x=480,y=640} + Rect{ay=1} + Label{text='A|',color=0xff0000ff, fontname=font.arial, fontsize=48}
 
 
 	-- text field
@@ -43,7 +43,7 @@ local game = {init = function()
 		+ Struct {
 			ecs.entity('background') + Trans() + Rect() + Sprite{color=0x333333aa},
 			ecs.entity('mask') 		 + Trans() + Rect() + Sprite{texname='resource/null.png'},
-			ecs.entity('label') 	 + Trans() + Rect() + Label{text='hi...',color=0xffffffff, fontname=font.arial, fontsize=24},
+			ecs.entity('label') 	 + Trans() + Rect() + Label{text='hi...',color=0xffffffff, fontname=font.arial, fontsize=38},
 			ecs.entity('cursor') 	 + Trans() + Rect() + Sprite{color=0xffffffff}
 		}
 		+ TextField()
@@ -61,7 +61,7 @@ local game = {init = function()
 	end)
 
 	world.add_entity(bg)
-	world.add_entity(fps)
+	--world.add_entity(fps)
 	world.add_entity(hw)
 	world.add_entity(ok)
 	world.add_entity(account)
@@ -72,7 +72,7 @@ end}
 
 function game.update(dt)
 	world('update', dt)
-	fps.text = 'fps:'..ft.fps	
+	-- fps.text = 'fps:'..ft.fps	
 end
 
 

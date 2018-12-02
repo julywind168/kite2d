@@ -38,7 +38,7 @@ local function TextField(e, t)
 		label.ax = 0
 		label.ay = e.ay
 		label.x = mask.x - mask.w * mask.ax
-		label.y = e.y - 6
+		label.y = e.y
 		label.camera = e.camera
 
 		cursor.x = label.x
