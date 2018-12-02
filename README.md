@@ -5,8 +5,10 @@ A simple 2d game engine for Lua
 ## Build & Test (for windows mingw)
 ```
 1. make
-2. fan.exe examples/1-hello-world/main.lua
-3. 
+2. ./fan.exe examples/1-hello-world/main.lua
+3. ./fan.exe examples/2-hello-camera/main.lua
+4. ./fan.exe examples/3-hello-ecs/main.lua
+5. ./fan.exe examples/4-hello-editor/main.lua
 ```
 
 ## Roadmap
