@@ -61,10 +61,9 @@ local function label(t)
 
 
 	local lab = {}
-
 	function lab.draw()
 		set_tx_color(self.color)
-		graphics.draw_text(self.x - self.anchorx * self.w, self.y - (self.anchory - 0.5)*self.h, scale, chars, self.angle, self.camera)
+		graphics.draw_text(self.x, self.y, self.x - self.anchorx * self.w, self.y - (self.anchory - 0.5)*self.h, scale, chars, self.angle, self.camera)
 	end
 
 	local function set(_, k, v)

@@ -3,13 +3,11 @@ A simple 2d game engine for Lua
 
 
 ## Build & Test (for windows mingw)
-```
-1. make
+1. install mingw64 and gcc, freetype <a href="https://github.com/HYbutterfly/Fantasy/wiki/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA">环境依赖说明</a>
 2. ./fan.exe examples/1-hello-world/main.lua
 3. ./fan.exe examples/2-hello-camera/main.lua
 4. ./fan.exe examples/3-hello-ecs/main.lua
 5. ./fan.exe examples/4-hello-editor/main.lua
-```
 
 ## Roadmap
 ```

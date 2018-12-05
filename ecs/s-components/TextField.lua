@@ -55,7 +55,7 @@ local function TextField(e, t)
 		label.init()
 		cursor.init()
 
-		e.on('active', function ()
+		e.on('click', function ()
 			cursor.x = label.x + (1-label.ax) * label.w + 2
 			cursor.active = true
 		end)

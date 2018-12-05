@@ -115,6 +115,10 @@ return function (world)
 			if e then
 				e(prefix..'mouseup')
 				if e == g_mouse.pressed then
+					if g_mouse.selected and g_mouse.selected ~= e then
+						e('focus')
+					end 
+					g_mouse.selected = e
 					e(prefix..'click')
 				end
 			end

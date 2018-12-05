@@ -4,6 +4,7 @@ local Render = require "ecs.systems.Render"
 local Input = require "ecs.systems.Input"
 local Script = require "ecs.systems.Script"
 
+local Node = require "ecs.d-components.Node"
 local Trans = require "ecs.d-components.Transform"
 local Rect = require "ecs.d-components.Rectangle"
 
@@ -31,59 +32,37 @@ local game = {init = function()
 		.add_system(Script)
 
 	-- base
-	bg = ecs.entity() + Trans{x=480,y=320} + Rect{w=960,h=640} + Sprite{texname='examples/asset/bg.jpg'}
-	fps = ecs.entity() + Trans{x=20,y=620} + Rect{ax=0, ay=1} + Label{text='fps:60',color=0x554411ff, fontname=font.arial, fontsize=24}
-	hw = ecs.entity() + Trans{x=480,y=320,angle=90} + Rect{} + Label{text='Hello World',color=0xff0000ff, fontname=font.arial, fontsize=48}
+	bg = ecs.entity() + Node{active=true} + Trans{x=480,y=320} + Sprite{texname='examples/asset/bg.jpg'}
+	fps = ecs.entity() + Node{active=true} + Trans{x=20,y=620} + Rect{ax=0, ay=1} + Label{text='fps:60',color=0x554411ff, fontname=font.arial, fontsize=24}
+	hw = ecs.entity() + Node{active=true} +  Trans{x=480,y=320,angle=90} + Rect{} + Label{text='Hello World',color=0xff0000ff, fontname=font.arial, fontsize=48}
+	
+	world.add_entity(bg)
+	world.add_entity(fps)
+	world.add_entity(hw)
 
 
 	-- text field
-	account = ecs.entity()
+	account = world.add_entity(ecs.entity()
 		+ Trans{x=480, y=200}
 		+ Rect{w=200, h=40}
 		+ Struct {
-			ecs.entity('background') + Trans() + Rect() + Sprite{color=0x333333aa},
-			ecs.entity('mask') 		 + Trans() + Rect() + Sprite{texname='resource/null.png'},
-			ecs.entity('label') 	 + Trans() + Rect() + Label{text='hi...',color=0xffffffff, fontname=font.msyh, fontsize=24},
-			ecs.entity('cursor') 	 + Trans() + Rect() + Sprite{color=0xffffffff}
+			ecs.entity('background') + Node{active=true} + Trans() + Sprite{color=0x333333aa},
+			ecs.entity('mask') 		 + Node{active=true} + Trans() + Sprite{texname='resource/null.png'},
+			ecs.entity('label') 	 + Node{active=true} + Trans() + Rect() + Label{text='hi...',color=0xffffffff, fontname=font.msyh, fontsize=24},
+			ecs.entity('cursor') 	 + Node{active=true} + Trans() + Sprite{color=0xffffffff}
 		}
-		+ TextField()
-
-	-- for i=1,400 do
-	-- 	local y = math.random(1,640)
-	-- 	local speed = math.random(100, 200)
-
-	-- 	world.add_entity(ecs.entity()
-	-- 		+ Node{active=true}
-	-- 		+ Trans{x=100, y=math.random(1,640)}
-	-- 		+ Speed{direction=0, speed=speed}
-	-- 		+ Flipbook {
-	-- 			frames = {
-	-- 				ecs.entity() + Node{active=true} + Trans{x=0, y=y} + Sprite{texname='examples/asset/bird0_0.png'},
-	-- 				ecs.entity() + Node{active=true} + Trans{x=0, y=y} + Sprite{texname='examples/asset/bird0_1.png'},
-	-- 				ecs.entity() + Node{active=true} + Trans{x=0, y=y} + Sprite{texname='examples/asset/bird0_2.png'},
-	-- 			},
-	-- 			interval = 1.1 - speed/200,
-	-- 			isloop = true,
-	-- 			pause = false,
-	-- 		})
-	-- end
+		+ TextField())
 	
 	-- button
-	ok = ecs.entity() 
+	ok = world.add_entity(ecs.entity() 
+		+ Node{active=true}
 		+ Trans{x=480,y=120}
-		+ Rect{w=80,h=28} 
 		+ Sprite{texname='examples/asset/button_ok.png'}
-		+ Button()
+		+ Button())
 
 	ok.on('click', function ()
 		printf('account: %s', account.label.text)
 	end)
-
-	world.add_entity(bg)
-	world.add_entity(fps)
-	world.add_entity(hw)
-	world.add_entity(ok)
-	world.add_entity(account)
 
 	world('init')
 end}
