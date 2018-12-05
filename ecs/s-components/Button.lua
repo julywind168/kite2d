@@ -14,7 +14,7 @@ local function Button(e, t)
 			e.sy = sx * scale
 		end)
 
-		e.on('moueup', function ()
+		e.on('mouseup', function ()
 			e.sx = sx
 			e.sy = sy
 		end)
