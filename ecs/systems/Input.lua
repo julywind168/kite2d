@@ -110,14 +110,15 @@ return function (world)
 				g_mouse.pressed = e
 				e(prefix..'mousedown')
 			end
+			if g_mouse.selected and g_mouse.selected ~= e then
+				g_mouse.selected('focus')
+				g_mouse.selected = nil
+			end 
 		else
 			local e = pos_test(g_listener.lmouse, x, y)
 			if e then
 				e(prefix..'mouseup')
 				if e == g_mouse.pressed then
-					if g_mouse.selected and g_mouse.selected ~= e then
-						e('focus')
-					end 
 					g_mouse.selected = e
 					e(prefix..'click')
 				end

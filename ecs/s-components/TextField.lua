@@ -55,16 +55,20 @@ local function TextField(e, t)
 		label.init()
 		cursor.init()
 
+		local active = false
 		e.on('click', function ()
+			active = true
 			cursor.x = label.x + (1-label.ax) * label.w + 2
 			cursor.active = true
 		end)
 
 		e.on('focus', function ()
+			active = false
 			cursor.active = false
 		end)
 
-		e.on('key_release', function (key)
+		e.on('keyup', function (key)
+			if active == false then return end
 			if key == 'backspace' then
 				local len = #label.text 
 				if len > 0 then
