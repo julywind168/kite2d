@@ -43,6 +43,7 @@ local game = {init = function()
 
 	-- text field
 	account = world.add_entity(ecs.entity()
+		+ Node{camera=false}
 		+ Trans{x=480, y=200}
 		+ Rect{w=200, h=40}
 		+ Struct {

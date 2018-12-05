@@ -2,8 +2,7 @@ local ecs = require "ecs"
 local graphics = require "ecs.graphics"
 local function TextField(e, t)
 	local self = {
-		active = (t.active ~= false) and true or false,
-		camera = (t.camera ~= false) and true or false,
+		accepting = false
 	}
 
 	local g = ecs.current_world.g
@@ -55,20 +54,20 @@ local function TextField(e, t)
 		label.init()
 		cursor.init()
 
-		local active = false
 		e.on('click', function ()
-			active = true
+			if e.accepting then return end
+			e.accepting = true
 			cursor.x = label.x + (1-label.ax) * label.w + 2
 			cursor.active = true
 		end)
 
 		e.on('focus', function ()
-			active = false
+			e.accepting = false
 			cursor.active = false
 		end)
 
 		e.on('keyup', function (key)
-			if active == false then return end
+			if e.accepting == false then return end
 			if key == 'backspace' then
 				local len = #label.text 
 				if len > 0 then
@@ -78,6 +77,7 @@ local function TextField(e, t)
 		end)
 
 		e.on('message', function (char)
+			if e.accepting == false then return end
 			label.text = label.text..char
 		end)
 
@@ -95,7 +95,7 @@ local function TextField(e, t)
 
 	local delay1, delay2 = 0, 0
 	function self.update(dt)
-		if g.active_input ~= e then return end
+		if e.accepting == false then return end
 
 		delay1 = delay1 + dt
 		if delay1 > 0.5 then

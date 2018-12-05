@@ -27,12 +27,12 @@ local font = {
 
 local CFA = util.coord_from_atlas
 
-local function Hero()
+local function Hero(world)
 
 	local hero
 	local walk_down, walk_left, walk_right, walk_up
 	walk_down = ecs.entity('walk_down')
-		+ Node{active=true}
+		+ Node{}
 		+ Trans{x=480,y=320}
 		+ Flipbook {
 			frames = {
@@ -46,7 +46,7 @@ local function Hero()
 			pause = true,
 		}
 	walk_left = ecs.entity('walk_left')
-		+ Node{active=true}
+		+ Node{}
 		+ Trans{x=480,y=320}
 		+ Flipbook {
 			frames = {
@@ -60,7 +60,7 @@ local function Hero()
 			pause = true,
 		}
 	walk_right = ecs.entity('walk_right')
-		+ Node{active=true}
+		+ Node{}
 		+ Trans{x=480,y=320}
 		+ Flipbook {
 			frames = {
@@ -74,7 +74,7 @@ local function Hero()
 			pause = true,
 		}
 	walk_up = ecs.entity('walk_up')
-		+ Node{active=true}
+		+ Node{}
 		+ Trans{x=480,y=320}
 		+ Flipbook {
 			frames = {
@@ -88,11 +88,59 @@ local function Hero()
 			pause = true,
 		}
 
-	hero = ecs.entity()
-		+ Node{active=true}
+	hero = world.add_entity(ecs.entity()
+		+ Node{}
 		+ Trans{x=480,y=320}
 		+ Speed{}
-		+ Animation {walk_down, walk_left, walk_right, walk_up}
+		+ Animation {walk_down, walk_left, walk_right, walk_up})
+
+	hero.on('keydown', function (key)
+		if key == 'left' then
+			hero.cur_action.cur_frame = 1
+			hero.run_action('walk_left')
+			hero.cur_action.pause = false
+			hero.direction = 180
+			hero.speed = 100
+		elseif key == 'right' then
+			hero.cur_action.cur_frame = 1
+			hero.run_action('walk_right')
+			hero.cur_action.pause = false
+			hero.direction = 0
+			hero.speed = 100
+		elseif key == 'down' then
+			hero.cur_action.cur_frame = 1
+			hero.run_action('walk_down')
+			hero.cur_action.pause = false
+			hero.direction = 270
+			hero.speed = 100
+		elseif key == 'up' then
+			hero.cur_action.cur_frame = 1
+			hero.run_action('walk_up')
+			hero.cur_action.pause = false
+			hero.direction = 90
+			hero.speed = 100
+		end
+	end)
+
+	hero.on('keyup', function (key)
+		if key == 'left' then
+			hero.speed = 0
+			hero.cur_action.pause = true
+			hero.cur_action.cur_frame = 1
+		elseif key == 'right' then
+			hero.speed = 0
+			hero.cur_action.pause = true
+			hero.cur_action.cur_frame = 1
+		elseif key == 'down' then
+			hero.speed = 0
+			hero.cur_action.pause = true
+			hero.cur_action.cur_frame = 1
+		elseif key == 'up' then
+			hero.speed = 0
+			hero.cur_action.pause = true
+			hero.cur_action.cur_frame = 1
+		end
+	end)
 
 	return hero
 end
@@ -104,62 +152,14 @@ local game = {init = function()
 
 	world = ecs.world().add_system(Input).add_system(Render).add_system(Script).add_system(Move)
 
-	world.add_entity(ecs.entity()
-		+ Node{active=true}
-		+ Trans{x=640,y=640}
-		+ Sprite{texname='examples/asset/map/arkanos.png'})
+	world.add_entity(ecs.entity('background') + Node{} + Trans{x=640,y=640} + Sprite{texname='examples/asset/map/arkanos.png'})
 
-	hero = world.add_entity(Hero())
-	hero.on('keydown', function (key)
-		if key == 'left' then
-			hero.cur_action.pause = true
-			hero.run_action('walk_left')
-			hero.cur_action.pause = false
-			hero.direction = 180
-			hero.speed = 100
-		elseif key == 'right' then
-			hero.cur_action.pause = true
-			hero.run_action('walk_right')
-			hero.cur_action.pause = false
-			hero.direction = 0
-			hero.speed = 100
-		elseif key == 'down' then
-			hero.cur_action.pause = true
-			hero.run_action('walk_down')
-			hero.cur_action.pause = false
-			hero.direction = 270
-			hero.speed = 100
-		elseif key == 'up' then
-			hero.cur_action.pause = true
-			hero.run_action('walk_up')
-			hero.cur_action.pause = false
-			hero.direction = 90
-			hero.speed = 100
-			hero.cur_action.pause = false
-		end
-	end)
-
-	hero.on('keyup', function (key)
-		if key == 'left' then
-			hero.speed = 0
-			hero.cur_action.pause = true
-		elseif key == 'right' then
-			hero.speed = 0
-			hero.cur_action.pause = true
-		elseif key == 'down' then
-			hero.speed = 0
-			hero.cur_action.pause = true
-		elseif key == 'up' then
-			hero.speed = 0
-			hero.cur_action.pause = true
-		end
-	end)
-
+	hero = Hero(world)
 
 	world.add_entity(ecs.entity()
-		+ Node{active=true}
+		+ Node{camera=false}
 		+ Trans{x=20,y=620}
-		+ Rect{ax=0, ay=1}
+		+ Rect{ax=0,ay=1}
 		+ Label{text='fps:60',color=0xffffffff, fontname=font.arial, fontsize=24}
 		+ Fps())
 

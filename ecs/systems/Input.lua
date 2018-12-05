@@ -111,7 +111,7 @@ return function (world)
 				e(prefix..'mousedown')
 			end
 			if g_mouse.selected and g_mouse.selected ~= e then
-				g_mouse.selected('focus')
+				g_mouse.selected(prefix..'focus')
 				g_mouse.selected = nil
 			end 
 		else
