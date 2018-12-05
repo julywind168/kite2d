@@ -33,4 +33,29 @@ function M.e_in_aabb(e, x, y)
 end
 
 
+function M.coord_from_atlas(horizontal, vertical, index)
+	local w = 1/horizontal
+	local h = 1/vertical
+
+	local xi = index%horizontal
+	if xi == 0 then xi = horizontal end
+	local yi = (index-1)//horizontal
+
+	local coord = {}
+	coord[1] = (xi-1)*w
+	coord[2] = 1-yi*h
+
+	coord[3] = coord[1]
+	coord[4] = coord[2] - h
+
+	coord[5] = coord[3] + w
+	coord[6] = coord[4]
+
+	coord[7] = coord[5] 
+	coord[8] = coord[2]
+
+	return coord
+end
+
+
 return M

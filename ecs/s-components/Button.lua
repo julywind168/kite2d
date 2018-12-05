@@ -9,12 +9,12 @@ local function Button(e, t)
 		
 		sx, sy = e.sx, e.sy
 
-		e.on('_press', function ()
+		e.on('mousedown', function ()
 			e.sx = sx * scale
 			e.sy = sx * scale
 		end)
 
-		e.on('_release', function ()
+		e.on('moueup', function ()
 			e.sx = sx
 			e.sy = sy
 		end)

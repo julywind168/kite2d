@@ -10,7 +10,9 @@ local function get_texture(texname)
 	local tex = textures[texname]
 	if tex then return tex end
 
-	tex = graphics.texture(texname)
+	local data, w, h = graphics.texture(texname)
+
+	tex = {data=data, w=w, h=h}
 
 	textures[texname] = tex
 	return tex

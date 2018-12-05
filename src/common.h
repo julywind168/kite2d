@@ -7,7 +7,7 @@
 #include <string.h>
 #include <stdbool.h>
 
-#include <freetype2/ft2build.h>
+#include <ft2build.h>
 #include FT_FREETYPE_H  
 #define GLFW_INCLUDE_NONE
 #include <glad/glad.h>

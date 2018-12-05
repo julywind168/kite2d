@@ -1,38 +1,35 @@
-local function in_aabb(aabb, x, y)
-	if x < aabb[1].x or x > aabb[4].x then return false end
-	if y > aabb[1].y or y < aabb[2].y then return false end
+local fantasy = require "fantasy"
+
+local function in_box(e, x, y)
+	-- 左上角的位置
+	local px, py				
+	px = e.x - e.w * e.ax
+	py = e.y + e.h * (1-e.ay)
+
+	if x < px or x > px + e.w then return false end
+	if y > py or y < py - e.h then return false end
 	return true
+end
+
+local function pos_test(list, x, y)
+	for _,e in ipairs(list) do
+		if in_box(e, x, y) then
+			return e
+		end
+	end
 end
 
 
 return function (world)
 	
-	local g = world.g
 	local g_mouse = world.g.mouse
 	local g_keyboard = world.g.keyboard
-	local buttons = g.buttons
-	local textfields = g.textfields
+	local g_listener = world.g.listener
 
 	local self = {}
 
 	function self.ejoin(e)
-		if e.components['textfield'] then
-			table.insert(textfields, e)
-		elseif e.components['button'] then
-			table.insert(buttons, e)
-		end
 	end
-
-	function self.message(char)
-		local e = world.g.active_input
-		if e then
-			e('message', char)
-		end
-	end
-
-	--[[
-		按下持续0.3s 才会设置 world.g.keyboard.pressed
-	]]
 
 	function self.update(dt)
 		if g_keyboard.pressed then
@@ -47,82 +44,84 @@ return function (world)
 		if what == 'press' then
 			g_keyboard.pressed = key
 			g_keyboard.press_time = 0
-			return
-		end
-
-		if what =='release' then
+		else
 			g_keyboard.press_time = 0
 			g_keyboard.pressed = nil
 			g_keyboard.lpressed = nil
-			
-			local e = world.g.active_input
-			if e then
-				return e('key_release', key)
-			end
+		end
+
+		local event if what=='press' then event='keydown' else event='keyup' end
+		for _,e in ipairs(g_listener.keyboard) do
+			e(event, key)
 		end
 	end
 
+	function self.message(char)
+		for _,e in ipairs(g_listener.accepter) do
+			e('message', char)
+		end
+	end
+
+
+	local window = fantasy.window
+	local camera = fantasy.camera()
+
 	function self.mouse(what, x, y, who)
-		if what == 'enter' then
-			g_mouse.entered = true
-			return
-		elseif what == 'leave' then
-			g_mouse.entered = false
+
+		-- 转换成世界坐标
+		if x and y then
+			x = camera.x + x - window.width/2
+			y = camera.y + y - window.height/2
+		end
+
+		-- mouse enter/leave client
+		if what == 'enter' or what == 'leave' then
+			local event = 'm_'..what..'_client'
+			for _,e in ipairs(g_listener.client) do
+				e(event)
+			end
 			return
 		end
-		g.mouse.x = x
-		g.mouse.y = y
 
-		if what == 'move' then return end
-		if who == 'right' then return end
-
-		if what == 'press' then
-			for _,e in ipairs(buttons) do
-				if in_aabb(e.aabb, x, y) then
-					g.pressed_btn = e
-					e('_press')
-					return
+		-- mouse enter/leave obj
+		if what == 'move' then
+			local hover = g_mouse.hover
+			local e = pos_test(g_listener.watcher, x, y)
+			if e then
+				if e ~= hover then
+					e('mouseenter')
 				end
+				g_mouse.hover = e
+			end
+			if hover and e ~= hover then
+				hover('mouseleave')
+				if hover == g_mouse.hover then
+					g_mouse.hover = nil
+				end
+			end
+			return
+		end
+
+		-- 按下/松开/点击事件
+		local prefix = '' if who == 'right' then prefix = 'r' end
+		if what == 'press' then
+			local e = pos_test(g_listener.lmouse, x, y)
+			if e then
+				g_mouse.pressed = e
+				e(prefix..'mousedown')
 			end
 		else
-			--[[
-				textfield
-			]]
-			for _,tf in ipairs(textfields) do
-				if in_aabb(tf.mask.aabb, x, y) then
-					if g.active_input == tf then
-						return
-					end
-					if g.active_input then
-						g.active_input('focus')
-					end
-					tf('active')
-					g.active_input = tf
-					return
+			local e = pos_test(g_listener.lmouse, x, y)
+			if e then
+				e(prefix..'mouseup')
+				if e == g_mouse.pressed then
+					e(prefix..'click')
 				end
 			end
-
-			if g.active_input then
-				g.active_input('focus')
-				g.active_input = nil
-			end
-
-			--[[
-				button
-			]]
-			for _,e in ipairs(buttons) do
-				if in_aabb(e.aabb, x, y) and e == g.pressed_btn then
-					g.pressed_btn = nil
-					e('_release')
-					e('click')
-					return
-				end
-			end
-
-			if g.pressed_btn then
-				g.pressed_btn('_release')
-				g.pressed_btn('cancel')
-				g.pressed_btn = nil	
+			local pressed = g_mouse.pressed
+			if pressed then
+				g_mouse.pressed = nil
+				pressed(prefix..'mouseup')
 			end
 		end
 	end

@@ -203,7 +203,9 @@ ltexture(lua_State *L)
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(data);
 	lua_pushinteger(L, texture);
-	return 1;
+	lua_pushinteger(L, width);
+	lua_pushinteger(L, height);
+	return 3;
 }
 
 

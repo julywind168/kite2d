@@ -6,11 +6,11 @@ local Script = require "ecs.systems.Script"
 
 local Trans = require "ecs.d-components.Transform"
 local Rect = require "ecs.d-components.Rectangle"
-local Struct = require "ecs.d-components.Struct"
 
 local Sprite = require "ecs.s-components.Sprite"
 local Label = require "ecs.s-components.Label"
 local Button = require "ecs.s-components.Button"
+local Struct = require "ecs.s-components.Struct"
 local TextField = require "ecs.s-components.TextField"
 
 
@@ -48,7 +48,26 @@ local game = {init = function()
 		}
 		+ TextField()
 
+	-- for i=1,400 do
+	-- 	local y = math.random(1,640)
+	-- 	local speed = math.random(100, 200)
 
+	-- 	world.add_entity(ecs.entity()
+	-- 		+ Node{active=true}
+	-- 		+ Trans{x=100, y=math.random(1,640)}
+	-- 		+ Speed{direction=0, speed=speed}
+	-- 		+ Flipbook {
+	-- 			frames = {
+	-- 				ecs.entity() + Node{active=true} + Trans{x=0, y=y} + Sprite{texname='examples/asset/bird0_0.png'},
+	-- 				ecs.entity() + Node{active=true} + Trans{x=0, y=y} + Sprite{texname='examples/asset/bird0_1.png'},
+	-- 				ecs.entity() + Node{active=true} + Trans{x=0, y=y} + Sprite{texname='examples/asset/bird0_2.png'},
+	-- 			},
+	-- 			interval = 1.1 - speed/200,
+	-- 			isloop = true,
+	-- 			pause = false,
+	-- 		})
+	-- end
+	
 	-- button
 	ok = ecs.entity() 
 		+ Trans{x=480,y=120}

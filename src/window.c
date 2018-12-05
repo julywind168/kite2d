@@ -73,7 +73,7 @@ create_window() {
 	}
 	ASSERT((int64_t)handle, "failed to create window");
 
-	window = malloc(sizeof(Window) + strlen(title) + 1);
+	window = malloc(sizeof(Window));
 	window->x = x;
 	window->y = y;
 	window->width = width;

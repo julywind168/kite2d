@@ -5,8 +5,6 @@ local util = require "ecs.util.sprite"
 
 local function Label(e, t)
 	local self = {
-		active = (t.active ~= false) and true or false,
-		camera = (t.camera ~= false) and true or false,
 		color = t.color or 0xffffffff,
 
 		fontname = assert(t.fontname),
@@ -17,7 +15,7 @@ local function Label(e, t)
 	local font, scale, chars
 
 	function self.init()
-		assert(e.components['transform'] and e.components['rectangle'])
+		assert(e.components['node'] and e.components['transform'])
 
 		font = graphics.font(e.fontname)
 		scale = e.fontsize/font.size
@@ -26,12 +24,10 @@ local function Label(e, t)
 		e.h = e.fontsize
 
 		-- hook
-		local after = getmetatable(e)
-		
-		function after.set.text()
-			chars = font.chars(e.text)
+		e.on('set_text', function (text)
+			chars = font.chars(text)
 			e.w = graphics.chars_length(chars, scale)
-		end
+		end)		
 	end
 
 	-- x 是开始绘画的地方

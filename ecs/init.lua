@@ -19,7 +19,17 @@ function ecs.world(name)
 			mouse = {x=0, y=0, enterd = false},
 			keyboard = { pressed=nil, lpressed=nil },	-- 按下的, 长按中的
 			buttons = {},
-			textfields = {}
+			textfields = {},
+			moveing = {},
+			listener = {
+				lmouse = {},	-- mouse down/up click cacel
+				rmouse = {},	-- right mouse ...
+				client = {},	-- 鼠标 进入/离开 窗口
+				watcher = {},	-- mouse enter/leave
+				keyboard = {},	-- key donw/up 
+				accepter = {}	-- message
+
+			},
 		}		
 	}
 
@@ -90,12 +100,47 @@ function ecs.entity(name, e)
 	e.world = {'no world'}
 	e.components = {}
 
-	local meta = { set={}, handle={} }
+
+	local meta = { }
+	
+	local handle = {}
+	
+	local flag = {}
 	meta.on = function (event, cb)
-		meta.handle[event] = cb
+		-- assert(e.world and e.world[1] ~= 'no world')
+
+		if IN(event, {'mousedown', 'mouseup', 'click', 'cancel'}) and not flag.lmouse then
+			table.insert(e.world.g.listener.lmouse, 1, e)
+			flag.lmouse = true
+		elseif IN(event, {'rmousedown', 'rmouseup', 'rclick', 'rcancel'}) and not flag.rmouse then
+			table.insert(e.world.g.listener.rmouse, 1, e)
+			flag.rmouse = true
+		elseif IN(event, {'mouseenter', 'mouseleave',}) and not flag.watcher then
+			table.insert(e.world.g.listener.watcher, 1, e)
+			flag.watcher = true
+		elseif IN(event, {'keydown', 'keyup'}) and not flag.listen_keyboard then
+			table.insert(e.world.g.listener.keyboard, e)
+			flag.listen_keyboard = true
+		elseif event == 'message' and not flag.accepter then
+			table.insert(e.world.g.listener.accepter, e)
+			flag.accepter = true
+		elseif event == 'm_enter_client' or event == 'm_leave_client' and not flag.mclient then
+			table.insert(e.world.g.accepter.mclient, e)
+			flag.mclient = true
+		end
+
+		local f = handle[event]
+		if f then
+			handle[event] = function (...)
+				f(...)
+				cb(...)
+			end
+		else
+			handle[event] = cb
+		end
 	end
 	meta.__call = function (_, event, ...)
-		local f = meta.handle[event]
+		local f = handle[event]
 		if f then
 			f(...)
 		end
@@ -103,9 +148,10 @@ function ecs.entity(name, e)
 	meta.__index = meta
 	meta.__newindex = function (_, k, v)
 		assert(meta[k] ~= nil, k)
-		meta[k] = v			-- set
-		local f = meta.set[k]
-		if f then f(v) end
+		local old = meta[k]
+		meta[k] = v
+		local f = handle['set_'..k]
+		if f then f(v, old) end
 	end
 	meta.__add = function (_, com)
 		local name, component = com(e)
@@ -129,7 +175,6 @@ function ecs.entity(name, e)
 							f2()
 						end
 					else
-						print(IN(k, {'init', 'start', 'update', 'exit'}), type(k), k=='init')
 						error('key conflict ' .. tostring(k))
 					end
 				end

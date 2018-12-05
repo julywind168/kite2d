@@ -126,8 +126,9 @@ opengl_init() {
 
 	tx_camera = glGetUniformLocation(tx_program, "camera");
 	tx_color = glGetUniformLocation(tx_program, "textcolor");
-
 	glUniformMatrix4fv(tx_camera, 1, GL_FALSE, &opengl->camera_mat[SCREEN_CAMERA][0][0]);
+	glUniform4f(tx_color, 1.0f, 1.0f, 1.0f, 1.0f);
+
 	opengl->tx_program = tx_program;
 	opengl->tx_color = tx_color;
 	opengl->tx_camera = tx_camera;
@@ -143,9 +144,9 @@ opengl_init() {
 	sp_color = glGetUniformLocation(sp_program, "color");
 	sp_additive = glGetUniformLocation(sp_program, "additive");
 	glUniformMatrix4fv(sp_camera, 1, GL_FALSE, &opengl->camera_mat[SCREEN_CAMERA][0][0]);
-	
 	glUniform4f(sp_color, 1.0f, 1.0f, 1.0f, 1.0f);
 	glUniform4f(sp_additive, 0.0f, 0.0f, 0.0f, 0.0f);
+	
 	opengl->sp_program = sp_program;
 	opengl->sp_camera = sp_camera;
 	opengl->sp_color = sp_color;
