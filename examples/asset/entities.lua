@@ -15,18 +15,8 @@ local textField = require "ecs.s-components.TextField"
 
 
 return {
-ecs.entity('m11')+Trans{x=150,y=490}+sprite{texname='examples/asset/map/m1_1.jpg'},
-ecs.entity('m12')+Trans{x=450,y=490}+sprite{texname='examples/asset/map/m1_2.jpg'},
-ecs.entity('m13')+Trans{x=750,y=490}+sprite{texname='examples/asset/map/m1_3.jpg'},
-ecs.entity('m14')+Trans{x=1050,y=490}+sprite{texname='examples/asset/map/m1_4.jpg'},
-
-ecs.entity('m21')+Trans{x=150,y=190}+sprite{texname='examples/asset/map/m2_1.jpg'},
-ecs.entity('m22')+Trans{x=450,y=190}+sprite{texname='examples/asset/map/m2_2.jpg'},
-ecs.entity('m23')+Trans{x=750,y=190}+sprite{texname='examples/asset/map/m2_3.jpg'},
-ecs.entity('m24')+Trans{x=1050,y=190}+sprite{texname='examples/asset/map/m2_4.jpg'},
-
-ecs.entity('m21')+Trans{x=150,y=-110}+sprite{texname='examples/asset/map/m3_1.jpg'},
-ecs.entity('m22')+Trans{x=450,y=-110}+sprite{texname='examples/asset/map/m3_2.jpg'},
-ecs.entity('m23')+Trans{x=750,y=-110}+sprite{texname='examples/asset/map/m3_3.jpg'},
-ecs.entity('m24')+Trans{x=1050,y=-110}+sprite{texname='examples/asset/map/m3_4.jpg'},
+ecs.entity('bg')+Node{active=true}+Trans{x=480,y=320}+sprite{texname='examples/asset/bg.jpg'},
+ecs.entity('bird1')+Node{active=true}+Trans{x=450,y=490}+sprite{texname='examples/asset/map/m1_2.jpg'},
+ecs.entity('bird2')+Node{active=true}+Trans{x=750,y=490}+sprite{texname='examples/asset/map/m1_3.jpg'},
+ecs.entity('bird3')+Node{active=true}+Trans{x=1050,y=490}+sprite{texname='examples/asset/map/m1_4.jpg'},
 }
