@@ -34,13 +34,13 @@ local function Hero(world, x, y)
 	local walk_down, walk_left, walk_right, walk_up
 	walk_down = ecs.entity('walk_down')
 		+ Node{}
-		+ Trans{x=480,y=320}
+		+ Trans{x=x,y=y}
 		+ Flipbook {
 			frames = {
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,1)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,2)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,3)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,4)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,1)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,2)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,3)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,4)},
 			},
 			interval = 0.2,
 			isloop = true,
@@ -48,13 +48,13 @@ local function Hero(world, x, y)
 		}
 	walk_left = ecs.entity('walk_left')
 		+ Node{}
-		+ Trans{x=480,y=320}
+		+ Trans{x=x,y=y}
 		+ Flipbook {
 			frames = {
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,5)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,6)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,7)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,8)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,5)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,6)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,7)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,8)},
 			},
 			interval = 0.2,
 			isloop = true,
@@ -62,13 +62,13 @@ local function Hero(world, x, y)
 		}
 	walk_right = ecs.entity('walk_right')
 		+ Node{}
-		+ Trans{x=480,y=320}
+		+ Trans{x=x,y=y}
 		+ Flipbook {
 			frames = {
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,9)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,10)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,11)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,12)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,9)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,10)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,11)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,12)},
 			},
 			interval = 0.2,
 			isloop = true,
@@ -76,13 +76,13 @@ local function Hero(world, x, y)
 		}
 	walk_up = ecs.entity('walk_up')
 		+ Node{}
-		+ Trans{x=480,y=320}
+		+ Trans{x=x,y=y}
 		+ Flipbook {
 			frames = {
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,13)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,14)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,15)},
-				ecs.entity()+Node{}+Trans{x=480, y=320}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,16)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,13)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,14)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,15)},
+				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,16)},
 			},
 			interval = 0.2,
 			isloop = true,
@@ -91,7 +91,7 @@ local function Hero(world, x, y)
 
 	hero = world.add_entity(ecs.entity()
 		+ Node{}
-		+ Trans{x=480,y=320}
+		+ Trans{x=x,y=y}
 		+ Speed{}
 		+ Animation {walk_down, walk_left, walk_right, walk_up})
 		+ Avatar {
@@ -277,7 +277,7 @@ local game = {init = function()
 
 	world.add_entity(ecs.entity('background') + Node{} + Trans{x=640,y=640} + Sprite{texname='examples/asset/map/arkanos.png'})
 
-	hero = Hero(world, 480, 320)
+	hero = Hero(world, 256, 100)
 
 	world.add_entity(ecs.entity()
 		+ Node{camera=false}
