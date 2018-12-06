@@ -24,9 +24,7 @@
 #define B(c) ((c>>8) &0xFF)/255.0f
 #define A(c) (c      &0xFF)/255.0f
 
-
-#define FF_ERROR(f_, ...) printf((f_), ##__VA_ARGS__); exit(EXIT_FAILURE)
-
+#define ERR(f_, ...) printf((f_), ##__VA_ARGS__); exit(EXIT_FAILURE)
 
 static inline void
 ASSERT(int ok, const char * msg) {
@@ -35,11 +33,6 @@ ASSERT(int ok, const char * msg) {
 		exit(EXIT_FAILURE);
 	}
 }
-
-
-
-
-
 
 
 #endif

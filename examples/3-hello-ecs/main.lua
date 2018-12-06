@@ -32,9 +32,9 @@ local game = {init = function()
 		.add_system(Script)
 
 	-- base
-	bg = ecs.entity() + Node{active=true} + Trans{x=480,y=320} + Sprite{texname='examples/asset/bg.jpg'}
-	fps = ecs.entity() + Node{active=true} + Trans{x=20,y=620} + Rect{ax=0, ay=1} + Label{text='fps:60',color=0x554411ff, fontname=font.arial, fontsize=24}
-	hw = ecs.entity() + Node{active=true} +  Trans{x=480,y=320,angle=90} + Rect{} + Label{text='Hello World',color=0xff0000ff, fontname=font.arial, fontsize=48}
+	bg = ecs.entity() + Node{} + Trans{x=480,y=320} + Sprite{texname='examples/asset/bg.jpg'}
+	fps = ecs.entity() + Node{} + Trans{x=20,y=620} + Rect{ax=0, ay=1} + Label{text='fps:60',color=0x554411ff, fontname=font.arial, fontsize=24}
+	hw = ecs.entity() + Node{} + Trans{x=480,y=320,angle=90} + Rect{} + Label{text='Hello World',color=0xff0000ff, fontname=font.arial, fontsize=48}
 	
 	world.add_entity(bg)
 	world.add_entity(fps)
@@ -47,10 +47,10 @@ local game = {init = function()
 		+ Trans{x=480, y=200}
 		+ Rect{w=200, h=40}
 		+ Struct {
-			ecs.entity('background') + Node{active=true} + Trans() + Sprite{color=0x333333aa},
-			ecs.entity('mask') 		 + Node{active=true} + Trans() + Sprite{texname='resource/null.png'},
-			ecs.entity('label') 	 + Node{active=true} + Trans() + Rect() + Label{text='hi...',color=0xffffffff, fontname=font.msyh, fontsize=24},
-			ecs.entity('cursor') 	 + Node{active=true} + Trans() + Sprite{color=0xffffffff}
+			ecs.entity('background') + Node{} + Trans() + Sprite{color=0x333333aa},
+			ecs.entity('mask') 		 + Node{} + Trans() + Sprite{texname='resource/null.png'},
+			ecs.entity('label') 	 + Node{} + Trans() + Rect() + Label{text='hi...',color=0xffffffff, fontname=font.msyh, fontsize=24},
+			ecs.entity('cursor') 	 + Node{} + Trans() + Sprite{color=0xffffffff}
 		}
 		+ TextField())
 	

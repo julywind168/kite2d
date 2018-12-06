@@ -26,6 +26,7 @@ local function Flipbook(e, t)
 
 	local delay = 0	
 	local frames = self.frames
+	local tmp_frame
 
 	function self.update(dt)
 		if e.cur_frame == #frames and e.isloop == false then
@@ -34,11 +35,10 @@ local function Flipbook(e, t)
 			if not e.pause then
 				delay = delay + dt
 				if delay >= e.interval then
-					e.cur_frame = e.cur_frame + 1
+					tmp_frame = e.cur_frame + 1
 					delay = delay - e.interval
-					if e.cur_frame > #frames then
-						e.cur_frame = 1
-					end
+					if tmp_frame > #frames then tmp_frame = 1 end
+					e.cur_frame = tmp_frame
 				end
 			end
 		end

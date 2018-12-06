@@ -14,10 +14,23 @@ local function Group(e, t)
 				end
 			end)
 		end
+
+		for _,e in ipairs(self.group) do
+			e.init()
+		end
 	end
 
 	function self.insert(entity)
+		entity.init()
 		table.insert(self.group, entity)
+	end
+
+	function self.draw()
+		if e.active then
+			for _,e in ipairs(self.group) do
+				e.draw()
+			end
+		end
 	end
 
 	return self

@@ -167,16 +167,16 @@ function ecs.entity(name, e)
 				if not meta[k] then
 					meta[k] = v
 				else
-					if IN(k, {'init', 'start', 'update', 'exit'}) then
-						local f1 = meta[k]
-						local f2 = v
-						meta[k] = function ()
-							f1()
-							f2()
-						end
-					else
-						error('key conflict ' .. tostring(k))
+					-- if IN(k, {'init', 'start', 'update', 'exit'}) then
+					local f1 = meta[k]
+					local f2 = v
+					meta[k] = function (...)
+						f1(...)
+						f2(...)
 					end
+					-- else
+					-- 	error('key conflict ' .. tostring(k))
+					-- end
 				end
 			end
 		end
