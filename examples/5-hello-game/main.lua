@@ -16,7 +16,7 @@ local Fps = require "ecs.s-components.Fps"
 local Group = require "ecs.s-components.Group"
 local Flipbook = require "ecs.s-components.Flipbook"
 local Animation = require "ecs.s-components.Animation"
-local Avatar = require "ecs.s-components.Avatar"
+local HeroCamera = require "ecs.s-components.HeroCamera"
 
 local util = require "ecs.util.sprite"
 
@@ -37,10 +37,38 @@ local function Hero(world, x, y)
 		+ Trans{x=x,y=y}
 		+ Flipbook {
 			frames = {
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,1)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,2)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,3)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,4)},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,1)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,1)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,1)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,1)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,1)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,1)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,2)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,2)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,2)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,2)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,2)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,2)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,3)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,3)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,3)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,3)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,3)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,3)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,4)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,4)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,4)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,4)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,4)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,4)},
+				}
 			},
 			interval = 0.2,
 			isloop = true,
@@ -51,10 +79,38 @@ local function Hero(world, x, y)
 		+ Trans{x=x,y=y}
 		+ Flipbook {
 			frames = {
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,5)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,6)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,7)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,8)},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,5)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,5)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,5)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,5)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,5)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,5)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,6)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,6)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,6)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,6)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,6)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,6)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,7)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,7)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,7)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,7)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,7)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,7)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,8)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,8)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,8)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,8)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,8)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,8)},
+				}
 			},
 			interval = 0.2,
 			isloop = true,
@@ -65,10 +121,38 @@ local function Hero(world, x, y)
 		+ Trans{x=x,y=y}
 		+ Flipbook {
 			frames = {
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,9)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,10)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,11)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,12)},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,9)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,9)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,9)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,9)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,9)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,9)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,10)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,10)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,10)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,10)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,10)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,10)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,11)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,11)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,11)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,11)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,11)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,11)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,12)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,12)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,12)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,12)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,12)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,12)},
+				}
 			},
 			interval = 0.2,
 			isloop = true,
@@ -79,10 +163,38 @@ local function Hero(world, x, y)
 		+ Trans{x=x,y=y}
 		+ Flipbook {
 			frames = {
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,13)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,14)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,15)},
-				ecs.entity()+Node{}+Trans{x=x, y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,16)},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,13)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,13)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,13)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,13)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,13)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,13)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,14)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,14)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,14)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,14)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,14)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,14)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,15)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,15)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,15)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,15)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,15)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,15)},
+				},
+				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
+					ecs.entity()+Node{}+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/body.png', texcoord=CFA(4,4,16)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,16)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,16)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,16)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,16)},
+					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,16)},
+				}
 			},
 			interval = 0.2,
 			isloop = true,
@@ -93,129 +205,8 @@ local function Hero(world, x, y)
 		+ Node{}
 		+ Trans{x=x,y=y}
 		+ Speed{}
-		+ Animation {walk_down, walk_left, walk_right, walk_up})
-		+ Avatar {
-			walk_down = {
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,1)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,1)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,1)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,1)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,1)},
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,2)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,2)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,2)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,2)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,2)},
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,3)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,3)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,3)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,3)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,3)},
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,4)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,4)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,4)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,4)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,4)},
-				}
-			},
-			walk_left = {
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,5)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,5)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,5)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,5)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,5)},
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,6)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,6)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,6)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,6)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,6)},
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,7)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,7)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,7)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,7)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,7)}
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,8)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,8)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,8)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,8)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,8)},
-				}
-			},
-			walk_right = {
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,9)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,9)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,9)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,9)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,9)},
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,10)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,10)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,10)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,10)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,10)},
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,11)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,11)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,11)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,11)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,11)},
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,12)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,12)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,12)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,12)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,12)},
-				}
-			},
-			walk_up = {
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,13)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,13)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,13)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,13)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,13)},
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,14)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,14)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,14)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,14)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,14)}
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,15)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,15)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,15)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,15)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,15)}
-				},
-				ecs.entity()+Node()+Trans{x=x,y=y}+Group{
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/arms.png', texcoord=CFA(4,4,16)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/eyes.png', texcoord=CFA(4,4,16)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/hair.png', texcoord=CFA(4,4,16)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/shoes.png', texcoord=CFA(4,4,16)},
-					ecs.entity()+Node()+Trans{x=x,y=y}+Sprite{texname='examples/asset/avatar/clothes.png', texcoord=CFA(4,4,16)}
-				}
-			}
-		}
+		+ Animation {walk_down, walk_left, walk_right, walk_up}
+		+ HeroCamera{screen={0,0, 1280,1280}, limit={w=200,h=200}})
 
 	hero.on('keydown', function (key)
 		if key == 'left' then
