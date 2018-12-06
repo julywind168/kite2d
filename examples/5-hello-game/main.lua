@@ -28,7 +28,7 @@ local font = {
 
 local CFA = util.coord_from_atlas
 
-local function Hero(world, x, y)
+local function Hero(world, x, y, skill)
 
 	local hero
 	local walk_down, walk_left, walk_right, walk_up
@@ -209,6 +209,25 @@ local function Hero(world, x, y)
 		+ HeroCamera{screen={0,0, 1280,1280}, limit={w=200,h=200}})
 
 	hero.on('keydown', function (key)
+
+		if key == 'a' then
+			if hero.direction == 90 then
+				skill.x = hero.x
+				skill.y = hero.y
+			elseif hero.direction == 0 then
+				skill.x = hero.x + 150
+				skill.y = hero.y - 140
+			elseif hero.direction == 180 then
+				skill.x = hero.x - 150
+				skill.y = hero.y - 140
+			elseif hero.direction == 270 then
+				skill.x = hero.x
+				skill.y = hero.y - 270
+			end
+			skill.active = true
+			skill.pause = false
+		end
+
 		if key == 'left' then
 			hero.cur_action.cur_frame = 1
 			hero.run_action('walk_left')
@@ -261,6 +280,7 @@ end
 
 local world
 local hero
+local skill
 
 local game = {init = function()
 
@@ -268,14 +288,51 @@ local game = {init = function()
 
 	world.add_entity(ecs.entity('background') + Node{} + Trans{x=640,y=640} + Sprite{texname='examples/asset/map/arkanos.png'})
 
-	hero = Hero(world, 256, 100)
+	skill = world.add_entity(ecs.entity()
+		+ Node{active=false}
+		+ Trans{}
+		+ Flipbook{
+			frames = {
+				ecs.entity()+Node{}+Trans{}+Sprite{texname='examples/asset/skill/s1.png', ay=0},
+				ecs.entity()+Node()+Trans{}+Sprite{texname='examples/asset/skill/s2.png', ay=0},
+				ecs.entity()+Node()+Trans{}+Sprite{texname='examples/asset/skill/s3.png', ay=0},
+				ecs.entity()+Node()+Trans{}+Sprite{texname='examples/asset/skill/s4.png', ay=0},
+				ecs.entity()+Node()+Trans{}+Sprite{texname='examples/asset/skill/s5.png', ay=0},
+				ecs.entity()+Node()+Trans{}+Sprite{texname='examples/asset/skill/s6.png', ay=0},
+				ecs.entity()+Node()+Trans{}+Sprite{texname='examples/asset/skill/s7.png', ay=0},
+			},
+			interval = 0.16,
+			isloop = false,
+			pause = true,
+		})
+
+	skill.on('action_done', function ()
+		skill.active = false
+		skill.pause = true
+		skill.cur_frame = 1
+	end)
+
+	hero = Hero(world, 256, 100, skill)
+
+
+-- 菜单背景
+	world.add_entity(ecs.entity()
+		+ Node{camera=false}
+		+ Trans{x=480,y=640}
+		+ Sprite{w=960,h=44, color=0x00000077, ay=1})
 
 	world.add_entity(ecs.entity()
 		+ Node{camera=false}
-		+ Trans{x=20,y=620}
+		+ Trans{x=20,y=630}
 		+ Rect{ax=0,ay=1}
 		+ Label{text='fps:60',color=0xffffffff, fontname=font.arial, fontsize=24}
 		+ Fps())
+
+	world.add_entity(ecs.entity()
+		+ Node{camera=false}
+		+ Trans{x=940,y=630}
+		+ Rect{ax=1,ay=1}
+		+ Label{text='按键a: 紫电狂龙',color=0xffff00ff, fontname=font.msyh, fontsize=24})
 
 	world('init')
 end}

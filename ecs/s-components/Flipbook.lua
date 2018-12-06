@@ -30,14 +30,17 @@ local function Flipbook(e, t)
 
 	function self.update(dt)
 		if e.cur_frame == #frames and e.isloop == false then
-			-- pass
+			e('action_done')
 		else
 			if not e.pause then
 				delay = delay + dt
 				if delay >= e.interval then
 					tmp_frame = e.cur_frame + 1
 					delay = delay - e.interval
-					if tmp_frame > #frames then tmp_frame = 1 end
+					if tmp_frame > #frames then
+						e('action_done')
+						tmp_frame = 1
+					end
 					e.cur_frame = tmp_frame
 				end
 			end
