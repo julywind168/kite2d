@@ -6,6 +6,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdbool.h>
+#include <unistd.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H  
@@ -24,7 +25,7 @@
 #define B(c) ((c>>8) &0xFF)/255.0f
 #define A(c) (c      &0xFF)/255.0f
 
-#define ERR(f_, ...) printf((f_), ##__VA_ARGS__); exit(EXIT_FAILURE)
+#define KT_ERROR(f_, ...) fprintf((stderr, f_), ##__VA_ARGS__); exit(EXIT_FAILURE)
 
 static inline void
 ASSERT(int ok, const char * msg) {

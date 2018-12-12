@@ -5,16 +5,13 @@
 
 typedef struct
 {
-	float x;
-	float y;
 	float width;
 	float height;
 	bool fullscreen;
 	const char *title;
 	GLFWwindow *handle;
 	const GLFWvidmode *display;
-
-	void (*init)(void);
+	
 	void (*destroy)(void);
 } Window;
 

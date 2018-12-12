@@ -57,7 +57,7 @@ GLuint create_shader(const char* file, GLenum type) {
 }
 
 GLuint
-create_program(const char *vs_name, const char *fs_name) {
+program_from_file(const char *vs_name, const char *fs_name) {
 	GLuint vs = create_shader(vs_name, GL_VERTEX_SHADER);
 	GLuint fs = create_shader(fs_name, GL_FRAGMENT_SHADER);
 	GLuint program = glCreateProgram();

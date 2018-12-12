@@ -6,7 +6,6 @@ in vec2 texcoord;
 
 uniform sampler2D texture0;
 uniform vec4 color;
-uniform vec4 additive;
 
 
 void main() {
@@ -14,5 +13,4 @@ void main() {
    	frag_color.xyz = tmp.xyz * color.xyz;
    	frag_color.w = tmp.w;
    	frag_color *= color.w;
-   	frag_color.xyz += additive.xyz * tmp.w;	
 }

@@ -1,25 +1,19 @@
-CFLAGS = -g -O0 -Wall -Isrc -Iluaclib -I3rd/include -I3rd/lua
+CFLAGS = -g -O0 -Wall -Isrc -Isrc/renderer -Iluaclib -I3rd/include -I3rd/lua
 LINK = -L3rd/lib -lglfw3 -lgdi32 -lopengl32 -lfreetype
 
 SRC := \
 	src/main.c \
-	src/window.c \
 	src/game.c \
-	src/fant.c \
+	src/kite.c \
+	src/window.c \
 	src/util.c \
-	src/opengl.c \
-
-
-LUACLIB := \
-	luaclib/lfantasy.c \
-	luaclib/lgraphics.c \
-	luaclib/lfont.c \
-
+	src/renderer.c \
+	src/renderer/manager.c \
 
 LUACLIB := \
-	luaclib/lfantasy.c \
+	luaclib/lkite.c \
 	luaclib/lgraphics.c \
-	luaclib/lfont.c \
+	luaclib/lfont.c
 
 
 LUASRC := \
@@ -62,8 +56,8 @@ THIRD_PARTY := \
 	3rd/src/glad.c \
 
 
-.PHONY : fan
+.PHONY : kite
 
 
-fan:
-	gcc $(CFLAGS) $(SRC) $(LUACLIB) $(LUASRC) $(THIRD_PARTY) -o fan.exe $(LINK)
+kite:
+	gcc $(CFLAGS) $(SRC) $(LUACLIB) $(LUASRC) $(THIRD_PARTY) -o kite.exe $(LINK)

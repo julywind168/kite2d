@@ -1,18 +1,14 @@
 #include "window.h"
 #include "game.h"
-#include "fant.h"
+#include "kite.h"
 
 extern Game *G;
-Window *window;
-
-void
-window_destroy() {
-	glfwTerminate();
-	free(window);
-}
+static Window *window;
 
 
-GLFWmonitor *
+
+
+static GLFWmonitor *
 get_monitor() {
 	int count = 0;
 	GLFWmonitor **monitor =  glfwGetMonitors(&count);
@@ -21,33 +17,25 @@ get_monitor() {
 }
 
 
-void
+static int
 window_init() {
-	glfwSetKeyCallback(window->handle, G->fant->keyboard);
-	glfwSetMouseButtonCallback(window->handle, G->fant->mouse);
-	glfwSetCursorPosCallback(window->handle, G->fant->_cursor_move);
-	glfwSetCursorEnterCallback(window->handle, G->fant->_cursor_enter);
-	glfwSetCharCallback(window->handle, G->fant->message);
-}
-
-
-Window *
-create_window() {
 
 	GLFWmonitor *monitor;
 	const GLFWvidmode *display;
 	const char *title;
-	float x, y, width, height;
+	float width, height;
 	bool fullscreen;
+	
+	width = G->kite->conf.window.width;
+	height = G->kite->conf.window.height;
+	title = G->kite->conf.window.title;
+	fullscreen = G->kite->conf.window.fullscreen;
 
-	x = G->fant->conf.window.x;
-	y = G->fant->conf.window.y;
-	width = G->fant->conf.window.width;
-	height = G->fant->conf.window.height;
-	title = G->fant->conf.window.title;
-	fullscreen = G->fant->conf.window.fullscreen;
+	if (!glfwInit()) {
+		fprintf(stderr, "failed to init glfw\n");
+		return 1;
+	}
 
-	ASSERT(glfwInit(), "failed to init glfw");
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -62,31 +50,50 @@ create_window() {
 
 	GLFWwindow *handle;
 	if (fullscreen) {
-		x = display->width/2;
-		y = display->height/2;
 		width = display->width;
 		height = display->height;
 		handle = glfwCreateWindow(width, height, title, monitor, NULL);
 	} else {
 		handle = glfwCreateWindow(width, height, title, NULL, NULL);
-		glfwSetWindowPos(handle, x - width/2, display->height - y - height/2);
+		glfwSetWindowPos(handle, display->width/2 - width/2, display->height/2 - height/2);
 	}
-	ASSERT((int64_t)handle, "failed to create window");
 
-	window = malloc(sizeof(Window));
-	window->x = x;
-	window->y = y;
+	if (!handle) {
+		fprintf(stderr, "failed to create window\n");
+		return 1;
+	}
+
+	glfwSetKeyCallback(handle, G->kite->keyboard);
+	glfwSetMouseButtonCallback(handle, G->kite->mouse);
+	glfwSetCursorPosCallback(handle, G->kite->_cursor_move);
+	glfwSetCursorEnterCallback(handle, G->kite->_cursor_enter);
+	glfwSetCharCallback(handle, G->kite->message);
+
 	window->width = width;
 	window->height = height;
-	window->handle = handle;
 	window->title = title;
-
-	window->init = window_init;
-	window->destroy = window_destroy;
-	return window;
+	window->fullscreen = fullscreen;
+	window->handle = handle;
+	window->display = display;
+	return 0;
 }
 
-/*
-	px = x0 - w/2
-	py = display.h-h/2-y0
-*/
+
+void
+window_destroy() {
+	glfwTerminate();
+	free(window);
+}
+
+Window *
+create_window() {
+	window = malloc(sizeof(Window));
+	window->destroy = window_destroy;
+
+	if (window_init()) {
+		free(window);
+		return NULL;
+	}
+
+	return window;
+}

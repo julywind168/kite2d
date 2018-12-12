@@ -1,6 +1,8 @@
 #include "lfont.h"
 #include "game.h"
 
+
+
 extern Game *G;
 
 
@@ -52,7 +54,7 @@ lchars_length(lua_State *L) {
     float first_width, end_width, first_x, end_x;
 
     n = luaL_len(L, 1);
-    scale = luaL_checknumber(L, 2);
+    scale = luaL_checknumber(L, 2)/FT_FACE_FSIZE;
 
     for (int i = 1; i <=n; ++i)
     {
@@ -82,18 +84,16 @@ lchars_length(lua_State *L) {
 
 static int
 lface(lua_State *L) {
-	FT_Library ft = G->opengl->ft;
+	FT_Library ft = G->renderer->ft;
 	FT_Face face;
 	const char *filename;
-	int size;
 
 	filename = luaL_checkstring(L, 1);
-	size = luaL_checkinteger(L, 2);
 
 	if (FT_New_Face(ft, filename, 0, &face)) {
 		return luaL_error(L, "failed to load font:%s", filename);
 	}
-	FT_Set_Pixel_Sizes(face, 0, size);
+	FT_Set_Pixel_Sizes(face, 0, FT_FACE_SIZE);
 	lua_pushlightuserdata(L, face);
 	return 1;
 }

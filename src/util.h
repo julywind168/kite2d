@@ -7,7 +7,7 @@
 
 
 GLuint
-create_program(const char*, const char*);
+program_from_file(const char*, const char*);
 
 
 
