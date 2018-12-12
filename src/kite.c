@@ -4,15 +4,14 @@
 #include "lgraphics.h"
 #include "lfont.h"
 
-#define KITE_START 1
-#define KITE_UPDATE 2
-#define KITE_DRAW 3
-#define KITE_MOUSE 4
-#define KITE_KEYBOARD 5
-#define KITE_MESSAGE 6
-#define KITE_PAUSE 7
-#define KITE_RESUME 8
-#define KITE_EXIT 9
+#define KITE_UPDATE 1
+#define KITE_DRAW 2
+#define KITE_MOUSE 3
+#define KITE_KEYBOARD 4
+#define KITE_MESSAGE 5
+#define KITE_PAUSE 6
+#define KITE_RESUME 7
+#define KITE_EXIT 8
 
 #define MOUSE_PRESS 1
 #define MOUSE_RELEASE 2
@@ -39,14 +38,6 @@ void
 kite_exit() {
 	lua_State *L = kite->L;
 	lua_pushvalue(L, KITE_EXIT);
-	if (lua_pcall(L, 0, 0, 0) != LUA_OK) on_kite_error(L);
-}
-
-
-void
-kite_start() {
-	lua_State *L = kite->L;
-	lua_pushvalue(L, KITE_START);
 	if (lua_pcall(L, 0, 0, 0) != LUA_OK) on_kite_error(L);
 }
 
@@ -145,7 +136,6 @@ int kite_load() {
 		return 1;
 	}
 	ASSERT(lua_gettop(L) == 0, "bad lua stack");
-	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_START");
 	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_UPDATE");
 	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_DRAW");
 	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_MOUSE");
@@ -264,7 +254,6 @@ create_kite(const char *gamedir) {
 	kite = malloc(sizeof(Kite));
 	kite->L = luaL_newstate();
 	kite->load = kite_load;
-	kite->start = kite_start;
 	kite->update = kite_update;
 	kite->draw = kite_draw;
 	kite->_cursor_move = _kite_cursor_move;

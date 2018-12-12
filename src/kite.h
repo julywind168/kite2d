@@ -26,7 +26,6 @@ typedef struct
 
 	//callback
 	int (*load)(void);
-	void (*start)(void);
 	void (*update)(double);
 	void (*draw)(void);
 	void (*_cursor_enter)(GLFWwindow*, int);

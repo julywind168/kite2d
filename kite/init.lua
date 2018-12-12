@@ -61,13 +61,13 @@ local kite = {}
 function kite.start(callback)
 
 	local cb = {}
-	cb.start = assert(callback.start)
 	cb.draw = assert(callback.draw)
-	cb.update = function (dt)
-		callback.update(dt)
-	end
+	cb.update = assert(callback.update)
 	
 	assert(callback.mouse)
+	assert(callback.keyboard)
+	assert(callback.message)
+
 	cb.mouse = function(what, x, y, who)
 		return callback.mouse(mouse_event[what], x, y, who and mouse_name[who])
 	end

@@ -1,8 +1,11 @@
 #include "lkite.h"
 #include "game.h"
 
+#define VERSION "0.01"
 
 extern Game * G;
+
+
 
 
 static int
@@ -22,9 +25,6 @@ ltime(lua_State *L) {
 static int
 linject(lua_State *L) {
 	luaL_checktype(L, 1, LUA_TTABLE);
-	lua_pushstring(L, "start");
-	lua_gettable(L, -2);
-	lua_setfield(L, LUA_REGISTRYINDEX, "KITE_START");
 	lua_pushstring(L, "update");
 	lua_gettable(L, -2);
 	lua_setfield(L, LUA_REGISTRYINDEX, "KITE_UPDATE");
@@ -54,6 +54,13 @@ linject(lua_State *L) {
 }
 
 
+static int
+lversion(lua_State *L) {
+	lua_pushstring(L, VERSION);
+	return 1;
+}
+
+
 int
 lib_kite(lua_State *L)
 {
@@ -61,6 +68,7 @@ lib_kite(lua_State *L)
 		{"exit", lexit},
         {"time", ltime},
         {"inject", linject},
+        {"version", lversion},
 		{NULL, NULL}
 	};
 	luaL_newlib(L, l);

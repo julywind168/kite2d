@@ -7,8 +7,6 @@ void
 game_run() {
 	GLFWwindow *hwnd = G->window->handle;
 	double now, dt;
-
-	G->kite->start();
 	
 	while(!glfwWindowShouldClose(hwnd)) {
 		now = glfwGetTime();

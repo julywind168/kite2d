@@ -8,16 +8,12 @@ local bg = gfx.texture('examples/assert/bg.jpg')
 
 local game = {}
 
-function game.start()
-end
-
 function game.update(dt)
-	-- print(1//dt)
 end
 
 function game.draw()
 	gfx.draw(bg, 480, 320, 0.5, 0.5, 1, 1, 0, 0xffffffff)
-	gfx.print('hello 哈哈旭旭宝宝123 | O(∩_∩)O', 24, 480, 640-2, 0.5, 1, 0, 0xff0000ff)	
+	gfx.print('hello world 哈哈 O(∩_∩)O~', 24, 480, 320, 0.5, 0.5, 0, 0xff0000ff)	
 end
 
 function game.mouse(what, x, y, who)
@@ -39,7 +35,7 @@ function game.pause()
 end
 
 function game.exit()
-	print('see you')
+	print('see you next version, current is v'..kite.version())
 end
 
 kite.start(game)
