@@ -1,3 +1,12 @@
+----------------------------------------------------------------------------------------
+--
+-- HelloWorld 就是为了演示 精灵 和 Label 的绘制
+-- kite 参考了 ejoy2d, https://github.com/ejoy/ejoy2d
+-- kite 还参考了 love2d 的api设计, https://love2d.org/ 
+-- 
+----------------------------------------------------------------------------------------
+
+
 local kite = require 'kite'
 local gfx = require "kite.graphics"
 

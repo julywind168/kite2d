@@ -1,3 +1,10 @@
+----------------------------------------------------------------------------------------
+--
+-- Game01 主要是让大家适应一下 kite-ECS
+-- 接下来, 我们将以 ECS 为基础构建一套简单的 UI 系统
+-- kite-ECS 参考了: https://github.com/ephja/love-ecs
+--  
+----------------------------------------------------------------------------------------
 package.path = 'examples/game01/?.lua;examples/game01/?/init.lua;' .. package.path
 
 local kite = require 'kite'
