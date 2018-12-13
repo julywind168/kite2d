@@ -3,18 +3,20 @@ package.path = 'examples/game/?.lua;examples/game/?/init.lua;' .. package.path
 local kite = require 'kite'
 local gfx = require 'kite.graphics'
 local ecs = require 'ecs'
+local create = require 'ecs.functions'
 
-local RenderSystem = require 'ecs.systems.Render'
+local Render = require 'ecs.systems.Render'
 
-
-local bg = gfx.texture('examples/assert/bg.jpg')
-
-
-local function create_sprite(texture, t)
+--
+-- 让我们手动构造一种 entity (纯数据的集合), 仅用于理解 
+--
+local function create_sprite(t, name)
 	local e = {}
-	e.has = {position=true, sprite=true}
+	e.name = name or 'unknown'
+	e.has = {node={'active'},position={'x','y'},transform={'sx','sy','rotate'},sprite={'texture','color'},rectangle={'w','h','ax','ay'}}
+
 	e.active = true
-	e.texture = texture
+	e.texture = t.texture
 	e.x = t.x
 	e.y = t.y
 	e.ax = t.ax or 0.5
@@ -27,12 +29,19 @@ local function create_sprite(texture, t)
 end
 
 
+-- start
+local background = create.sprite{ tex=gfx.texture('examples/assert/bg.jpg'), x=480, y=320 }
+local helloworld = create.label{ text='Hello World', x=480, y=320, fontsize=48, color=0xff0000ff }
 
+local bird_tex = gfx.texture('examples/assert/bird0_0.png')
+local bird = create_sprite{ texture=bird_tex, x=480, y=420 }
 
 
 local world = ecs.world()
-	.add_system(RenderSystem)
-	.add_entity(create_sprite(bg, {x = 480, y = 320}))
+	.add_system(Render())
+	.add_entity(background)
+	.add_entity(bird)
+	.add_entity(helloworld)
 
 
 local game = {}

@@ -18,9 +18,10 @@ end
 
 function M.print(text, size, x, y, ax, ay, rotate, color, fontname)
 	local ft = font.create(fontname, size)
-	local chars, length = ft.load(text)
+	local chars, width = ft.load(text)
 	local height = size + 2
-	core.print(chars, x, y, x - ax * length, y-(ay-0.24)*height, rotate, color)
+	core.print(chars, x, y, x - ax * width, y-(ay-0.24)*height, rotate, color)
+	return width
 end
 
 

@@ -23,7 +23,7 @@ function ecs.world()
 
 
 	function self.add_system(system)
-		table.insert(systems, system(self))
+		table.insert(systems, system)
 		return self
 	end
 
@@ -55,7 +55,25 @@ function ecs.entity(name)
 	local e = {}
 	e.name = name or 'unknown'
 	e.has = {}
-	return e
+
+	return setmetatable(e, {__add = function (_, f)
+		local name, desc, component = f()
+
+		assert(not e.has[name], 'repeat component '..name)
+		e.has[name] = desc
+
+		for k,v in pairs(component) do
+			assert(not e[k], 'repeat key'..k)
+			e[k] = v
+		end
+		return e
+	end, __sub = function (_, name)
+		local desc = assert(e.has[name], 'no component '..tostring(name))
+		for _,key in ipairs(desc) do
+			e[key] = nil
+		end
+		e.has[name] = nil
+	end})
 end
 
 
