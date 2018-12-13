@@ -1,8 +1,10 @@
+package.path = 'examples/game/?.lua;examples/game/?/init.lua;' .. package.path
+
 local kite = require 'kite'
 local gfx = require 'kite.graphics'
-local ecs = require 'kite.ecs'
+local ecs = require 'ecs'
 
-local RenderSystem = require 'kite.ecs.systems.Render'
+local RenderSystem = require 'ecs.systems.Render'
 
 
 local bg = gfx.texture('examples/assert/bg.jpg')
