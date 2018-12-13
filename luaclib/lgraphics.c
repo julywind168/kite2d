@@ -20,16 +20,15 @@ static int
 lprint(lua_State *L) {
 	Character *ch;
 	uint32_t n, color;
-	float x0, y0, x, y, w, h, scale, posx, posy, angle;
+	float x0, y0, x, y, w, h, posx, posy, angle;
 
 	n = luaL_len(L, 1);
 	x0 = luaL_checknumber(L, 2);
 	y0 = luaL_checknumber(L, 3);
 	x = luaL_checknumber(L, 4);
 	y = luaL_checknumber(L, 5);
-	scale = luaL_checknumber(L, 6) / FT_FACE_FSIZE;
-	angle = luaL_checknumber(L, 7) * (M_PI/180.f);
-	color = luaL_checkinteger(L, 8);
+	angle = luaL_checknumber(L, 6) * (M_PI/180.f);
+	color = luaL_checkinteger(L, 7);
 	
 	float vertices[4][4] = {
 		{0.f, 0.f,	0.f, 0.f},
@@ -44,11 +43,11 @@ lprint(lua_State *L) {
 		lua_rawgeti(L, 1, i);
 		ch = lua_touserdata(L, -1);
 
-		posx = x + ch->offsetx * scale;
-		posy = y - (ch->height - ch->offsety) * scale;
+		posx = x + ch->offsetx;
+		posy = y - (ch->height - ch->offsety);
 
-		w = ch->width * scale;
-		h = ch->height * scale;
+		w = ch->width;
+		h = ch->height;
 
 		// 左上 -> 左下 -> 右下 -> 右上 (逆时针)
 		ROTATE(x0, y0, angle, posx, posy+h, &vertices[0][0], &vertices[0][1]);
@@ -59,7 +58,7 @@ lprint(lua_State *L) {
 		G->renderer->draw(&vertices[0][0], ch->texture);
 		
 		lua_pop(L, 1);
-		x = x + (ch->advancex >> 6) * scale;
+		x = x + (ch->advancex >> 6);
 	}
 
 	return 0;

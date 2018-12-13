@@ -21,20 +21,22 @@ local M = {}
 
 local fonts = {}
 
-function M.create(name)
+function M.create(name, sz)
 
 	name = name or default
-	if fonts[name] then return fonts[name] end
+
+	local cache = fonts[name] and fonts[name][sz]
+	if cache then return cache end
 
 	local self = {}
-	local face = core.face(name)
+	local face = core.face(name, sz)
 
 	-- cache start
 	local loaded = {}
 	local texts = {}
 	-- cache end
 
-	function self.load(text, size)
+	function self.load(text)
 
 		local cache = texts[text]
 		if cache then
@@ -51,12 +53,13 @@ function M.create(name)
 			table.insert(chars, char)
 		end
 
-		local length = core.chars_length(chars, size)
+		local length = core.chars_length(chars)
 		texts[text] = {chars, length}
 		return chars, length
 	end
 
-	fonts[name] = self
+	fonts[name] = fonts[name] or {}
+	fonts[name][sz] = self
 
 	return self
 end

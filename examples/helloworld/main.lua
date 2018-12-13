@@ -13,7 +13,7 @@ end
 
 function game.draw()
 	gfx.draw(bg, 480, 320, 0.5, 0.5, 1, 1, 0, 0xffffffff)
-	gfx.print('hello world 哈哈 O(∩_∩)O~', 24, 480, 320, 0.5, 0.5, 0, 0xff0000ff)	
+	gfx.print('hello world 哈哈 O(∩_∩)O~', 48, 480, 320, 0.5, 0.5, 0, 0xff0000ff)	
 end
 
 function game.mouse(what, x, y, who)

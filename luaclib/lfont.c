@@ -50,11 +50,9 @@ static int
 lchars_length(lua_State *L) {
     int n, length;
     Character *ch;
-    float x, scale;
-    float first_width, end_width, first_x, end_x;
+    float x, first_width, end_width, first_x, end_x;
 
     n = luaL_len(L, 1);
-    scale = luaL_checknumber(L, 2)/FT_FACE_FSIZE;
 
     for (int i = 1; i <=n; ++i)
     {
@@ -62,14 +60,14 @@ lchars_length(lua_State *L) {
         ch = lua_touserdata(L, -1);
 
         if (i == 1) {
-            first_width = ch->width * scale;
-            first_x = x + ch->offsetx * scale;
-            x += (ch->advancex >> 6) * scale;
+            first_width = ch->width;
+            first_x = x + ch->offsetx;
+            x += (ch->advancex >> 6);
         } else if (i == n) {
-            end_width = ch->width * scale;
-            end_x = x + ch->offsetx * scale;
+            end_width = ch->width;
+            end_x = x + ch->offsetx;
         } else {
-            x += (ch->advancex >> 6) * scale;
+            x += (ch->advancex >> 6);
         }
         lua_pop(L, 1);
     }
@@ -87,13 +85,15 @@ lface(lua_State *L) {
 	FT_Library ft = G->renderer->ft;
 	FT_Face face;
 	const char *filename;
+    int sz;
 
 	filename = luaL_checkstring(L, 1);
+    sz = luaL_checkinteger(L, 2);
 
 	if (FT_New_Face(ft, filename, 0, &face)) {
 		return luaL_error(L, "failed to load font:%s", filename);
 	}
-	FT_Set_Pixel_Sizes(face, 0, FT_FACE_SIZE);
+	FT_Set_Pixel_Sizes(face, 0, sz);
 	lua_pushlightuserdata(L, face);
 	return 1;
 }
