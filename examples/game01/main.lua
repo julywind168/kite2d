@@ -1,4 +1,4 @@
-package.path = 'examples/game/?.lua;examples/game/?/init.lua;' .. package.path
+package.path = 'examples/game01/?.lua;examples/game01/?/init.lua;' .. package.path
 
 local kite = require 'kite'
 local gfx = require 'kite.graphics'
@@ -47,11 +47,11 @@ local world = ecs.world()
 local game = {}
 
 function game.update(dt)
-	world('update', dt)
+	world('update', dt) 	-- dispatch event 'update'
 end
 
 function game.draw()
-	world('draw')
+	world('draw') 			-- dispatch event 'draw'
 end
 
 function game.mouse(what, x, y, who)
