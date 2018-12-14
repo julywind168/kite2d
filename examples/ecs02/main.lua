@@ -19,14 +19,10 @@ local Animation = require 'ecs.systems.Animation'
 local background = create.sprite{ texname='examples/assert/bg.jpg', x=480, y=320 } + TAG('TAG_MAP_LAYER')
 local helloworld = create.label{ text='Hello World', x=480, y=320, fontsize=48, color=0xff0000ff } + TAG('TAG_UI_LAYER') 
 
-local bird = create.flipbook{
-		x=480, y=420,
-		w=48, h=48,
-		isloop=true, current=1, speed=1,
-		frames = {
+local bird = create.flipbook{ x=480, y=420, isloop=true, frames = {
 			{texname='examples/assert/bird0_0.png'},
 			{texname='examples/assert/bird0_1.png'},
-			{texname='examples/assert/bird0_2.png'},
+			{texname='examples/assert/bird0_2.png'}
 		}} + TAG('TAG_SPRITE_LAYER')
 
 

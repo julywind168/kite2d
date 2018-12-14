@@ -21,7 +21,7 @@ function M.flipbook(t, name)
 			+ Node(t.active ~= false and true or false, 'flipbook')
 			+ Position(t.x, t.y)
 			+ Transform(t.sx, t.sy, t.rotate)
-			+ Rectangle(t.w, t.h, t.ax, t.ay)
+			+ Rectangle(t.w or 0, t.h or 0, t.ax, t.ay)
 			+ Flipbook(t.frames, t.current, t.pause, t.isloop, t.speed, t.timec)
 	return e
 end
