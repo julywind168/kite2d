@@ -6,9 +6,9 @@ return function ()
 
 	function self.draw(e)
 		if e.has.sprite then
-			gfx.draw(e.texture, e.x, e.y, e.ax, e.ay, e.sx, e.sy, e.rotate, e.color, e.w, e.h)
+			gfx.draw(e.texname, e.x, e.y, e.ax, e.ay, e.sx, e.sy, e.rotate, e.color, e.w, e.h, e.texcoord)
 		else
-			e.w = gfx.print(e.text, e.fontsize, e.x, e.y, e.ax, e.ay, e.rotate, e.color, e.fontname)
+			e.w = gfx.print(e.text, e.fontsize, e.x, e.y, e.color, e.ax, e.ay, e.rotate, e.fontname)
 		end
 	end
 

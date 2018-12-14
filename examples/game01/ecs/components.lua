@@ -1,10 +1,10 @@
 -- description
 local D = {
-	node = {'active'},
+	node = 	{'active'},
 	position = {'x', 'y'},
 	transform = {'sx', 'sy', 'rotate'},
 	rectangle = {'w', 'h', 'ax', 'ay'},
-	sprite = {'texture', 'color'},
+	sprite = {'texname', 'texcoord', 'color'},
 	label = {'text', 'fontsize', 'color'}
 }
 
@@ -37,9 +37,9 @@ function Rectangle(w, h, ax, ay)
 end
 
 
-function Sprite(tex, color)
+function Sprite(texname, texcoord, color)
 	return function ()
-		return 'sprite', D.sprite, {texture = assert(tex), color = color or 0xffffffff}
+		return 'sprite', D.sprite, {texname = assert(texname), texcoord = texcoord or {0,1, 0,0, 1,0, 1,1}, color = color or 0xffffffff}
 	end
 end
 

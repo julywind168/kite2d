@@ -8,15 +8,15 @@ local M = {}
 
 function M.sprite(t, name)
 
-	assert(t and t.tex and t.x and t.y)
-	local w, h = gfx.texture_size(t.tex)
+	assert(t and t.x and t.y)
+	local tex = gfx.texture(t.texname)
 	
 	local e = ecs.entity(name)
 			+ Node(t.active ~= false and true or false)
 			+ Position(t.x, t.y)
 			+ Transform(t.sx, t.sy, t.rotate)
-			+ Sprite(t.tex, t.color)
-			+ Rectangle(t.w or w, t.h or h, t.ax, t.ay)
+			+ Sprite(t.texname, t.texcoord, t.color)
+			+ Rectangle(t.w or tex.w, t.h or tex.h, t.ax, t.ay)
 
 	return e
 end

@@ -67,13 +67,12 @@ lprint(lua_State *L) {
 
 static int
 ldraw(lua_State *L) {
-	Texture *tex;
-	float x, y, posx, posy, w, h;
-	float ax, ay, sx, sy, rotate;
+	GLuint texture;
+	float x, y, w, h, ax, ay, sx, sy, rotate, posx, posy;
 	uint32_t color;
 	float vertices[4][4];
 
-	tex = lua_touserdata(L, 1);
+	texture = luaL_checkinteger(L, 1);
 	x = luaL_checknumber(L, 2);
 	y = luaL_checknumber(L, 3);
 	ax = luaL_checknumber(L, 4);
@@ -82,8 +81,17 @@ ldraw(lua_State *L) {
 	sy = luaL_checknumber(L, 7);
 	rotate = luaL_checknumber(L, 8) * M_PI/180.f;
 	color = luaL_checkinteger(L, 9);
-	w = luaL_optnumber(L, 10, tex->width) * sx;
-	h = luaL_optnumber(L, 11, tex->height) * sy;
+	w = luaL_checknumber(L, 10) * sx;
+	h = luaL_checknumber(L, 11) * sy;
+
+	vertices[0][2] = luaL_checknumber(L, 12);
+	vertices[0][3] = luaL_checknumber(L, 13);
+	vertices[1][2] = luaL_checknumber(L, 14);
+	vertices[1][3] = luaL_checknumber(L, 15);
+	vertices[2][2] = luaL_checknumber(L, 16);
+	vertices[2][3] = luaL_checknumber(L, 17);
+	vertices[3][2] = luaL_checknumber(L, 18);
+	vertices[3][3] = luaL_checknumber(L, 19);
 
 	// 左下角的世界坐标
 	posx = x - ax * w;
@@ -94,13 +102,8 @@ ldraw(lua_State *L) {
 	ROTATE(x, y, rotate, posx+w, posy,   &vertices[2][0], &vertices[2][1]);
 	ROTATE(x, y, rotate, posx+w, posy+h, &vertices[3][0], &vertices[3][1]);
 
-	vertices[0][2] = tex->coord[0]; vertices[0][3] = tex->coord[1];
-	vertices[1][2] = tex->coord[2]; vertices[1][3] = tex->coord[3];
-	vertices[2][2] = tex->coord[4]; vertices[2][3] = tex->coord[5];
-	vertices[3][2] = tex->coord[6]; vertices[3][3] = tex->coord[7];
-
 	G->renderer->manager->use_sprite_program(color);
-	G->renderer->draw(&vertices[0][0], tex->id);
+	G->renderer->draw(&vertices[0][0], texture);
     return 0;
 }
 
@@ -115,23 +118,11 @@ lclear(lua_State *L) {
 
 
 static int
-ltexture_size(lua_State *L) {
-	Texture *tex;
-	tex = lua_touserdata(L, 1);
-	lua_pushinteger(L, tex->width);
-	lua_pushinteger(L, tex->height);
-	return 2;
-}
-
-
-static int
 ltexture(lua_State *L) {
 	GLuint texture;
 	const char *filename;
 	int width, height, channel;
 	unsigned char *data;
-	Texture* tex;
-	float default_coord[8] = {0.f, 1.f, 0.f, 0.f, 1.f, 0.f, 1.f, 1.f};
 
 	filename = luaL_checkstring(L, 1);
 	data = stbi_load(filename, &width, &height, &channel, STBI_rgb_alpha);
@@ -146,21 +137,10 @@ ltexture(lua_State *L) {
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(data);
 
-	tex = lua_newuserdata(L, sizeof(Texture));
-	tex->id = texture;
-	tex->width = width;
-	tex->height = height;
-
-	if (lua_istable(L, 2)) {
-		for (int i = 0; i < 8; ++i) {
-			lua_rawgeti(L, 2, i+1);
-			tex->coord[i] = lua_tonumber(L, -1);
-		}
-		lua_pushvalue(L, 3);
-	} else {
-		memcpy(tex->coord, default_coord, sizeof(float)*8);
-	}
-	return 1;
+	lua_pushinteger(L, texture);
+	lua_pushinteger(L, width);
+	lua_pushinteger(L, height);
+	return 3;
 }
 
 
@@ -173,7 +153,6 @@ lib_graphics(lua_State *L)
 		{"draw", ldraw},
 		{"clear", lclear},
         {"texture", ltexture},
-        {"texture_size", ltexture_size},
 		{NULL, NULL}
 	};
 	luaL_newlib(L, l);
