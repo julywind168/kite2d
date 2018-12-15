@@ -47,9 +47,7 @@ local function Render(world)
 		local y = e.y + frame.oy
 		local w = frame.w
 		local h = frame.h
-		local fx = frame.fx
-		local fy = frame.fy
-		gfx.draw(texname, x, y, e.ax, e.ay, e.sx, e.sy, e.rotate, e.color, w, h, fx, fy, texcoord)
+		gfx.draw(texname, x, y, e.ax, e.ay, e.sx, e.sy, e.rotate, e.color, w, h, e.fx ~= frame.fx, e.fy ~= frame.fx, texcoord)
 	end
 
 	local function draw_entities(entities)

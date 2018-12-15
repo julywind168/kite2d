@@ -20,7 +20,7 @@ function M.texture(name)
 end
 
 
-function M.draw(texname, x, y, ax, ay, sx, sy, rotate, color, w, h, texcoord)
+function M.draw(texname, x, y, ax, ay, sx, sy, rotate, color, w, h, fx, fy, texcoord)
 	local tex = M.texture(texname)
 	ax = ax or 0.5
 	ay = ay or 0.5
@@ -30,8 +30,10 @@ function M.draw(texname, x, y, ax, ay, sx, sy, rotate, color, w, h, texcoord)
 	color = color or 0xffffffff
 	w = w or tex.w
 	h = h or tex.h
+	fx = fx or false
+	fy = fy or false
 	texcoord = texcoord or {0,1, 0,0, 1,0, 1,1}
-	core.draw(tex.id, x, y, ax, ay, sx, sy, rotate, color, w, h, table.unpack(texcoord))
+	core.draw(tex.id, x, y, ax, ay, sx, sy, rotate, color, w, h, fx, fy, table.unpack(texcoord))
 end
 
 

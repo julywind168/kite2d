@@ -4,7 +4,7 @@ local D = {
 	position = {'x', 'y'},
 	transform = {'sx', 'sy', 'rotate'},
 	rectangle = {'w', 'h', 'ax', 'ay'},
-	sprite = {'texname', 'texcoord', 'color'},
+	sprite = {'texname', 'texcoord', 'color', 'fx', 'fy'},
 	label = {'text', 'fontsize', 'color'}
 }
 
@@ -37,9 +37,15 @@ function Rectangle(w, h, ax, ay)
 end
 
 
-function Sprite(texname, texcoord, color)
+function Sprite(texname, texcoord, color, fx, fy)
 	return function ()
-		return 'sprite', D.sprite, {texname = assert(texname), texcoord = texcoord or {0,1, 0,0, 1,0, 1,1}, color = color or 0xffffffff}
+		return 'sprite', D.sprite, {
+			texname = assert(texname),
+			texcoord = texcoord or {0,1, 0,0, 1,0, 1,1},
+			color = color or 0xffffffff,
+			fx = fx or false,
+			fy = fy or false
+		}
 	end
 end
 

@@ -13,6 +13,13 @@ ROTATE(float x0, float y0, float a, float x1, float y1, float *x, float *y) {
 	*y = (x1 - x0)*sin(a) + (y1 - y0)*cos(a) + y0;
 }
 
+static void
+swap(float *a, float *b) {
+	float tmp;
+	tmp = *a;
+	*a = *b;
+	*b = tmp;
+}
 
 
 
@@ -69,7 +76,7 @@ static int
 ldraw(lua_State *L) {
 	GLuint texture;
 	float x, y, w, h, ax, ay, sx, sy, rotate, posx, posy;
-	uint32_t color;
+	uint32_t color, flipx, flipy;
 	float vertices[4][4];
 
 	texture = luaL_checkinteger(L, 1);
@@ -84,14 +91,30 @@ ldraw(lua_State *L) {
 	w = luaL_checknumber(L, 10) * sx;
 	h = luaL_checknumber(L, 11) * sy;
 
-	vertices[0][2] = luaL_checknumber(L, 12);
-	vertices[0][3] = luaL_checknumber(L, 13);
-	vertices[1][2] = luaL_checknumber(L, 14);
-	vertices[1][3] = luaL_checknumber(L, 15);
-	vertices[2][2] = luaL_checknumber(L, 16);
-	vertices[2][3] = luaL_checknumber(L, 17);
-	vertices[3][2] = luaL_checknumber(L, 18);
-	vertices[3][3] = luaL_checknumber(L, 19);
+	flipx = lua_toboolean(L, 12);
+	flipy = lua_toboolean(L, 13);
+	vertices[0][2] = luaL_checknumber(L, 14);
+	vertices[0][3] = luaL_checknumber(L, 15);
+	vertices[1][2] = luaL_checknumber(L, 16);
+	vertices[1][3] = luaL_checknumber(L, 17);
+	vertices[2][2] = luaL_checknumber(L, 18);
+	vertices[2][3] = luaL_checknumber(L, 19);
+	vertices[3][2] = luaL_checknumber(L, 20);
+	vertices[3][3] = luaL_checknumber(L, 21);
+
+	if (flipx) {
+		swap(&vertices[0][2], &vertices[3][2]);
+		swap(&vertices[0][3], &vertices[3][3]);
+		swap(&vertices[1][2], &vertices[2][2]);
+		swap(&vertices[1][3], &vertices[2][3]);
+	}
+
+	if (flipy) {
+		swap(&vertices[0][2], &vertices[1][2]);
+		swap(&vertices[0][3], &vertices[1][3]);
+		swap(&vertices[2][2], &vertices[3][2]);
+		swap(&vertices[2][3], &vertices[3][3]);
+	}
 
 	// 左下角的世界坐标
 	posx = x - ax * w;

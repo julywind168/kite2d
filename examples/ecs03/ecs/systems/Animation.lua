@@ -1,5 +1,3 @@
-local gfx = require "kite.graphics"
-
 local function Animation(world)
 
 	local self = {name='animation'}
@@ -14,7 +12,7 @@ local function Animation(world)
 		local flipbooks = get_flipbooks()
 		for _,e in ipairs(flipbooks) do
 			e.timec = e.timec + dt
-			local interval = 0.167/e.speed -- speed max is 10
+			local interval = 0.167/e.playspeed -- play speed max is 10
 			if e.timec >= interval then
 				e.timec = e.timec - interval
 				e.current = e.current + 1
