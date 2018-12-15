@@ -1,13 +1,9 @@
 ----------------------------------------------------------------------------------------
 --
--- 在 ecs03 中 我们要实现
--- 1. button 并响应点击事件, 思路就是加一个Input系统用来处理 点击 按键 文字输入 事件,
--- 		为了实现点击(或按键)后的逻辑，我们要传一个 handle(s) 给 Input系统 回调
--- 2. 输入框(TextField)的实现
--- 		重构之前已经做过了, 主要是先画一个背景, 再画一个裁剪框, 再画 label, 再加一个闪烁的光标
--- 
+-- 第二个 demo, 打算做个flybird, 现在只能飞
+--
 ----------------------------------------------------------------------------------------
-package.path = 'examples/ecs03/?.lua;examples/ecs03/?/init.lua;' .. package.path
+package.path = 'examples/flybird/?.lua;examples/flybird/?/init.lua;' .. package.path
 
 local kite = require 'kite'
 local gfx = require 'kite.graphics'
@@ -18,51 +14,76 @@ local Render = require 'ecs.systems.Render'
 local Animation = require 'ecs.systems.Animation'
 local Moveing = require 'ecs.systems.Moveing'
 local Input = require 'ecs.systems.Input'
+local Gravity = require 'ecs.systems.Gravity'
 
 --[[
 	这里 这么写的原因是为了 模拟 从文件中加载 entities, 比如我们的 entities 可以用编辑器生产 
 ]]
 local function load_entities()
-	return {
-		ecs.entity('game', {gameing = false}),
-		create.sprite{ texname='examples/assert/bg.jpg', x=480, y=320 } + TAG('TAG_MAP_LAYER'),
-		create.label{ text='Hello World', x=480, y=320, fontsize=48, color=0xff0000ff } + TAG('TAG_UI_LAYER'),
-		create.button({ texname='examples/assert/button_ok.png', x=480, y=220 }, 'start') + TAG('TAG_UI_LAYER'),
-		create.flipbook({ x=480, y=420, isloop=true, pause = true, frames = {
+
+	local entities = {}
+
+	table.insert(entities, ecs.entity('game', {land = 138, bird_x_speed = 180}))
+
+	for i=1,10 do
+		table.insert(entities, create.sprite{ texname='examples/assert/bg_day.png', x=180 + (i-1)*360, y=320, w=360, h=640} + TAG('TAG_MAP_LAYER'))
+	end
+
+	for i=1,10 do
+		table.insert(entities, create.sprite{ texname='examples/assert/land.png', x=180 + (i-1)*360, y=69, w=360, h=138} + TAG('TAG_MAP_LAYER'))
+	end
+
+	table.insert(entities, create.label{ text='Scroe:0', x=10, y=630, ax=0, ay=1, fontsize=24, color=0xff0000ff } + TAG('TAG_UI_LAYER'))
+	table.insert(entities, create.button({ texname='examples/assert/button_play.png', x=480, y=220 }, 'btn_play') + TAG('TAG_UI_LAYER'))
+	local bird = create.flipbook({ x=48, y=420, isloop=true, pause = true, frames = {
 					{texname='examples/assert/bird0_0.png'},
 					{texname='examples/assert/bird0_1.png'},
 					{texname='examples/assert/bird0_2.png'}
-				}}, 'bird') + TAG('TAG_SPRITE_LAYER') + Move(0, 0),
-	}
+				}}, 'bird') + TAG('TAG_SPRITE_LAYER') + Move(0, 0)
+	table.insert(entities, bird)
+
+	return entities
 end
 
 
 local world = ecs.world().add_entitys(load_entities())
 
+
 local game = world.find_entity('game')
 local bird = world.find_entity('bird')
-local start = world.find_entity('start')
+local btn_play = world.find_entity('btn_play')
+
+--[[
+local function flip_bird()
+	for _,frame in ipairs(bird.frames) do
+		local coord = frame.texcoord
+		coord[1], coord[7] = coord[7], coord[1]
+		coord[2], coord[8] = coord[8], coord[2]
+
+		coord[3], coord[5] = coord[5], coord[3]
+		coord[4], coord[6] = coord[6], coord[4]
+	end
+end
+]]
 
 
 local handle = { click = {}, keydown = {} }
 
 -- start button click handle
-function handle.click.start()
-	game.gameing = true
-	start.active = false
+function handle.click.btn_play()
+	btn_play.active = false
 	bird.pause = false
+	bird.speed = game.bird_x_speed
 
-	-- listen left/right keydown on start 
-	function handle.keydown.left()
-		bird.fx = true 		-- flip x 将小鸟水平镜像
-		bird.speed = -100 	-- 方向是0度 (向右), 负数刚好是向左 (bird.direction = 180 效果一样)
-	end
+	world.add_system(Gravity())
 
-	function handle.keydown.right()
-		bird.fx = false
-		bird.speed = 100
+	-- listen up keydown on start 
+	function handle.keydown.up()
+		bird.speed = math.sqrt(game.bird_x_speed^2 + game.bird_x_speed^2)
+		bird.direction = 45
 	end
 end
+
 
 world.add_system(Render())
 	.add_system(Animation())

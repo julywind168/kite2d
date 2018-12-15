@@ -32,7 +32,7 @@ local function Render(world)
 	local draw = {}
 
 	function draw.sprite(e)
-		gfx.draw(e.texname, e.x, e.y, e.ax, e.ay, e.sx, e.sy, e.rotate, e.color, e.w, e.h, e.fx, e.fy, e.texcoord)
+		gfx.draw(e.texname, e.x, e.y, e.ax, e.ay, e.sx, e.sy, e.rotate, e.color, e.w, e.h, e.texcoord)
 	end
 
 	function draw.label(e)
@@ -47,9 +47,17 @@ local function Render(world)
 		local y = e.y + frame.oy
 		local w = frame.w
 		local h = frame.h
-		local fx = frame.fx
-		local fy = frame.fy
-		gfx.draw(texname, x, y, e.ax, e.ay, e.sx, e.sy, e.rotate, e.color, w, h, fx, fy, texcoord)
+		gfx.draw(texname, x, y, e.ax, e.ay, e.sx, e.sy, e.rotate, e.color, w, h, texcoord)
+	end
+
+	function draw.textfield(e)
+		local bg = e.background
+		local mask = e.mask
+		gfx.draw(bg.texname, e.x, e.y, e.ax, e.ay, e.sx, e.sy, e.rotate, bg.color, e.w, e.h, bg.fx, bg.fy, bg.texcoord)
+		gfx.start_stencil()
+		gfx.draw(mask.texname, e.x, e.y, e.ax, e.ay, e.sx, e.sy, e.rotate, mask.color, e.w, e.h, mask.fx, mask.fy, bg.texcoord)
+		gfx.stop_stencil()
+		gfx.clear_stencil()
 	end
 
 	local function draw_entities(entities)

@@ -5,12 +5,18 @@ local D = {
 	position = {'x', 'y'},
 	transform = {'sx', 'sy', 'rotate'},
 	rectangle = {'w', 'h', 'ax', 'ay'},
-	sprite = {'texname', 'texcoord', 'color', 'fx', 'fy'},
+	sprite = {'texname', 'texcoord', 'color'},
 	label = {'text', 'fontsize', 'color'},
-	filpbook = {'frames', 'pause', 'stop', 'isloop', 'playspeed', 'timec', 'fx', 'fy'},
+	filpbook = {'frames', 'pause', 'stop', 'isloop', 'playspeed', 'timec'},
 	button = {'scale'},
 	move = {'direction', 'speed'},
+	textfield = {'background', 'mask', 'label'}
 }
+
+
+function Textfield(background, mask, label)
+	return 'textfield', D.textfield, {background = background, mask = mask, label = label}
+end
 
 
 function Move(direction, speed)
@@ -27,7 +33,7 @@ function Button(scale)
 end
 
 
-function Flipbook(frames, current, pause, isloop, playspeed, fx, fy)
+function Flipbook(frames, current, pause, isloop, playspeed)
 	return function ( )
 		return  'flipbook', D.filpbook, {
 			frames = frames,
@@ -35,9 +41,7 @@ function Flipbook(frames, current, pause, isloop, playspeed, fx, fy)
 			pause = pause or false,
 			isloop = isloop or false,
 			playspeed = playspeed or 1,
-			timec = 0,
-			fx = fx or false,
-			fy = fy or false,
+			timec = 0
 		}
 	end
 end

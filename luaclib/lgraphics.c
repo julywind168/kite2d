@@ -13,15 +13,6 @@ ROTATE(float x0, float y0, float a, float x1, float y1, float *x, float *y) {
 	*y = (x1 - x0)*sin(a) + (y1 - y0)*cos(a) + y0;
 }
 
-static void
-swap(float *a, float *b) {
-	float tmp;
-	tmp = *a;
-	*a = *b;
-	*b = tmp;
-}
-
-
 
 static int
 lprint(lua_State *L) {
@@ -76,7 +67,7 @@ static int
 ldraw(lua_State *L) {
 	GLuint texture;
 	float x, y, w, h, ax, ay, sx, sy, rotate, posx, posy;
-	uint32_t color, flipx, flipy;
+	uint32_t color;
 	float vertices[4][4];
 
 	texture = luaL_checkinteger(L, 1);
@@ -91,30 +82,14 @@ ldraw(lua_State *L) {
 	w = luaL_checknumber(L, 10) * sx;
 	h = luaL_checknumber(L, 11) * sy;
 
-	flipx = lua_toboolean(L, 12);
-	flipy = lua_toboolean(L, 13);
-	vertices[0][2] = luaL_checknumber(L, 14);
-	vertices[0][3] = luaL_checknumber(L, 15);
-	vertices[1][2] = luaL_checknumber(L, 16);
-	vertices[1][3] = luaL_checknumber(L, 17);
-	vertices[2][2] = luaL_checknumber(L, 18);
-	vertices[2][3] = luaL_checknumber(L, 19);
-	vertices[3][2] = luaL_checknumber(L, 20);
-	vertices[3][3] = luaL_checknumber(L, 21);
-
-	if (flipx) {
-		swap(&vertices[0][2], &vertices[3][2]);
-		swap(&vertices[0][3], &vertices[3][3]);
-		swap(&vertices[1][2], &vertices[2][2]);
-		swap(&vertices[1][3], &vertices[2][3]);
-	}
-
-	if (flipy) {
-		swap(&vertices[0][2], &vertices[1][2]);
-		swap(&vertices[0][3], &vertices[1][3]);
-		swap(&vertices[2][2], &vertices[3][2]);
-		swap(&vertices[2][3], &vertices[3][3]);
-	}
+	vertices[0][2] = luaL_checknumber(L, 12);
+	vertices[0][3] = luaL_checknumber(L, 13);
+	vertices[1][2] = luaL_checknumber(L, 14);
+	vertices[1][3] = luaL_checknumber(L, 15);
+	vertices[2][2] = luaL_checknumber(L, 16);
+	vertices[2][3] = luaL_checknumber(L, 17);
+	vertices[3][2] = luaL_checknumber(L, 18);
+	vertices[3][3] = luaL_checknumber(L, 19);
 
 	// 左下角的世界坐标
 	posx = x - ax * w;
@@ -166,12 +141,39 @@ ltexture(lua_State *L) {
 	return 3;
 }
 
+// 开始模板绘制 -> draw stencils(sprites) -> 结束模板绘制 -> draw sprites -> 清空模板
+static int
+lstart_stencil(lua_State *L) {
+	glEnable(GL_STENCIL_TEST);
+	glStencilFunc(GL_ALWAYS, 1, 0XFF);
+	glStencilMask(0XFF);
+	return 0;
+}
+
+
+static int
+lstop_stencil(lua_State *L) {
+	glStencilFunc(GL_EQUAL, 1, 0xFF);
+	glStencilMask(0x00);
+	return 0;
+}
+
+
+static int
+lclear_stencil(lua_State *L) {
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+	return 0;
+}
 
 int
 lib_graphics(lua_State *L)
 {
 	stbi_set_flip_vertically_on_load(true);
 	luaL_Reg l[] = {
+		{"clear_stencil", lclear_stencil},
+		{"stop_stencil", lstop_stencil},
+		{"start_stencil", lstart_stencil},
 		{"print", lprint},
 		{"draw", ldraw},
 		{"clear", lclear},
