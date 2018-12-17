@@ -91,9 +91,9 @@ end
 world.add_system(Animation())
 	.add_system(Moveing())
 	.add_system(Input(handle))
-	.add_system(Debug())
 	.add_system(Gravity())
 	.add_system(Render())
+	.add_system(Debug())
 
 local game = {}
 
