@@ -35,15 +35,17 @@ function M.draw(texname, x, y, ax, ay, sx, sy, rotate, color, w, h, texcoord)
 end
 
 
-function M.print(text, size, x, y, color, ax, ay, rotate, fontname)
+function M.print(text, size, x, y, color, ax, ay, rotate, fontname, only_width)
 	ax = ax or 0.5
 	ay = ay or 0.5
 	rotate = rotate or 0
 
 	local ft = font.create(fontname, size)
 	local chars, width = ft.load(text)
-	local height = size + 2
-	core.print(chars, x, y, x - ax * width, y-(ay-0.24)*height, rotate, color)
+
+	if only_width then return width end
+
+	core.print(chars, x, y, x - ax * width, y-(ay-0.2)*size, rotate, color)
 	return width
 end
 

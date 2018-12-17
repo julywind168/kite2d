@@ -6,16 +6,18 @@ local D = {
 	transform = {'sx', 'sy', 'rotate'},
 	rectangle = {'w', 'h', 'ax', 'ay'},
 	sprite = {'texname', 'texcoord', 'color'},
-	label = {'text', 'fontsize', 'color'},
+	label = {'text', 'fontname', 'fontsize', 'color'},
 	filpbook = {'frames', 'pause', 'stop', 'isloop', 'playspeed', 'timec'},
 	button = {'scale'},
 	move = {'direction', 'speed'},
-	textfield = {'background', 'mask', 'label'}
+	textfield = {'background', 'mask', 'label', 'cursor', 'selected'}
 }
 
 
-function Textfield(background, mask, label)
-	return 'textfield', D.textfield, {background = background, mask = mask, label = label}
+function Textfield(background, mask, label, cursor, selected)
+	return function ()
+		return 'textfield', D.textfield, {background = background, mask = mask, label = label, cursor = cursor, selected = selected}
+	end
 end
 
 
@@ -86,8 +88,8 @@ function Sprite(texname, texcoord, color)
 	end
 end
 
-function Label(text, fontsize, color)
+function Label(text, fontname, fontsize, color)
 	return function ()
-		return 'label', D.label, {text = assert(text), fontsize = fontsize or 24, color = color or 0x888888ff}
+		return 'label', D.label, {text = assert(text), fontname = fontname,  fontsize = fontsize or 24, color = color or 0x888888ff}
 	end
 end

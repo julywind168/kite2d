@@ -1,4 +1,4 @@
-local physics_g = 180
+local physics_g = 200
 
 local function Gravity(world)
 
@@ -8,6 +8,7 @@ local function Gravity(world)
 	local bird = world.find_entity('bird')
 
 	function self.update(dt)
+		if game.state ~= 'gameing' then return end
 		if bird.y > game.land then
 			local yspeed = math.sin(bird.direction * math.pi/180) * bird.speed
 			yspeed = yspeed - physics_g * dt

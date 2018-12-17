@@ -8,6 +8,9 @@ local function Move(world)
 		end)
 	end
 
+	local bird = world.find_entity('bird')
+	local camera = world.find_entity('camera')
+
 	function self.update(dt)
 		local entities = get_moveing()
 
@@ -16,6 +19,8 @@ local function Move(world)
 			e.x = e.x + distance * math.cos(e.direction * math.pi/180)
 			e.y = e.y + distance * math.sin(e.direction * math.pi/180)		
 		end
+
+		camera.x = bird.x+bird.w/2 - 480
 	end
 
 	return self

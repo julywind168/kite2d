@@ -9,16 +9,23 @@ local M = {}
 function M.textfield(t, name)
 	assert(t.background and t.background.color and t.label)
 
+	t.label.x = 0
+	t.label.y = t.y
+	t.label.ay = t.ay or 0.5
 	t.background.texname = t.background.texname or 'resource/white.png'
 	t.background.texcoord = t.background.texcoord or {0,1, 0,0, 1,0, 1,1}
 	t.mask = t.mask or {texname = 'resource/null.png', texcoord = {0,1, 0,0, 1,0, 1,1}, color = 0xffffffff}
+	t.cursor = t.cursor or {texname = 'resource/white.png', texcoord = {0,1, 0,0, 1,0, 1,1}, color = 0xffffffff, x=0, y=t.y}
 
 	local e = ecs.entity(name)
 			+ Node(t.active ~= false and true or false, 'textfield')
 			+ Position(t.x, t.y)
 			+ Transform(t.sx, t.sy, t.rotate)
 			+ Rectangle(t.w, t.h, t.ax, t.ay)
-			+ Textfield(t.background, t.mask, t.label)
+			+ Textfield(t.background, t.mask, t.label, t.cursor, t.selected or false)
+			+ TAG('TAG_CLICKABLE')
+			+ TAG('TAG_SELECTEABEL')
+	return e
 end
 
 
@@ -46,19 +53,20 @@ end
 
 
 function M.button(t, name)
-	local e = M.sprite(t, name)
+	local e = M.sprite(t, name, 'button')
 		+ Button(t.scale or 1.2)
+		+ TAG('TAG_CLICKABLE')
 	return e
 end
 
 
-function M.sprite(t, name)
+function M.sprite(t, name, node_type)
 
 	assert(t and t.x and t.y)
 	local tex = gfx.texture(t.texname)
 	
 	local e = ecs.entity(name)
-			+ Node(t.active ~= false and true or false, 'sprite')
+			+ Node(t.active ~= false and true or false, node_type or 'sprite')
 			+ Position(t.x, t.y)
 			+ Transform(t.sx, t.sy, t.rotate)
 			+ Sprite(t.texname, t.texcoord, t.color)
@@ -79,7 +87,7 @@ function M.label(t, name)
 			+ Node(t.active ~= false and true or false, 'label')
 			+ Position(t.x, t.y)
 			+ Transform(t.sx, t.sy, t.rotate)
-			+ Label(t.text, t.fontsize, t.color)
+			+ Label(t.text, t.fontname, t.fontsize, t.color)
 			+ Rectangle(w, h, t.ax, t.ay)
 
 	return e
