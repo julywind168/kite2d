@@ -69,7 +69,7 @@ local function Render(world)
 	function draw.label(e, cx, cy)
 		local x = e.x - cx
 		local y = e.y - cy
-		e.w = gfx.print(e.text, e.fontsize, x, y, e.color, e.ax, e.ay, e.rotate, e.fontname)
+		gfx.print(e.text, e.fontsize, x, y, e.color, e.ax, e.ay, e.rotate, e.fontname)
 	end
 
 	function draw.flipbook(e, cx, cy)
@@ -99,6 +99,13 @@ local function Render(world)
 		if cursor.active then
 			gfx.draw(cursor.texname, cursor.x - cx, cursor.y - cy, 0, 0.5, e.sx, e.sy, 0, cursor.color, 1, e.h-4, cursor.texcoord)
 		end
+	end
+
+	-- 扩展
+	function draw.bird(e, cx, cy)
+		draw.flipbook(e, cx, cy)
+		local nk = e.nick
+		gfx.print(nk.text, nk.fontsize, e.x+nk.ox-cx, e.y+nk.oy-cy, nk.color, nk.ax, nk.ay, 0, nk.fontname)
 	end
 
 	local function draw_entities(entities, cx, cy)

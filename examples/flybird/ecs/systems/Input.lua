@@ -1,10 +1,18 @@
 --[[
 	首先更新键盘状态, 处理UI, 然后是用户自定义控制逻辑
 ]]
+local camera
 
 local function IN(x, y, e)
 	local x2 = e.x - e.ax * e.w * e.sx
 	local y2 = e.y - e.ay * e.h * e.sy
+	
+	-- 转换成屏幕坐标
+	if not e.has['TAG_UI_LAYER'] then
+		x2 = x2 - camera.x
+		y2 = y2 - camera.y
+	end
+
 	local x4 = x2 + e.w * e.sx
 	local y4 = y2 + e.h * e.sy
 
@@ -35,13 +43,6 @@ local function clock(tick, f)
 	end
 end
 
-local function listen(handle)
-	return function (event, ...)
-		local f = handle[event]
-		if f then f(...) end
-	end
-end  
-
 --
 -- Input system
 --
@@ -56,6 +57,7 @@ local function filter_textfield(e) return e.has['textfield'] and e.active end
 --
 -- local
 --
+camera = world.find_entity('camera')
 local keyboard = world.find_entity('keyboard')
 local tmppressed = nil
 local tmpselected = nil
@@ -122,8 +124,10 @@ function on.button.cancel(e)
 end
 
 function on.textfield.click(e)
-	e.selected = 0
-	e.cursor.active = true
+	if not e.selected then
+		e.selected = 0
+		e.cursor.active = true
+	end
 end
 
 function on.textfield.lose_focus(e)

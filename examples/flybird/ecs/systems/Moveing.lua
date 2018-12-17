@@ -20,7 +20,7 @@ local function Move(world)
 			e.y = e.y + distance * math.sin(e.direction * math.pi/180)		
 		end
 
-		camera.x = bird.x+bird.w/2 - 480
+		camera.x = bird.x - 480
 	end
 
 	return self

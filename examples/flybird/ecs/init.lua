@@ -1,3 +1,5 @@
+local description = require 'ecs.components'
+
 local ecs = {}
 
 
@@ -81,10 +83,10 @@ function ecs.entity(name, e)
 	e.has = {}
 
 	return setmetatable(e, {__add = function (_, f)
-		local name, desc, component = f()
+		local name, component = f()
 
 		assert(not e.has[name], 'repeat component '..name)
-		e.has[name] = desc
+		e.has[name] = true
 
 		for k,v in pairs(component) do
 			assert(not e[k], 'repeat key'..k)
@@ -92,7 +94,8 @@ function ecs.entity(name, e)
 		end
 		return e
 	end, __sub = function (_, name)
-		local desc = assert(e.has[name], 'no component '..tostring(name))
+		assert(e.has[name], 'no component '..tostring(name))
+		local desc = assert(description[name])
 		for _,key in ipairs(desc) do
 			e[key] = nil
 		end

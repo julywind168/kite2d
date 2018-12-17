@@ -6,7 +6,18 @@ require "ecs.components"
 local M = {}
 
 
-function M.textfield(t, name)
+function M.bird(t)
+	local nick = assert(t.nick)
+	local e = M.flipbook(t, 'bird')
+			+ Nick(nick)
+			+ Move(0, 0)
+			+ TAG('TAG_SPRITE_LAYER')
+
+	return e
+end
+
+
+function M.textfield(t)
 	assert(t.background and t.background.color and t.label)
 
 	t.label.x = 0
@@ -17,7 +28,7 @@ function M.textfield(t, name)
 	t.mask = t.mask or {texname = 'resource/null.png', texcoord = {0,1, 0,0, 1,0, 1,1}, color = 0xffffffff}
 	t.cursor = t.cursor or {texname = 'resource/white.png', texcoord = {0,1, 0,0, 1,0, 1,1}, color = 0xffffffff, x=0, y=t.y}
 
-	local e = ecs.entity(name)
+	local e = ecs.entity(t.name)
 			+ Node(t.active ~= false and true or false, 'textfield')
 			+ Position(t.x, t.y)
 			+ Transform(t.sx, t.sy, t.rotate)
@@ -25,11 +36,12 @@ function M.textfield(t, name)
 			+ Textfield(t.background, t.mask, t.label, t.cursor, t.selected or false)
 			+ TAG('TAG_CLICKABLE')
 			+ TAG('TAG_SELECTEABEL')
+			+ TAG('TAG_UI_LAYER')
 	return e
 end
 
 
-function M.flipbook(t, name)
+function M.flipbook(t, node_type)
 	local frames = t.frames
 	for _,frame in ipairs(frames) do
 		frame.texcoord = frame.texcoord or {0,1, 0,0, 1,0, 1,1}
@@ -38,12 +50,10 @@ function M.flipbook(t, name)
 		frame.h = frame.h or tex.h
 		frame.ox = frame.ox or 0
 		frame.oy = frame.oy or 0
-		frame.fx = frame.fx or false
-		frame.fy = frame.fy or false
 	end
 
-	local e = ecs.entity(name)
-			+ Node(t.active ~= false and true or false, 'flipbook')
+	local e = ecs.entity(t.name)
+			+ Node(t.active ~= false and true or false, node_type or 'flipbook')
 			+ Position(t.x, t.y)
 			+ Transform(t.sx, t.sy, t.rotate)
 			+ Rectangle(t.w or 0, t.h or 0, t.ax, t.ay)
@@ -52,20 +62,22 @@ function M.flipbook(t, name)
 end
 
 
-function M.button(t, name)
-	local e = M.sprite(t, name, 'button')
+function M.button(t)
+	local e = M.sprite(t, 'button')
 		+ Button(t.scale or 1.2)
 		+ TAG('TAG_CLICKABLE')
+		+ TAG('TAG_UI_LAYER')
+
 	return e
 end
 
 
-function M.sprite(t, name, node_type)
+function M.sprite(t, node_type)
 
 	assert(t and t.x and t.y)
 	local tex = gfx.texture(t.texname)
 	
-	local e = ecs.entity(name)
+	local e = ecs.entity(t.name)
 			+ Node(t.active ~= false and true or false, node_type or 'sprite')
 			+ Position(t.x, t.y)
 			+ Transform(t.sx, t.sy, t.rotate)
@@ -75,7 +87,7 @@ function M.sprite(t, name, node_type)
 	return e
 end
 
-function M.label(t, name)
+function M.label(t)
 
 	assert(t and t.text and t.x and t.y)
 	t.fontsize = t.fontsize or 24
@@ -83,12 +95,13 @@ function M.label(t, name)
 	local w = 0 	-- width will init on draw
 	local h = t.fontsize + 2 
 
-	local e = ecs.entity(name)
+	local e = ecs.entity(t.name)
 			+ Node(t.active ~= false and true or false, 'label')
 			+ Position(t.x, t.y)
 			+ Transform(t.sx, t.sy, t.rotate)
 			+ Label(t.text, t.fontname, t.fontsize, t.color)
 			+ Rectangle(w, h, t.ax, t.ay)
+			+ TAG('TAG_UI_LAYER')
 
 	return e
 end
