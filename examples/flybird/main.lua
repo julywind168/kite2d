@@ -35,16 +35,16 @@ end
 local function load_entities()
 
 	local list = create_list()
-		+ ecs.entity('game', {land = 138, bird_x_speed = 180, state='ready'})
+		+ ecs.entity('game', {land = 138, bird_x_speed = 180, state='ready',score = 0,time = 0})
 		+ ecs.entity('camera', {x=0, y=0})
 		+ ecs.entity('keyboard', {pressed={}, lpressed={}})
 
 	for i=1,10 do
-		list = list + (create.sprite{ texname='examples/assert/bg_day.png', x=180+(i-1)*360, y=320, w=360, h=640 } + TAG('TAG_MAP_LAYER'))
+		list = list + (create.sprite{ texname='examples/assert/bg_day.png', index = i, x=180+(i-1)*360, y=320, w=360, h=640 } + TAG('TAG_MAP_LAYER'))
 	end
 
 	for i=1,10 do
-		list = list + (create.sprite{ texname='examples/assert/land.png', x=180+(i-1)*360, y=69, w=360, h=138 } + TAG('TAG_MAP_LAYER'))
+		list = list + (create.sprite{ texname='examples/assert/land.png', index = i, x=180+(i-1)*360, y=69, w=360, h=138 } + TAG('TAG_MAP_LAYER'))
 	end
 
 	list = list
@@ -83,7 +83,7 @@ local game = world.find_entity('game')
 local bird = world.find_entity('bird')
 local btn_play = world.find_entity('btn_play')
 local textfield = world.find_entity('textfield')
-
+local score = world.find_entity('score')
 
 local handle = { click = {}, keydown = {} }
 
@@ -95,12 +95,16 @@ end
 -- start button click handle
 function handle.click.btn_play()
 	game.state = 'gameing'
+	game.time = os.time()
+	game.score = 0
 	btn_play.active = false
 	textfield.active = false
 
 	bird.nick.text = textfield.label.text
 	bird.pause = false
 	bird.speed = game.bird_x_speed
+
+	score.text = game.score
 
 	-- listen up keydown on start 
 	function handle.keydown.up()
