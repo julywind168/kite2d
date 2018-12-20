@@ -1,33 +1,33 @@
---[[
-	首先更新键盘状态, 处理UI, 然后是用户自定义控制逻辑
-]]
-local camera
+local eye_foreach = eye_foreach
 
-local function IN(x, y, e)
-	local x2 = e.x - e.ax * e.w * e.sx
-	local y2 = e.y - e.ay * e.h * e.sy
-	
-	-- 转换成屏幕坐标
-	if not e.has['TAG_UI_LAYER'] then
-		x2 = x2 - camera.x
-		y2 = y2 - camera.y
-	end
+local function IN(x, y, root, camera, e)
+	local ex = root.x + e.x - camera.x
+	local ey = root.y + e.y - camera.y
+	local sx = root.sx * e.sx / camera.sx
+	local sy = root.sy * e.sy / camera.sy
+	local w = e.w * sx
+	local h = e.h * sy
 
-	local x4 = x2 + e.w * e.sx
-	local y4 = y2 + e.h * e.sy
+	local x2 = ex - e.ax * w
+	local y2 = ey - e.ay * h
 
-	if x < x2 or x > x4 then return false end
-	if y < y2 or y > y4 then return false end
-
+	if x < x2 or x > x2 + w then return false end
+	if y < y2 or y > y2 + h then return false end
 	return true
 end
 
-local function TEST(x, y, entities)
-	for _,e in ipairs(entities) do
-		if IN(x, y, e) then
-			return e
-		end
+
+local function test(root, camera, e, x, y, result)
+	if e.clickable and IN(x, y, root, camera, e) then
+		table.insert(result, e)
 	end
+end
+
+
+local function TEST(x, y, entities)
+	local result = {}
+	eye_foreach(test, entities, x, y, result)
+	return #result > 0 and result[#result]
 end
 
 
@@ -50,17 +50,10 @@ local function Input(world, handle)
 
 local self = {name='input'}
 
-local function filter_buttons(e) return e.has['button'] and e.active end
-local function filter_textfield(e) return e.has['textfield'] and e.active end
 
-
---
--- local
---
-camera = world.find_entity('camera')
-local keyboard = world.find_entity('keyboard')
 local tmppressed = nil
 local tmpselected = nil
+local keyboard = world.find_entity('keyboard')
 
 local watchdog = clock(0.05, function ()
 	if not tmpselected or tmpselected.type ~= 'textfield' then return end
@@ -76,7 +69,6 @@ end)
 -- update
 ---------------------------------------------------------------------------
 
-
 function self.update(dt)
 	for key,time in pairs(keyboard.pressed) do
 		time = time + dt
@@ -86,7 +78,6 @@ function self.update(dt)
 		end
 	end
 
-	-- textfield backspace
 	watchdog(dt)
 end
 
@@ -94,11 +85,6 @@ end
 ---------------------------------------------------------------------------
 -- mouse
 ---------------------------------------------------------------------------
-local function get_clickable()
-	return world.get_entities(function (e)
-		return e.has['TAG_CLICKABLE'] and e.active
-	end)
-end
 
 
 local on = { button = {}, textfield = {} }
@@ -144,7 +130,7 @@ end})
 
 
 function self.mousedown(x, y)
-	local e = TEST(x, y, get_clickable())
+	local e = TEST(x, y, world.entities)
 	if not e then
 		if tmpselected then
 			on(tmpselected, 'lose_focus')
@@ -161,7 +147,7 @@ function self.mousedown(x, y)
 end
 
 function self.mouseup(x, y)
-	local e = TEST(x, y, get_clickable())
+	local e = TEST(x, y, world.entities)
 	if e and e == tmppressed then
 		on(e, 'mouseup')
 		on(e, 'click')

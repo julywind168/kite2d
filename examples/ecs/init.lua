@@ -1,64 +1,55 @@
+require 'ecs.systems.util'
+
 local description = require 'ecs.components'
 
 local ecs = {}
 
 
-function ecs.world()
+function ecs.world(entities)
 	local self = {}
-	local entities = {}
-	local systems = {}
+	
+	self.entities = assert(entities)
+	self.systems = {}	
 
-	function self.get_entities(...)
-		local filters = {...}
-		local r = {}
-		for i,f in ipairs(filters) do
-			r[i] = {}
-			for _,e in ipairs(entities) do
-				if f(e) then
-					table.insert(r[i], e)
-				end
-			end	
+	local function find_e(e, name)
+		if e.name == name then
+			return e 
 		end
-		return table.unpack(r)
-	end
-
-	function self.find_entity(name)
-		for _,e in ipairs(entities) do
-			if e.name == name then
-				return e
+		if e.list then
+			for _,_e in ipairs(e.list) do
+				local e = find_e(_e, name)
+				if e then return e end
 			end
 		end
 	end
 
+	function self.find_entity(name)
+		return find_e(self.entities, name)
+	end
+
 	function self.add_entity(e)
-		table.insert(entities, e)
+		table.insert(self.canvas.list, e)
 		return self
 	end
 
 	function self.add_entitys(es)
 		for _,e in ipairs(es) do
-			table.insert(entities, e)
+			table.insert(self.canvas.list, e)
 		end
 		return self
 	end
 
 	function self.remove_entity(e)
-		for i,_e in ipairs(entities) do
-			if _e == e then
-				table.remove(entities, i)
-				return self
-			end
-		end
 	end
 
 
 	function self.add_system(system)
-		table.insert(systems, system(self))
+		table.insert(self.systems, system(self))
 		return self
 	end
 
 	function self.remove_system(name)
-		for i,system in ipairs(systems) do
+		for i,system in ipairs(self.systems) do
 			if system.name == name then
 				table.remove(systems, i)
 				return self
@@ -67,7 +58,7 @@ function ecs.world()
 	end
 
 	return setmetatable(self, {__call = function (_, event, ...)
-		for _,sys in ipairs(systems) do
+		for _,sys in ipairs(self.systems) do
 			local handle = sys[event]
 			if handle then
 				handle(...)
@@ -83,21 +74,30 @@ function ecs.entity(name, e)
 	e.has = {}
 
 	return setmetatable(e, {__add = function (_, f)
-		local name, component = f()
+		local name, data = f()
 
-		assert(not e.has[name], 'repeat component '..name)
-		e.has[name] = true
+		if type(name) == 'table' then
+			for _,nm in ipairs(name) do
+				assert(not e.has[nm], 'repeat component '..nm)
+				e.has[nm] = true
+			end
+		else
+			assert(not e.has[name], 'repeat component '..name)		
+			e.has[name] = true
+		end
 
-		for k,v in pairs(component) do
+		for k,v in pairs(data) do
 			assert(not e[k], 'repeat key'..k)
 			e[k] = v
 		end
 		return e
 	end, __sub = function (_, name)
 		assert(e.has[name], 'no component '..tostring(name))
-		local desc = assert(description[name])
-		for _,key in ipairs(desc) do
-			e[key] = nil
+		local desc = description[name]
+		if desc then
+			for _,key in ipairs(desc) do
+				e[key] = nil
+			end
 		end
 		e.has[name] = nil
 	end})

@@ -20,18 +20,16 @@ function M.texture(name)
 end
 
 
-function M.draw(texname, x, y, ax, ay, sx, sy, rotate, color, w, h, texcoord)
+function M.draw(texname, x, y, ax, ay, rotate, color, w, h, texcoord)
 	local tex = M.texture(texname)
 	ax = ax or 0.5
 	ay = ay or 0.5
-	sx = sx or 1
-	sy = sy or 1
 	rotate = rotate or 0
 	color = color or 0xffffffff
 	w = w or tex.w
 	h = h or tex.h
 	texcoord = texcoord or {0,1, 0,0, 1,0, 1,1}
-	core.draw(tex.id, x, y, ax, ay, sx, sy, rotate, color, w, h, table.unpack(texcoord))
+	core.draw(tex.id, x, y, ax, ay, rotate, color, w, h, table.unpack(texcoord))
 end
 
 
@@ -46,7 +44,6 @@ function M.print(text, size, x, y, color, ax, ay, rotate, fontname, only_width)
 	if only_width then return width end
 
 	core.print(chars, x, y, x - ax * width, y-(ay-0.2)*size, rotate, color)
-	return width
 end
 
 

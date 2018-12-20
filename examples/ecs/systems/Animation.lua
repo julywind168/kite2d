@@ -1,16 +1,15 @@
+local foreach = foreach
+
 local function Animation(world)
 
 	local self = {name='animation'}
 
-	local function get_flipbooks()
-		return world.get_entities(function (e)
-			return e.has['flipbook'] and e.active and not e.pause and not e.stop
-		end)
-	end
 
 	function self.update(dt)
-		local flipbooks = get_flipbooks()
-		for _,e in ipairs(flipbooks) do
+
+		foreach(function (e)
+			if e.type ~= 'flipbook' then return end
+			
 			e.timec = e.timec + dt
 			local interval = 0.167/e.playspeed -- play speed max is 10
 			if e.timec >= interval then
@@ -24,7 +23,7 @@ local function Animation(world)
 					end  
 				end
 			end
-		end
+		end, world.entities)
 	end
 
 	return self

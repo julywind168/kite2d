@@ -66,7 +66,7 @@ lprint(lua_State *L) {
 static int
 ldraw(lua_State *L) {
 	GLuint texture;
-	float x, y, w, h, ax, ay, sx, sy, rotate, posx, posy;
+	float x, y, w, h, ax, ay, rotate, posx, posy;
 	uint32_t color;
 	float vertices[4][4];
 
@@ -75,21 +75,19 @@ ldraw(lua_State *L) {
 	y = luaL_checknumber(L, 3);
 	ax = luaL_checknumber(L, 4);
 	ay = luaL_checknumber(L, 5);
-	sx = luaL_checknumber(L, 6);
-	sy = luaL_checknumber(L, 7);
-	rotate = luaL_checknumber(L, 8) * M_PI/180.f;
-	color = luaL_checkinteger(L, 9);
-	w = luaL_checknumber(L, 10) * sx;
-	h = luaL_checknumber(L, 11) * sy;
+	rotate = luaL_checknumber(L, 6) * M_PI/180.f;
+	color = luaL_checkinteger(L, 7);
+	w = luaL_checknumber(L, 8);
+	h = luaL_checknumber(L, 9);
 
-	vertices[0][2] = luaL_checknumber(L, 12);
-	vertices[0][3] = luaL_checknumber(L, 13);
-	vertices[1][2] = luaL_checknumber(L, 14);
-	vertices[1][3] = luaL_checknumber(L, 15);
-	vertices[2][2] = luaL_checknumber(L, 16);
-	vertices[2][3] = luaL_checknumber(L, 17);
-	vertices[3][2] = luaL_checknumber(L, 18);
-	vertices[3][3] = luaL_checknumber(L, 19);
+	vertices[0][2] = luaL_checknumber(L, 10);
+	vertices[0][3] = luaL_checknumber(L, 11);
+	vertices[1][2] = luaL_checknumber(L, 12);
+	vertices[1][3] = luaL_checknumber(L, 13);
+	vertices[2][2] = luaL_checknumber(L, 14);
+	vertices[2][3] = luaL_checknumber(L, 15);
+	vertices[3][2] = luaL_checknumber(L, 16);
+	vertices[3][3] = luaL_checknumber(L, 17);
 
 	// 左下角的世界坐标
 	posx = x - ax * w;

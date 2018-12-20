@@ -53,7 +53,11 @@ function M.create(name, sz)
 			table.insert(chars, char)
 		end
 
-		local length = core.chars_length(chars)
+		local length = 0
+		if #chars > 0 then
+			length = core.chars_length(chars)
+		end
+
 		texts[text] = {chars, length}
 		return chars, length
 	end
