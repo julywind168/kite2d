@@ -30,7 +30,7 @@ n. easy to create RPG and other type game
 
 ## Support
 ```
-skynet开源交流群: 340504014, my qq: 707298413
+qq: 707298413
 ```
 
 ## Also to see (my server framework for Lua)
