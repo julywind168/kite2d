@@ -1,7 +1,6 @@
-##![kite logo](https://github.com/HYbutterfly/kite/wiki/image/kite_logo.png)
+## ![kite logo](https://github.com/HYbutterfly/kite/wiki/image/kite_logo.png)
 
 Kite is a simple 2d game engine for Lua
-
 
 ## Build & Test (for windows mingw)
 1. install mingw64 and gcc, freetype <a href="https://github.com/HYbutterfly/Fantasy/wiki/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA">环境搭建</a>
