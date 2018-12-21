@@ -1,4 +1,4 @@
-![kite logo](https://github.com/HYbutterfly/kite/wiki/image/kite_logo.png)
+##![kite logo](https://github.com/HYbutterfly/kite/wiki/image/kite_logo.png)
 
 Kite is a simple 2d game engine for Lua
 
