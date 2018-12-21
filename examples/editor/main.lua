@@ -1,10 +1,4 @@
-----------------------------------------------------------------------------------------
---
--- 第二个 demo, 打算做个flybird, 现在只能飞, 开始后 可以按 up 键 使小鸟向上飞
---
-----------------------------------------------------------------------------------------
-
-package.path = 'examples/?.lua;examples/?/init.lua;' .. package.path
+package.path = 'examples/?.lua;examples/?/init.lua;examples/editor/?.lua;' .. package.path
 
 local kite = require 'kite'
 local Miss = require 'kite.Miss'
@@ -16,10 +10,21 @@ local Gravity = require 'ecs.systems.Gravity'
 local Animation = require 'ecs.systems.Animation'
 local Debug = require 'ecs.systems.Debug'
 
+local seri = require 'seri'
 local create = require 'ecs.functions'
 
+-- local flybird_entities = require 'out.flybird_entities'
 
-local function create_canvas()
+local file_head = "--[[\n"..[[
+	@Time:	  %s
+	@Author:  Kite Editor v0.01
+]].."]]\n"
+
+--
+-- 编辑器现在 只能支持对已有的 entities 修改
+-- 这个 函数 是从 flybird 中 copy来的 里面包含了 flybird 所需的全部 entity
+--
+local function create_flybied_entities()
 	local canvas = create.canvas('canvas')
 	local system_resource = ecs.entity() + Group()
 	system_resource.list[1] = create.keyboard()
@@ -94,82 +99,72 @@ local function create_canvas()
 end
 
 
-local world = ecs.world(create_canvas())
+local function create_editor_layer()
+	
+	local function create_hierarchy()
+		local bg = create.sprite{ color = 0x88888888, x = 150, y = 320-40, w = 300, h = 600} + Group() + SimpleDragg()
+		bg.list[1] = create.sprite { x=0, y=300-32, ay=1, w=300-8, h=1, color = 0x22222288 }
+		bg.list[2] = create.label { text = 'Hierarchy', x = 0, y = 300-2, ay = 1, fontsize = 28, color = 0x222222cc}
 
-local camera = world.find_entity('main_camera')
-local button = world.find_entity('play')
-local textfield = world.find_entity('textfield')
-local score = world.find_entity('score')
+		return bg
+	end
+
+	local layer = create.layer('LAYER(Editor)')
+	layer.list[1] = create_hierarchy()
+
+	return layer
+end
+
+
+local flybird_entities = create_flybied_entities()
+local editor_layer = create_editor_layer()
+table.insert(flybird_entities.list, editor_layer)
+
+local world = ecs.world(flybird_entities)
+
+local keyboard = world.find_entity('keyboard')
+
 local bird = world.find_entity('bird')
-local bird_nick = bird.list[1]
+
+--
+-- App data
+--
+local g = Miss { outfile = 'examples/editor/out/flybird_entities.lua' }
+
+local handle = { click = {}, keydown = {}, keyup = {} }
 
 
-local g = Miss { nick = '请修改我', score = 'Score:0', state = 'ready', timec = 0 }
-		.miss('nick', textfield.label, 'text', bird_nick, 'text')
-		.miss('score', score, 'text')
+-- ctrl + s
+function handle.keydown.s()
+	if keyboard.pressed['ctrl'] then
 
+		local editor_layer = table.remove(flybird_entities.list, #flybird_entities.list)
 
-local handle = { click = {}, keydown = {} }
+		local f = io.open(g.outfile, 'w')
+		f:write(string.format(file_head, os.date('%Y/%m/%d %H:%M:%S')))
+		f:write('return '..seri.pack(flybird_entities))
+		f:close()
 
-function handle.click.play()
-	g.state = 'gameing'
-
-	button.active = false
-	textfield.active = false
-
-	bird.speed = 200
-	bird.mass = 1
+		table.insert(flybird_entities.list, editor_layer)
+	end
 end
 
-function handle.keydown.up()
-	if g.state ~= 'gameing' then return end
-	bird.speed = math.sqrt(200^2 + 200^2)
-	bird.direction = 45
-	bird.rotate = 45
+-- show/hide hierarchy
+function handle.keydown.h()
+	editor_layer.active = not editor_layer.active
 end
+
 
 world.add_system(Input(handle))
-	.add_system(Gravity())
 	.add_system(Moving())
 	.add_system(Animation())
 	.add_system(Render())
-	.add_system(Debug())
-
-
-
-local function bird_carsh()
-	if bird.y - bird.h/2 + 8 < 138 then return true end
-end
 
 
 local game = {}
 
 function game.update(dt)
 	world('update', dt)
-
-	-- 我们并不想 nick 被旋转
-	bird_nick.rotate = - bird.rotate
-	
-	-- 相机 跟随 bird
-	camera.x = bird.x - 480
-
-
-	-- logic
-	if g.state == 'gameing' then
-		g.timec = g.timec + dt
-
-		g.score = 'Score:' .. math.floor(g.timec)
-
-		if bird_carsh() then
-			print('game over ...')
-			g.state = 'over'
-			bird.mass = 0
-			bird.speed = 0
-		end
-	end
-
-	-- update miss
-	g()
 end
 
 function game.draw()
@@ -190,7 +185,7 @@ function game.mouse(what, x, y, who)
 			world('rmouseup', x, y)
 		end
 	else
-		world('mousemove', x, y)
+		world('mouse'..what, x, y)
 	end
 end
 
@@ -213,7 +208,6 @@ function game.pause()
 end
 
 function game.exit()
-	print('see you next version, current is v'..kite.version())
 end
 
 kite.start(game)

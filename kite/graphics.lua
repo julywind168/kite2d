@@ -44,6 +44,7 @@ function M.print(text, size, x, y, color, ax, ay, rotate, fontname, only_width)
 	if only_width then return width end
 
 	core.print(chars, x, y, x - ax * width, y-(ay-0.2)*size, rotate, color)
+	return width
 end
 
 

@@ -26,10 +26,10 @@ local function Render(world)
 			local w = gfx.print(lab.text, lab.fontsize * sx, x + lab.x, y + lab.y, lab.color, lab.ax, lab.ay, 0, lab.fontname, true)
 			if w < ew-8 then
 				lab.ax = 0
-				lab.x = x - (ew-8) * e.ax
+				lab.x = - (ew-8) * e.ax
 			else
 				lab.ax = 1
-				lab.x = x + (ew-8) * e.ax
+				lab.x = (ew-8) * e.ax
 			end
 			csr.x = lab.x + (1-lab.ax) * w + 2
 			if e.selected then
@@ -41,8 +41,6 @@ local function Render(world)
 			end	
 		end, world.entities)	
 	end
-
-
 
 	local draw = {}
 
@@ -67,10 +65,10 @@ local function Render(world)
 		gfx.start_stencil()
 		gfx.draw(mask.texname, x, y, e.ax, e.ay, e.rotate, mask.color, w-8, h, mask.texcoord)
 		gfx.stop_stencil()
-		gfx.print(label.text, label.fontsize * sx, label.x, label.y, label.color, label.ax, label.ay, 0, label.fontname)
+		gfx.print(label.text, label.fontsize * sx, x+label.x, y+label.y, label.color, label.ax, label.ay, 0, label.fontname)
 		gfx.clear_stencil()
 		if cursor.active then
-			gfx.draw(cursor.texname, cursor.x, cursor.y, 0, 0.5, 0, cursor.color, 1, h-4, cursor.texcoord)
+			gfx.draw(cursor.texname, x+cursor.x, y+cursor.y, 0, 0.5, 0, cursor.color, 1, h-4, cursor.texcoord)
 		end
 	end
 
@@ -81,7 +79,14 @@ local function Render(world)
 	end
 
 	function draw.label(x, y, sx, sy, rotate, e)
-		gfx.print(e.text, e.fontsize * sx, x, y, e.color, e.ax, e.ay, rotate, e.fontname)
+		if e.bordersize > 0 then
+			gfx.print(e.text, e.fontsize * sx, x-e.bordersize, y, e.bordercolor, e.ax, e.ay, rotate, e.fontname)
+			gfx.print(e.text, e.fontsize * sx, x+e.bordersize, y, e.bordercolor, e.ax, e.ay, rotate, e.fontname)
+			gfx.print(e.text, e.fontsize * sx, x, y-e.bordersize, e.bordercolor, e.ax, e.ay, rotate, e.fontname)
+			gfx.print(e.text, e.fontsize * sx, x, y+e.bordersize, e.bordercolor, e.ax, e.ay, rotate, e.fontname)
+		end
+
+		e.w = gfx.print(e.text, e.fontsize * sx, x, y, e.color, e.ax, e.ay, rotate, e.fontname)
 	end
 
 	function draw.sprite(x, y, sx, sy, rotate, e)

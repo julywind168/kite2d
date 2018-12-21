@@ -1,6 +1,7 @@
 require 'ecs.systems.util'
 
-local description = require 'ecs.components'
+local description, dependence = table.unpack(require 'ecs.components')
+
 
 local ecs = {}
 
@@ -68,6 +69,15 @@ function ecs.world(entities)
 end
 
 
+local function match(condition, components)
+	for _,name in ipairs(condition) do
+		if not components[name] then
+			return false
+		end
+	end
+	return true
+end
+
 function ecs.entity(name, e)
 	e = e or {}
 	e.name = name or 'unknown'
@@ -84,6 +94,13 @@ function ecs.entity(name, e)
 		else
 			assert(not e.has[name], 'repeat component '..name)		
 			e.has[name] = true
+		end
+		
+		-- 添加抽象组件
+		for abstract,condition in pairs(dependence) do
+			if match(condition, e.has) then
+				e.has[abstract] = true
+			end	
 		end
 
 		for k,v in pairs(data) do

@@ -18,7 +18,7 @@ end
 
 
 local function test(root, camera, e, x, y, result)
-	if e.clickable and IN(x, y, root, camera, e) then
+	if (e.touchable or e.has['DRAGG'] or (MODE == 'EDITOR' and e.has['position'] and e.has['rectangle'])) and IN(x, y, root, camera, e) then
 		table.insert(result, e)
 	end
 end
@@ -27,7 +27,7 @@ end
 local function TEST(x, y, entities)
 	local result = {}
 	eye_foreach(test, entities, x, y, result)
-	return #result > 0 and result[#result]
+	return #result > 0 and result[#result] or nil
 end
 
 
@@ -53,6 +53,7 @@ local self = {name='input'}
 
 local tmppressed = nil
 local tmpselected = nil
+local mouse = world.find_entity('mouse')
 local keyboard = world.find_entity('keyboard')
 
 local watchdog = clock(0.05, function ()
@@ -83,12 +84,25 @@ end
 
 
 ---------------------------------------------------------------------------
--- mouse
+-- mouse move
 ---------------------------------------------------------------------------
+function self.mousemove(x, y)
+	if tmppressed and (tmppressed.has['DRAGG'] or MODE == 'EDITOR') then
+		tmppressed.x = tmppressed.x + x - mouse.x
+		tmppressed.y = tmppressed.y + y - mouse.y
+	end
+
+	mouse.x = x
+	mouse.y = y
+end
 
 
+---------------------------------------------------------------------------
+-- mouse touch
+---------------------------------------------------------------------------
 local on = { button = {}, textfield = {} }
 
+-- button
 function on.button.mousedown(e)
 	e.sx = e.sx * e.scale
 	e.sy = e.sy * e.scale
@@ -109,6 +123,7 @@ function on.button.cancel(e)
 	if f then f() end	
 end
 
+-- textfield
 function on.textfield.click(e)
 	if not e.selected then
 		e.selected = 0
@@ -122,7 +137,7 @@ function on.textfield.lose_focus(e)
 end
 
 setmetatable(on, {__call = function (_, e, event, ...)
-	local f = on[e.type] and on[e.type][event]
+	local f = on[e.uitype] and on[e.uitype][event]
 	if f then
 		f(e, ...)
 	end
@@ -131,6 +146,7 @@ end})
 
 function self.mousedown(x, y)
 	local e = TEST(x, y, world.entities)
+
 	if not e then
 		if tmpselected then
 			on(tmpselected, 'lose_focus')
@@ -188,6 +204,7 @@ end
 function self.keyup(key)
 	keyboard.pressed[key] = nil
 	keyboard.lpressed[key] = nil
+	keyboard.previous = key
 
 	local tf = tmpselected and tmpselected.type == 'textfield' and tmpselected
 	if tf then

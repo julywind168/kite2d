@@ -8,26 +8,23 @@ A simple 2d game engine for Lua
 
 ## Roadmap
 ```
-1. ui (label, textfield, ...)
-2. editor(map, ui, ...)
+1. core
+2. ecs, miss(vue-bind)
+3. flybird (doing)
+4. editor (doing)
+5. audio, auto-batch
 
 n. easy to create RPG and other type game
 ```
 
-## How to use (in China)
+## How to use (in Chinese)
 * Read the doucment: https://github.com/HYbutterfly/Fantasy/wiki
 
 
-## Donation
-<label>付款时可以留下 ID + 留言(或者你的项目链接等等)(可选), 捐赠前10名将会出现在捐赠人列表:)</label><br><br>
-<img src="https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/wechatpay.png" align="left" height="450" width="350">
-<img src="https://raw.githubusercontent.com/HYbutterfly/Fantasy-scorpio-donation/master/alipay.png" height="450" width="350">
-<br>
-
-## Donors (1-10) order by time
+## 捐赠人
 ```
-1. first donor (no ID)	2018/11/13
-2. Cabrite				2018/11/13
+1. first donor (no ID)  2018/11/13
+2. Cabrite              2018/11/13
 ```
 
 ## Also to see (my server framework for Lua)

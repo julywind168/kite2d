@@ -27,12 +27,12 @@ function M.textfield(t)
 	assert(t.background and t.background.color and t.label)
 
 	t.label.x = 0
-	t.label.y = t.y
+	t.label.y = 0
 	t.label.ay = t.ay or 0.5
 	t.background.texname = t.background.texname or 'resource/white.png'
 	t.background.texcoord = t.background.texcoord or {0,1, 0,0, 1,0, 1,1}
 	t.mask = t.mask or {texname = 'resource/null.png', texcoord = {0,1, 0,0, 1,0, 1,1}, color = 0xffffffff}
-	t.cursor = t.cursor or {texname = 'resource/white.png', texcoord = {0,1, 0,0, 1,0, 1,1}, color = 0xffffffff, x=0, y=t.y}
+	t.cursor = t.cursor or {texname = 'resource/white.png', texcoord = {0,1, 0,0, 1,0, 1,1}, color = 0xffffffff, x=0, y=0}
 
 	return ecs.entity(t.name) + Textfield(t)
 end
@@ -56,6 +56,7 @@ function M.button(t)
 end
 
 function M.sprite(t)
+	t.texname = t.texname or 'resource/white.png'
 	local tex = gfx.texture(t.texname)
 	t.w = t.w or tex.w
 	t.h = t.h or tex.h

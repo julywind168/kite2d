@@ -7,13 +7,14 @@ local description = {
 	position = {'x', 'y'},
 	scale = {'sx', 'sy'},
 	rotate = {'rotate'},
-	rectangel = {'w', 'h', 'ax', 'ay'},
+	rectangle = {'w', 'h', 'ax', 'ay'},
 	texture = {'texname', 'texcoord', 'color'},
 	text = {'text', 'fontname', 'fontsize', 'color'},
 	move = {'speed', 'direction'},
 	mass = {'mass'},
-	simple_button = {'scale', 'clickable'},
-	simple_textfield = {'background', 'mask', 'label', 'cursor', 'selected', 'clickable', 'selectable'},
+	simple_dragg = {'draggable'},
+	simple_button = {'scale', 'touchable', 'uitype'},
+	simple_textfield = {'background', 'mask', 'label', 'cursor', 'selected', 'touchable', 'selectable', 'uitype'},
 	simple_flipbook = {'frames', 'current', 'isloop', 'pause', 'stop', 'playspeed', 'timec'},
 
 	-- system
@@ -27,13 +28,14 @@ local description = {
 --
 local dependence = {
 	TRANSFORM = {'position', 'scale', 'rotate'},
+	DRAGG = {'node', 'position', 'rectangle', 'simple_dragg'},
 	CAMERA = {'node', 'TRANSFORM'},
-	SPRITE = {'node', 'TRANSFORM', 'rectangel', 'texture'},
-	LABEL = {'node', 'TRANSFORM', 'rectangel', 'text'},
+	SPRITE = {'node', 'TRANSFORM', 'rectangle', 'texture'},
+	LABEL = {'node', 'TRANSFORM', 'rectangle', 'text'},
 	MASK = {'SPRITE', 'group'},
 	BUTTON = {'SPRITE', 'simple_button'},
-	TEXTFIELD = {'node', 'TRANSFORM', 'rectangel', 'smaple_textfield'},
-	FLIPBOOK = {'node', 'TRANSFORM', 'rectangel', 'simple_flipbook'},
+	TEXTFIELD = {'node', 'TRANSFORM', 'rectangle', 'smaple_textfield'},
+	FLIPBOOK = {'node', 'TRANSFORM', 'rectangle', 'simple_flipbook'},
 }
 
 
@@ -54,7 +56,7 @@ end end
 -- component family
 -----------------------------------------------------------------------------------------
 function Flipbook(t) return function ()
-	return {'FLIPBOOK', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangel', 'simple_flipbook'}, {
+	return {'FLIPBOOK', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangle', 'simple_flipbook'}, {
 		active = t.active ~= false and true or false,
 		type = 'flipbook',
 		x = t.x or 0,
@@ -78,7 +80,7 @@ end end
 
 
 function Textfield(t) return function()
-	return {'TEXTFIELD', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangel', 'simple_textfield'}, {
+	return {'TEXTFIELD', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangle', 'simple_textfield'}, {
 		active = t.active ~= false and true or false,
 		type = 'textfield',
 		x = t.x or 0,
@@ -96,16 +98,17 @@ function Textfield(t) return function()
 		mask = t.mask,
 		cursor = t.cursor,
 		selected = false,
-		clickable = true,
-		selectable = true
+		selectable = true,
+		touchable = true,
+		uitype = 'textfield'
 	}
 end end
 
 
 function Button(t) return function ()
-	return {'BUTTON', 'SPRITE', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'sprite', 'rectangel', 'texture', 'simplebutton'}, {
+	return {'BUTTON', 'SPRITE', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'sprite', 'rectangle', 'texture', 'simplebutton'}, {
 		active = t.active ~= false and true or false,
-		type = 'button',
+		type = 'sprite',
 		x = t.x or 0,
 		y = t.y or 0,
 		sx = t.sx or 1,
@@ -118,14 +121,16 @@ function Button(t) return function ()
 		texname = t.texname or 'resource/white.png',
 		texcoord = t.texcoord or {0,1, 0,0, 1,0, 1,1},
 		color = t.color or 0xffffffff,
+
 		scale = t.scale or 1.2,
-		clickable = true,
+		touchable = true,
+		uitype = 'button'
 	}
 end end
 
 
 function Mask(t) return function()
-	return {'MASK', 'SPRITE', 'TRANSFORM', 'node', 'group', 'position', 'scale', 'rotate', 'rectangel', 'texture'}, {
+	return {'MASK', 'SPRITE', 'TRANSFORM', 'node', 'group', 'position', 'scale', 'rotate', 'rectangle', 'texture'}, {
 		active = t.active ~= false and true or false,
 		type = 'mask',
 		x = t.x or 0,
@@ -146,7 +151,7 @@ end end
 
 
 function Sprite(t) return function ()
-	return {'SPRITE', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangel', 'texture'}, {
+	return {'SPRITE', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangle', 'texture'}, {
 		active = t.active ~= false and true or false,
 		type = 'sprite',
 		x = t.x or 0,
@@ -166,7 +171,7 @@ end end
 
 
 function Label(t) return function()
-	return {'LABEL', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangel', 'text'}, {
+	return {'LABEL', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangle', 'text'}, {
 		active = t.active ~= false and true or false,
 		type = 'label',
 		x = t.x or 0,
@@ -181,7 +186,9 @@ function Label(t) return function()
 		text = t.text or '',
 		fontname = t.fontname,
 		fontsize = t.fontsize or 24,
-		color = t.color or 0xffffffff
+		color = t.color or 0xffffffff,
+		bordersize = t.bordersize or 0,
+		bordercolor = t.bordercolor or 0x000000ff
 	}
 end end
 
@@ -212,6 +219,11 @@ end end
 -----------------------------------------------------------------------------------------
 -- single component
 -----------------------------------------------------------------------------------------
+function SimpleDragg() return function ()
+	return 'simple_dragg', {draggable = true}
+end end
+
+
 function SimpleFlipbook(t) return function ( )
 	return  'simple_flipbook', {
 		frames = t.frames or {},
@@ -219,7 +231,7 @@ function SimpleFlipbook(t) return function ( )
 		pause = t.pause or false,
 		isloop = t.isloop or false,
 		playspeed = t.playspeed or 1,
-		timec = 0
+		timec = 0,
 	}
 end end
 
@@ -231,14 +243,15 @@ function SimpleTextfield(t) return function ()
 		mask = t.mask,
 		cursor = t.cursor,
 		selected = false,
-		clickable = true,
-		selectable = true
+		touchable = true,
+		selectable = true,
+		uitype = 'textfield',
 	}
 end end
 
 
 function SimpleButton(t) return function ()
-	return 'simple_button', { scale = t.scale or 1.2, clickable = true }
+	return 'simple_button', { scale = t.scale or 1.2, touchable = true, uitype = 'button' }
 end end
 
 
@@ -253,12 +266,19 @@ end end
 
 
 function Rectangel(t) return function ()
-	return 'rectangel', { w = t.w or 0, h = t.h or 0, ax = t.ax or 0.5, ay = t.ay or 0.5 }
+	return 'rectangle', { w = t.w or 0, h = t.h or 0, ax = t.ax or 0.5, ay = t.ay or 0.5 }
 end end
 
 
 function Text(t) return function ()
-	return 'text', { text = t.text or '', fontname = t.fontname, fontsize = t.fontsize or 24, color = t.color or 0xffffffff }
+	return 'text', {
+		text = t.text or '',
+		fontname = t.fontname,
+		fontsize = t.fontsize or 24,
+		color = t.color or 0xffffffff,
+		bordersize = t.bordersize or 0,
+		bordercolor = t.bordercolor or 0x000000ff
+	}
 end end
 
 
@@ -296,4 +316,4 @@ function Node(t) return function ()
 end end
 
 
-return description, dependence
+return { description, dependence }
