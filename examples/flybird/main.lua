@@ -18,93 +18,50 @@ local Debug = require 'ecs.systems.Debug'
 
 local create = require 'ecs.functions'
 
+local entities = require 'editor.out.flybird_entities_v1'
 
-local function create_canvas()
-	local canvas = create.canvas('canvas')
-	local system_resource = ecs.entity() + Group()
-	system_resource.list[1] = create.keyboard()
-	system_resource.list[2] = create.mouse()
-	
-	local map_layer = create.layer()
-	local game_layer = create.layer()
-	local ui_layer = create.layer()
-	local main_camera = create.camera{name = 'main_camera'}
-	local ui_camera = create.camera()
+local function in_e(x, y, e)
+	local w = e.w * e.sx
+	local h = e.h * e.sy
+	local x2 = e.x - e.ax * w
+	local y2 = e.y - e.ay * h
 
-
-	for i=1,10 do
-		local map = create.sprite{ texname='examples/assert/bg_day.png', x=180+(i-1)*360, y=320, w=360, h=640 }
-		table.insert(map_layer.list, map)
-	end
-
-	for i=1,10 do
-		local map = create.sprite{ texname='examples/assert/land.png', x=180+(i-1)*360, y=69, w=360, h=138 }
-		table.insert(map_layer.list, map)		
-	end
-
-	local button = create.button {name = 'play', texname = 'examples/assert/button_play.png', x=480, y=200 }
-	local textfield = create.textfield {
-		name = 'textfield',
-		x = 480,
-		y = 100,
-		w = 200,
-		h = 28,
-		background = {color=0x333333aa},
-		label = {color=0xffffffff, fontsize=24, text = 'NICK'}
-	}
-
-	local score = create.label {name='score', text='Score:0', x=10, y=630, ax=0, ay=1, color=0xcc4400ff, bordersize=1, bordercolor=0xeeee00ff}
-
-	local bird = create.flipbook {
-		name = 'bird',
-		x = 480,
-		y = 320,
-		w = 48,
-		h = 48,
-		isloop = true,
-		frames = {
-			{texname='examples/assert/bird0_0.png'},
-			{texname='examples/assert/bird0_1.png'},
-			{texname='examples/assert/bird0_2.png'}
-		}
-	} + Move{speed = 0} + Mass{mass = 0} + Group{
-		list = {create.label{text = 'NICK', x = 0, y = 34, fontsize = 20, bordersize=1}}
-	}
-
-
-	game_layer.list[1] = bird
-
-	ui_layer.list[1] = button
-	ui_layer.list[2] = textfield
-	ui_layer.list[3] = score
-
-	
-	canvas.list[1] = system_resource
-
-	-- main camera
-	canvas.list[2] = main_camera
-	canvas.list[3] = map_layer
-	canvas.list[4] = game_layer
-
-	-- ui camera
-	canvas.list[5] = ui_camera
-	canvas.list[6] = ui_layer
-
-	return canvas
+	if x < x2 or x > x2 + w then return false end
+	if y < y2 or y > y2 + h then return false end
+	return true
 end
 
 
-local world = ecs.world(create_canvas())
+local function rect_carsh(e0, e)
+	local w = e.w * e.sx
+	local h = e.h * e.sy
+	local x2 = e.x - e.ax * w
+	local y2 = e.y - e.ay * h
+	return in_e(x2, y2, e0) or in_e(x2+w, y2, e0) or in_e(x2, y2+h, e0) or in_e(x2+w, y2+h, e0)
+end
 
-local camera = world.find_entity('main_camera')
+
+
+
+local world = ecs.world(entities)
+
+local game_layer = entities.list[2]
 local button = world.find_entity('play')
 local textfield = world.find_entity('textfield')
 local score = world.find_entity('score')
 local bird = world.find_entity('bird')
 local bird_nick = bird.list[1]
 
+-- 小鸟的实际大小 (碰撞检测需要)
+bird.w = 30
+bird.h = 24
 
-local g = Miss { nick = '请修改我', score = 'Score:0', state = 'ready', timec = 0 }
+local pipes = {}
+for i=21,40 do
+	table.insert(pipes, game_layer.list[i])
+end
+
+local g = Miss { nick = '请修改我', score = 'Score:0', state = 'ready', timec = 0, speed = 160 }
 		.miss('nick', textfield.label, 'text', bird_nick, 'text')
 		.miss('score', score, 'text')
 
@@ -112,18 +69,26 @@ local g = Miss { nick = '请修改我', score = 'Score:0', state = 'ready', time
 local handle = { click = {}, keydown = {} }
 
 function handle.click.play()
-	g.state = 'gameing'
 
+	if g.state == 'over' then
+		g.timec = 0
+		g.score = 'Score:0'
+		bird.x = 480
+		bird.y = 320
+		bird.rotate = 0
+		bird.direction = 0
+	end
+
+	g.state = 'gameing'
 	button.active = false
 	textfield.active = false
-
-	bird.speed = 200
+	bird.speed = g.speed
 	bird.mass = 1
 end
 
 function handle.keydown.up()
 	if g.state ~= 'gameing' then return end
-	bird.speed = math.sqrt(200^2 + 200^2)
+	bird.speed = math.sqrt(g.speed^2 + g.speed^2)
 	bird.direction = 45
 	bird.rotate = 45
 end
@@ -139,6 +104,13 @@ world.add_system(Input(handle))
 
 local function bird_carsh()
 	if bird.y - bird.h/2 + 8 < 138 then return true end
+
+	for i,pipe in ipairs(pipes) do
+		if rect_carsh(pipe, bird) then
+			print('pipe'..i, pipe.x, pipe.y)
+			return true
+		end
+	end
 end
 
 
@@ -151,7 +123,7 @@ function game.update(dt)
 	bird_nick.rotate = - bird.rotate
 	
 	-- 相机 跟随 bird
-	camera.x = bird.x - 480
+	game_layer.x = 480-bird.x
 
 
 	-- logic
@@ -161,10 +133,11 @@ function game.update(dt)
 		g.score = 'Score:' .. math.floor(g.timec)
 
 		if bird_carsh() then
-			print('game over ...')
+			print('game over, you dead ...')
 			g.state = 'over'
 			bird.mass = 0
 			bird.speed = 0
+			button.active = true
 		end
 	end
 

@@ -74,10 +74,10 @@ function M.mouse()
 	return ecs.entity('mouse') + Mouse()
 end
 
-function M.canvas(name)
-	local t = {}
+function M.canvas(t)
+	t = t or {}
 
-	local canvas = ecs.entity(name)
+	local canvas = ecs.entity(t.name)
 		+ Node(t)
 		+ Transform(t)
 		+ Group(t)

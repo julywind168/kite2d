@@ -1,10 +1,10 @@
 local eye_foreach = eye_foreach
 
-local function IN(x, y, root, camera, e)
-	local ex = root.x + e.x - camera.x
-	local ey = root.y + e.y - camera.y
-	local sx = root.sx * e.sx / camera.sx
-	local sy = root.sy * e.sy / camera.sy
+local function IN(x, y, root, e)
+	local ex = root.x + e.x
+	local ey = root.y + e.y
+	local sx = root.sx * e.sx
+	local sy = root.sy * e.sy
 	local w = e.w * sx
 	local h = e.h * sy
 
@@ -17,8 +17,8 @@ local function IN(x, y, root, camera, e)
 end
 
 
-local function test(root, camera, e, x, y, result)
-	if (e.touchable or e.has['DRAGG'] or (MODE == 'EDITOR' and e.has['position'] and e.has['rectangle'])) and IN(x, y, root, camera, e) then
+local function test(root, e, x, y, result)
+	if (e.touchable or e.has['DRAGG'] or (MODE == 'EDITOR' and e.has['position'] and e.has['rectangle'])) and IN(x, y, root, e) then
 		table.insert(result, e)
 	end
 end
@@ -56,8 +56,15 @@ local tmpselected = nil
 local mouse = world.find_entity('mouse')
 local keyboard = world.find_entity('keyboard')
 
+mouse.pressed = {}
+mouse.x = 0
+mouse.y = 0
+keyboard.pressed = {}
+keyboard.lpressed = {}
+
 local watchdog = clock(0.05, function ()
 	if not tmpselected or tmpselected.type ~= 'textfield' then return end
+
 	if keyboard.lpressed['backspace'] then
 		local label = tmpselected.label
 		local len = #label.text 
@@ -162,7 +169,10 @@ function self.mousedown(x, y)
 		end
 		on(e, 'mousedown')
 		tmppressed = e
+		if handle.press then handle.press(e) end
 	end
+
+	mouse.pressed['left'] = true
 end
 
 function self.mouseup(x, y)
@@ -182,6 +192,8 @@ function self.mouseup(x, y)
 			tmppressed = nil
 		end
 	end
+
+	mouse.pressed['left'] = nil 
 end
 
 ---------------------------------------------------------------------------
@@ -201,7 +213,13 @@ function self.keydown(key)
 	keyboard.pressed[key] = 0
 
 	local tf = tmpselected and tmpselected.type == 'textfield' and tmpselected
-	if tf then return end
+	if tf then
+		-- 其他键 忽略
+		if key ~= 'backspace' and key ~= 'enter' then
+			keyboard.pressed[key] = nil
+		end
+		return
+	end
 
 	local f = handle.keydown and handle.keydown[key]
 	if f then f() end
@@ -220,6 +238,10 @@ function self.keyup(key)
 			if len > 0 then
 				label.text = label.text:sub(1, utf8.offset(label.text, utf8.len(label.text))-1)
 			end
+		elseif key == 'enter' then
+			tmpselected = nil
+			tf.selected = nil
+			tf.cursor.active = false
 		end
 		return
 	end

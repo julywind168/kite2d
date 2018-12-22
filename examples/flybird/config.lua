@@ -2,7 +2,7 @@ application =
 {
 	window = 
 	{
-		title = 'Flybird v0.3',
+		title = 'Flybird v1.0',
 		width = 960,
 		height = 640,
 		fullscreen = false

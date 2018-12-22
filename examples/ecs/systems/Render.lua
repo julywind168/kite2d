@@ -11,13 +11,13 @@ local function Render(world)
 	local self = {}
 
 	function self.update(dt)
-		eye_foreach(function (root, camera, e)
+		eye_foreach(function (root, e)
 			if e.type ~= 'textfield' then return end
 
-			local x =  root.x + e.x - camera.x
-			local y =  root.y + e.y - camera.y
-			local sx =  root.sx * e.sx / camera.sx
-			local sy =  root.sy * e.sy / camera.sy
+			local x =  root.x + e.x
+			local y =  root.y + e.y
+			local sx =  root.sx * e.sx
+			local sy =  root.sy * e.sy
 			local ew = e.w * sx
 			local eh = e.h * sy
 
@@ -95,38 +95,29 @@ local function Render(world)
 
 	draw.button = draw.sprite
 
-	local function draw_entity(root, camera, e)
+	local function draw_entity(root, e)
 		if not e.has['node'] or not e.active then return end
 
-		if e.type == 'camera' then
-			camera.x = e.x
-			camera.y = e.y
-			camera.sx = e.sx
-			camera.sy = e.sy
-			camera.rotate = e.rotate
-		elseif e.type ~= 'nil' then
+		if e.type ~= 'nil' then
 			local f = assert(draw[e.type], e.type)
-			local x =  root.x + e.x - camera.x
-			local y =  root.y + e.y - camera.y
-			local sx =  root.sx * e.sx / camera.sx
-			local sy =  root.sy * e.sy / camera.sy
-			local rotate =  root.rotate + e.rotate - camera.rotate
+			local x =  root.x + e.x
+			local y =  root.y + e.y
+			local sx =  root.sx * e.sx
+			local sy =  root.sy * e.sy
+			local rotate =  root.rotate + e.rotate
 			f(x, y, sx, sy, rotate, e)
 		end
 
-		-- entity group ?
 		if e.has['group'] and #e.list > 0 then
-
 			local root = {
 				x = root.x + e.x,
 				y = root.y + e.y,
 				sx = root.sx * e.sx,
 				sy = root.sy * e.sy,
-				rotate = root.rotate + e.rotate
+				rotate = root.rotate + e.rotate,
 			}
-
 			for _,e in ipairs(e.list) do
-				draw_entity(root, camera, e)
+				draw_entity(root, e)
 			end
 		end
 
@@ -137,8 +128,7 @@ local function Render(world)
 
 	function self.draw()
 		local root = {x = 0, y = 0, sx = 1, sy = 1, rotate = 0}
-		local camera = {x = 0, y = 0, sx = 1, sy = 1, rotate = 0}
-		draw_entity(root, camera, world.entities)
+		draw_entity(root, world.entities)
 	end
 
 	return self

@@ -1,15 +1,7 @@
-local function _foreach(handle, root, camera, e, ...)
+local function _foreach(handle, root, e, ...)
 	if not e.active then return end
 
-	handle(root, camera, e, ...)
-
-	if e.type == 'camera' then
-		camera.x = e.x
-		camera.y = e.y
-		camera.sx = e.sx
-		camera.sy = e.sy
-		camera.rotate = e.rotate
-	end
+	handle(root, e, ...)
 
 	if e.list then
 		local root = {
@@ -20,7 +12,7 @@ local function _foreach(handle, root, camera, e, ...)
 			rotate = root.rotate + e.rotate
 		}
 		for _,e in ipairs(e.list) do
-			_foreach(handle, root, camera, e, ...)
+			_foreach(handle, root, e, ...)
 		end
 	end
 end
@@ -28,8 +20,7 @@ end
 
 function eye_foreach(handle, entities, ...)
 	local root = {x = 0, y = 0, sx = 1, sy = 1, rotate = 0}
-	local camera = {x = 0, y = 0, sx = 1, sy = 1, rotate = 0}
-	_foreach(handle, root, camera, entities, ...)
+	_foreach(handle, root, entities, ...)
 end
 
 

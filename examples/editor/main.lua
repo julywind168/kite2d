@@ -2,8 +2,12 @@
 --
 -- 简单编辑器, 尝试修改某个 UI 的位置( 拖拽, 或者选中后在属性面板中修改 ) ctrl+s 保存后, 重启看是否编辑成功
 --
+-- tip: 选中物体后, 可以按方向键(up, donw, left, right) 以1像素的步长 调节物体的位置
+-- tip: 可以按 'w' 'a' 's' 'd', 调节编辑器视野 (长按加速)
+-- tip: 按 h 键可以 显示/隐藏 Hierarchy (层级面板), i 键 可以 显示/隐藏 Inspector (属性检查面板)
+-- tip: 拖拽移动物体后, ctrl + z 可以撤销操作
+-- 
 ----------------------------------------------------------------------------------------
-
 
 package.path = 'examples/?.lua;examples/?/init.lua;examples/editor/?.lua;' .. package.path
 
@@ -20,7 +24,7 @@ local Debug = require 'ecs.systems.Debug'
 local seri = require 'seri'
 local create = require 'ecs.functions'
 
-local flybird_entities = require 'out.flybird_entities'
+local flybird_entities = pcall(require, 'out.flybird_entities')
 
 local file_head = "--[[\n"..[[
 	@Time:	  %s
@@ -38,10 +42,11 @@ local function foreach(f, e)
 	end
 end
 
-local function inspector_manager(inspector)
+local function inspector_manager(inspector, mouse, keyboard, handle)
 	local self = {}
 	local selected = nil
 	local editing = false
+	local old = {}
 
 	local content = inspector.list[3]
 	local name = content.list[1]
@@ -54,28 +59,54 @@ local function inspector_manager(inspector)
 
 	content.active = false
 
-	function self.on_selected(e)
-		if e then
-			if e.tag == 'editor' then
-				editing = true
-			else 
-				editing = false
-				selected = e
+	function handle.keydown.up()
+		if selected then
+			selected.y = selected.y + 1
+		end 
+	end
+
+	function handle.keydown.left()
+		if selected then
+			selected.x = selected.x - 1
+		end 
+	end
+
+	function handle.keydown.down()
+		if selected then
+			selected.y = selected.y - 1
+		end 
+	end
+
+	function handle.keydown.right()
+		if selected then
+			selected.x = selected.x + 1
+		end 
+	end
+
+	function handle.keydown.z()
+		if keyboard.pressed['ctrl'] then
+			if selected then
+				selected.x = old.x
+				selected.y = old.y
 			end
 		end
 	end
 
-	function self.apply()
-		local e = selected
-		if not e then return end
-		e.x = tonumber(x.label.text) or 0
-		e.y = tonumber(y.label.text) or 0
-		
-		e.w = tonumber(w.label.text) or 0
-		e.h = tonumber(h.label.text) or 0
+	function handle.press(e)
+		if e.tag == 'editor' then
+			editing = true
+		else 
+			editing = false
+			selected = e
+			old.x = e.x
+			old.y = e.y
+		end
+	end
 
-		e.ax = tonumber(ax.label.text) or 0
-		e.ay = tonumber(ay.label.text) or 0
+	function self.on_eye_move(key, dist)
+		if mouse.pressed['left'] and selected then
+			selected[key] = selected[key] + dist
+		end
 	end
 
 	function self.update()
@@ -120,22 +151,27 @@ local function create_flybird_entities()
 	system_resource.list[1] = create.keyboard()
 	system_resource.list[2] = create.mouse()
 	
-	local map_layer = create.layer()
 	local game_layer = create.layer()
-	local ui_layer = create.layer()
-	local main_camera = create.camera{name = 'main_camera'}
-	local ui_camera = create.camera()
+	local ui_layer = create.layer({name = 'flybird_ui_layer'})
 
 
 	for i=1,10 do
 		local map = create.sprite{ texname='examples/assert/bg_day.png', x=180+(i-1)*360, y=320, w=360, h=640 }
-		table.insert(map_layer.list, map)
+		table.insert(game_layer.list, map)
 	end
 
 	for i=1,10 do
 		local map = create.sprite{ texname='examples/assert/land.png', x=180+(i-1)*360, y=69, w=360, h=138 }
-		table.insert(map_layer.list, map)		
+		table.insert(game_layer.list, map)		
 	end
+
+	for i=1,10 do
+		local pipe_up = create.sprite{ texname='examples/assert/pipe_up.png', x=400+(i-1)*100, y=0, ay=0}
+		local pipe_down = create.sprite{ texname='examples/assert/pipe_down.png', x=pipe_up.x+50, y=640, ay=1}
+		table.insert(game_layer.list, pipe_up)
+		table.insert(game_layer.list, pipe_down)
+	end
+
 
 	local button = create.button {name = 'play', texname = 'examples/assert/button_play.png', x=480, y=200 }
 	local textfield = create.textfield {
@@ -166,30 +202,22 @@ local function create_flybird_entities()
 		list = {create.label{text = 'NICK', x = 0, y = 34, fontsize = 20, bordersize=1}}
 	}
 
+	table.insert(game_layer.list, bird)
 
-	game_layer.list[1] = bird
 
 	ui_layer.list[1] = button
 	ui_layer.list[2] = textfield
 	ui_layer.list[3] = score
 
-	
 	canvas.list[1] = system_resource
-
-	-- main camera
-	canvas.list[2] = main_camera
-	canvas.list[3] = map_layer
-	canvas.list[4] = game_layer
-
-	-- ui camera
-	canvas.list[5] = ui_camera
-	canvas.list[6] = ui_layer
+	canvas.list[2] = game_layer
+	canvas.list[3] = ui_layer
 
 	return canvas
 end
 
 
-local function create_editor_layer()
+local function create_editor_canvas(flybird_entities)
 	
 	local function create_hierarchy()
 		local bg = create.sprite{ name='hierarchy', color=0x88888888, x=150, y=320-40, w=300, h=600} + Group() + SimpleDragg()
@@ -235,8 +263,6 @@ local function create_editor_layer()
 			}
 		}
 
-
-
 		bg.list[3] = content
 
 		bg.tag = 'editor'
@@ -249,26 +275,38 @@ local function create_editor_layer()
 		return bg	
 	end
 
-	local layer = create.layer('LAYER(Editor)')
-	layer.list[1] = create_hierarchy()
-	layer.list[2] = create_inspector()
+	local target = create.layer {
+		name = 'LAYER(target)',
+		list = { flybird_entities }
+	}
 
-	return layer
+	local editor = create.layer{
+		name = 'LAYER(editor)',
+		list = {create_hierarchy(), create_inspector()}
+	}
+
+	local canvas = create.layer {
+		name = 'Canvas',
+		list = {target, editor}
+	}
+
+	return canvas
 end
 
 
--- local flybird_entities = create_flybird_entities()
-local editor_layer = create_editor_layer()
-local hierarchy = editor_layer.list[1]
-local inspector = editor_layer.list[2]
+local flybird_entities = flybird_entities or create_flybird_entities()
+local canvas = create_editor_canvas(flybird_entities)
 
-local ins_mgr = inspector_manager(inspector)
+local target = canvas.list[1]
+local hierarchy = canvas.list[2].list[1]
+local inspector = canvas.list[2].list[2]
 
-table.insert(flybird_entities.list, editor_layer)
 
-local world = ecs.world(flybird_entities)
+
+local world = ecs.world(canvas)
 
 local keyboard = world.find_entity('keyboard')
+local mouse = world.find_entity('mouse')
 
 local bird = world.find_entity('bird')
 
@@ -280,18 +318,16 @@ local g = Miss { outfile = 'examples/editor/out/flybird_entities.lua' }
 local handle = { click = {}, keydown = {}, keyup = {} }
 
 
+local ins_mgr = inspector_manager(inspector, mouse, keyboard, handle)
+
+
 -- ctrl + s
 function handle.keydown.s()
 	if keyboard.pressed['ctrl'] then
-
-		local editor_layer = table.remove(flybird_entities.list, #flybird_entities.list)
-
 		local f = io.open(g.outfile, 'w')
 		f:write(string.format(file_head, os.date('%Y/%m/%d %H:%M:%S')))
 		f:write('return '..seri.pack(flybird_entities))
 		f:close()
-
-		table.insert(flybird_entities.list, editor_layer)
 	end
 end
 
@@ -303,16 +339,6 @@ end
 function handle.keydown.i()
 	inspector.active = not inspector.active
 end
-
-function handle.select(e)
-	ins_mgr.on_selected(e)
-end
-
-
-function handle.keydown.enter()
-	ins_mgr.apply()
-end
-
 
 
 world.add_system(Input(handle))
@@ -327,6 +353,25 @@ function game.update(dt)
 	world('update', dt)
 	ins_mgr.update()
 
+	if keyboard.pressed['ctrl'] then return end
+
+	if keyboard.pressed['w'] then
+		local dist = math.floor(keyboard.pressed['w']/0.016/3)
+		target.y = target.y - dist
+		ins_mgr.on_eye_move('y', dist)
+	elseif keyboard.pressed['a'] then
+		local dist = -math.floor(keyboard.pressed['a']/0.016/3)
+		target.x = target.x - dist
+		ins_mgr.on_eye_move('x', dist)
+	elseif keyboard.pressed['s'] then
+		local dist = -math.floor(keyboard.pressed['s']/0.016/3)
+		target.y = target.y - dist
+		ins_mgr.on_eye_move('y', dist)
+	elseif keyboard.pressed['d'] then
+		local dist = math.floor(keyboard.pressed['d']/0.016/3)
+		target.x = target.x - dist
+		ins_mgr.on_eye_move('x', dist)
+	end
 end
 
 function game.draw()

@@ -1,7 +1,7 @@
 #include "lkite.h"
 #include "game.h"
 
-#define VERSION "0.02"
+#define VERSION "0.03"
 
 extern Game * G;
 

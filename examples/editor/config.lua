@@ -2,7 +2,7 @@ application =
 {
 	window = 
 	{
-		title = 'Kite Editor v0.01',
+		title = 'Kite Editor v0.02',
 		width = 960,
 		height = 640,
 		fullscreen = false
