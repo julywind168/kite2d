@@ -1,3 +1,10 @@
+----------------------------------------------------------------------------------------
+--
+-- 简单编辑器, 尝试修改某个 UI 的位置( 拖拽, 或者选中后在属性面板中修改 ) ctrl+s 保存后, 重启看是否编辑成功
+--
+----------------------------------------------------------------------------------------
+
+
 package.path = 'examples/?.lua;examples/?/init.lua;examples/editor/?.lua;' .. package.path
 
 local kite = require 'kite'
@@ -13,18 +20,101 @@ local Debug = require 'ecs.systems.Debug'
 local seri = require 'seri'
 local create = require 'ecs.functions'
 
--- local flybird_entities = require 'out.flybird_entities'
+local flybird_entities = require 'out.flybird_entities'
 
 local file_head = "--[[\n"..[[
 	@Time:	  %s
 	@Author:  Kite Editor v0.01
 ]].."]]\n"
 
+
+local function foreach(f, e)
+	f(e)
+
+	if e.list then
+		for _,e in ipairs(e.list) do
+			foreach(f, e)
+		end
+	end
+end
+
+local function inspector_manager(inspector)
+	local self = {}
+	local selected = nil
+	local editing = false
+
+	local content = inspector.list[3]
+	local name = content.list[1]
+	local x = content.list[3]
+	local y = content.list[5]
+	local w = content.list[7]
+	local h = content.list[9]
+	local ax = content.list[11]
+	local ay = content.list[13]
+
+	content.active = false
+
+	function self.on_selected(e)
+		if e then
+			if e.tag == 'editor' then
+				editing = true
+			else 
+				editing = false
+				selected = e
+			end
+		end
+	end
+
+	function self.apply()
+		local e = selected
+		if not e then return end
+		e.x = tonumber(x.label.text) or 0
+		e.y = tonumber(y.label.text) or 0
+		
+		e.w = tonumber(w.label.text) or 0
+		e.h = tonumber(h.label.text) or 0
+
+		e.ax = tonumber(ax.label.text) or 0
+		e.ay = tonumber(ay.label.text) or 0
+	end
+
+	function self.update()
+		if selected then
+			local e = selected
+
+			if editing then
+				e.x = tonumber(x.label.text) or 0
+				e.y = tonumber(y.label.text) or 0
+				
+				e.w = tonumber(w.label.text) or 0
+				e.h = tonumber(h.label.text) or 0
+
+				e.ax = tonumber(ax.label.text) or 0
+				e.ay = tonumber(ay.label.text) or 0
+			else
+				content.active = true
+				name.text = e.name
+				x.label.text = tostring(e.x)
+				y.label.text = tostring(e.y)
+
+				w.label.text = tostring(e.w)
+				h.label.text = tostring(e.h)
+
+				ax.label.text = tostring(e.ax)
+				ay.label.text = tostring(e.ay)
+			end
+		end
+	end
+
+	return self
+end
+
+
 --
 -- 编辑器现在 只能支持对已有的 entities 修改
 -- 这个 函数 是从 flybird 中 copy来的 里面包含了 flybird 所需的全部 entity
 --
-local function create_flybied_entities()
+local function create_flybird_entities()
 	local canvas = create.canvas('canvas')
 	local system_resource = ecs.entity() + Group()
 	system_resource.list[1] = create.keyboard()
@@ -102,22 +192,78 @@ end
 local function create_editor_layer()
 	
 	local function create_hierarchy()
-		local bg = create.sprite{ color = 0x88888888, x = 150, y = 320-40, w = 300, h = 600} + Group() + SimpleDragg()
+		local bg = create.sprite{ name='hierarchy', color=0x88888888, x=150, y=320-40, w=300, h=600} + Group() + SimpleDragg()
 		bg.list[1] = create.sprite { x=0, y=300-32, ay=1, w=300-8, h=1, color = 0x22222288 }
 		bg.list[2] = create.label { text = 'Hierarchy', x = 0, y = 300-2, ay = 1, fontsize = 28, color = 0x222222cc}
 
+
+		bg.tag = 'editor'
+		for _,e in ipairs(bg.list) do
+			foreach(function (e)
+				e.tag = 'editor'
+				e.locked = true
+			end, e)
+		end
 		return bg
+	end
+
+	local function create_inspector()
+		local bg = create.sprite{ name='inspector', color=0x88888888, x =960-150, y=320-40, w=300, h=600 } + Group() + SimpleDragg()
+		bg.list[1] = create.sprite { x=0, y=300-32, ay=1, w=300-8, h=1, color = 0x22222288 }
+		bg.list[2] = create.label { text = 'Inspector', x = 0, y = 300-2, ay = 1, fontsize = 28, color = 0x222222cc}
+
+		local content = create.sprite{color=0xdd888888, x=0, y=300-32-20, w=300-8,h=28}+Group{
+			list = {
+				create.label{text='my name', x=0,y=0, w=300-8, h=28, fontsize=24, color=0x00000088},
+				create.label{text='x',x=-100,y=-33, w=300-8, h=30, fontsize=24, color=0x00000088},
+				create.textfield{x=0,y=-33,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+				
+				create.label{text='y',x=-100,y=-66, w=300-8, h=30, fontsize=24, color=0x00000088},
+				create.textfield{x=0,y=-66,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+
+				create.label{text='w',x=-100,y=-99, w=300-8, h=30, fontsize=24, color=0x00000088},
+				create.textfield{x=0,y=-99,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+				
+				create.label{text='h',x=-100,y=-132, w=300-8, h=30, fontsize=24, color=0x00000088},
+				create.textfield{x=0,y=-132,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+				
+				create.label{text='ax',x=-100,y=-165, w=300-8, h=30, fontsize=24, color=0x00000088},
+				create.textfield{x=0,y=-165,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+				
+				create.label{text='ay',x=-100,y=-198, w=300-8, h=30, fontsize=24, color=0x00000088},
+				create.textfield{x=0,y=-198,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}}
+			}
+		}
+
+
+
+		bg.list[3] = content
+
+		bg.tag = 'editor'
+		for _,e in ipairs(bg.list) do
+			foreach(function (e)
+				e.tag = 'editor'
+				e.locked = true
+			end, e)
+		end
+		return bg	
 	end
 
 	local layer = create.layer('LAYER(Editor)')
 	layer.list[1] = create_hierarchy()
+	layer.list[2] = create_inspector()
 
 	return layer
 end
 
 
-local flybird_entities = create_flybied_entities()
+-- local flybird_entities = create_flybird_entities()
 local editor_layer = create_editor_layer()
+local hierarchy = editor_layer.list[1]
+local inspector = editor_layer.list[2]
+
+local ins_mgr = inspector_manager(inspector)
+
 table.insert(flybird_entities.list, editor_layer)
 
 local world = ecs.world(flybird_entities)
@@ -151,8 +297,22 @@ end
 
 -- show/hide hierarchy
 function handle.keydown.h()
-	editor_layer.active = not editor_layer.active
+	hierarchy.active = not hierarchy.active
 end
+
+function handle.keydown.i()
+	inspector.active = not inspector.active
+end
+
+function handle.select(e)
+	ins_mgr.on_selected(e)
+end
+
+
+function handle.keydown.enter()
+	ins_mgr.apply()
+end
+
 
 
 world.add_system(Input(handle))
@@ -165,6 +325,8 @@ local game = {}
 
 function game.update(dt)
 	world('update', dt)
+	ins_mgr.update()
+
 end
 
 function game.draw()

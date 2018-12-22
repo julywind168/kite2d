@@ -88,6 +88,7 @@ end
 ---------------------------------------------------------------------------
 function self.mousemove(x, y)
 	if tmppressed and (tmppressed.has['DRAGG'] or MODE == 'EDITOR') then
+		if tmppressed.locked then return end
 		tmppressed.x = tmppressed.x + x - mouse.x
 		tmppressed.y = tmppressed.y + y - mouse.y
 	end
@@ -151,11 +152,13 @@ function self.mousedown(x, y)
 		if tmpselected then
 			on(tmpselected, 'lose_focus')
 			tmpselected = nil
+			local f = handle.select if f then f() end
 		end
 	else
 		if tmpselected and tmpselected ~= e then
 			on(tmpselected, 'lose_focus')
 			tmpselected = nil
+			local f = handle.select if f then f() end
 		end
 		on(e, 'mousedown')
 		tmppressed = e
@@ -168,7 +171,10 @@ function self.mouseup(x, y)
 		on(e, 'mouseup')
 		on(e, 'click')
 		tmppressed = nil
-		tmpselected = e
+		if tmpselected ~= e then
+			tmpselected = e
+			local f = handle.select if f then f(e) end
+		end
 	else
 		if tmppressed then
 			on(tmppressed, 'mouseup')

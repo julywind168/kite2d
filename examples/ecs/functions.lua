@@ -26,6 +26,7 @@ end
 function M.textfield(t)
 	assert(t.background and t.background.color and t.label)
 
+	t.fontsize = t.fontsize or 24
 	t.label.x = 0
 	t.label.y = 0
 	t.label.ay = t.ay or 0.5
@@ -45,6 +46,8 @@ end
 
 
 function M.label(t)
+	t.fontsize = t.fontsize or 24
+	t.h = t.h or t.fontsize + 2
 	return ecs.entity(t.name) + Label(t)
 end
 

@@ -12,7 +12,7 @@ local description = {
 	text = {'text', 'fontname', 'fontsize', 'color'},
 	move = {'speed', 'direction'},
 	mass = {'mass'},
-	simple_dragg = {'draggable'},
+	simple_dragg = {'draggable', 'locked'},
 	simple_button = {'scale', 'touchable', 'uitype'},
 	simple_textfield = {'background', 'mask', 'label', 'cursor', 'selected', 'touchable', 'selectable', 'uitype'},
 	simple_flipbook = {'frames', 'current', 'isloop', 'pause', 'stop', 'playspeed', 'timec'},
@@ -219,8 +219,9 @@ end end
 -----------------------------------------------------------------------------------------
 -- single component
 -----------------------------------------------------------------------------------------
-function SimpleDragg() return function ()
-	return 'simple_dragg', {draggable = true}
+function SimpleDragg(t) return function ()
+	t = t or {}
+	return 'simple_dragg', {draggable = t.draggable ~= false and true or false, locked = t.locked or false}
 end end
 
 
