@@ -15,7 +15,10 @@ typedef struct
 	GLuint ebo;
 	GLuint cur_texture;
 
+	uint32_t drawc;
+
 	void(*draw)(float *, GLuint);
+	void(*commit)(void);
 	void(*destroy)(void);
 } Renderer;
 

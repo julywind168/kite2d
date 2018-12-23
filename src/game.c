@@ -17,6 +17,7 @@ game_run() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 		glDisable(GL_STENCIL_TEST);
 		G->kite->draw();
+		G->renderer->commit();
 
 		glfwPollEvents();
 		glfwSwapBuffers(hwnd);
@@ -37,6 +38,9 @@ game_destroy() {
 Game *
 create_game(const char *gamedir) {
 	G = malloc(sizeof(Game));
+
+	G->drawcall = 0;
+	G->time = 0.f;
 
 	G->kite = create_kite(gamedir); 	if (G->kite == NULL) {free(G); exit(EXIT_FAILURE);}
 	G->window = create_window();		if (G->window == NULL) {free(G); exit(EXIT_FAILURE);}

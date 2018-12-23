@@ -13,6 +13,15 @@ renderer_draw(float *vertices, GLuint texture) {
 	}
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float)*4*4, vertices);
 	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+	renderer->drawc += 1;
+}
+
+
+
+void
+renderer_commit() {
+	G->drawcall = renderer->drawc;
+	renderer->drawc = 0;
 }
 
 
@@ -93,6 +102,7 @@ create_renderer() {
 		return NULL;
 	}
 
+	renderer->drawc = 0;
 	renderer->manager = create_manager();
 
 	if (renderer->manager == NULL) {
@@ -105,6 +115,7 @@ create_renderer() {
 	}
 
 	renderer->draw = renderer_draw;
+	renderer->commit = renderer_commit;
 	renderer->destroy = renderer_destroy;
 	return renderer;
 }

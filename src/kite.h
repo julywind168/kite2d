@@ -23,7 +23,7 @@ typedef struct
 {
 	lua_State *L;
 	Conf conf;
-
+	
 	//callback
 	int (*load)(void);
 	void (*update)(double);

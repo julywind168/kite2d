@@ -78,7 +78,7 @@ local function Render(world)
 		gfx.stop_stencil()
 	end
 
-	function draw.label(x, y, sx, sy, rotate, e)
+	function draw.label(x, y, sx, sy, rotate, e)		
 		if e.bordersize > 0 then
 			gfx.print(e.text, e.fontsize * sx, x-e.bordersize, y, e.bordercolor, e.ax, e.ay, rotate, e.fontname)
 			gfx.print(e.text, e.fontsize * sx, x+e.bordersize, y, e.bordercolor, e.ax, e.ay, rotate, e.fontname)
@@ -100,8 +100,8 @@ local function Render(world)
 
 		if e.type ~= 'nil' then
 			local f = assert(draw[e.type], e.type)
-			local x =  root.x + e.x
-			local y =  root.y + e.y
+			local x =  math.floor(root.x + e.x)
+			local y =  math.floor(root.y + e.y)
 			local sx =  root.sx * e.sx
 			local sy =  root.sy * e.sy
 			local rotate =  root.rotate + e.rotate
@@ -126,8 +126,8 @@ local function Render(world)
 		end
 	end
 
+	local root = {x = 0, y = 0, sx = 1, sy = 1, rotate = 0}
 	function self.draw()
-		local root = {x = 0, y = 0, sx = 1, sy = 1, rotate = 0}
 		draw_entity(root, world.entities)
 	end
 

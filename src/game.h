@@ -13,6 +13,7 @@ typedef struct
 	Renderer *renderer;
 
 	double time;			// 累计游戏时间
+	uint32_t drawcall;
 
 	void (*init)(void);
 	void (*run)(void);

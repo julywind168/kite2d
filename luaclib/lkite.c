@@ -16,6 +16,13 @@ lexit(lua_State *L) {
 
 
 static int
+ldrawcall(lua_State *L) {
+	lua_pushinteger(L, G->drawcall);
+	return 1;
+}
+
+
+static int
 ltime(lua_State *L) {
     lua_pushnumber(L, G->time);
     return 1;
@@ -66,6 +73,7 @@ lib_kite(lua_State *L)
 {
 	luaL_Reg l[] = {
 		{"exit", lexit},
+		{"drawcall", ldrawcall},
         {"time", ltime},
         {"inject", linject},
         {"version", lversion},
