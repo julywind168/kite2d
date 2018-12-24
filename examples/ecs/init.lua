@@ -6,12 +6,31 @@ local description, dependence = table.unpack(require 'ecs.components')
 local ecs = {}
 
 
-function ecs.world(entities)
+-- scene is a entity group (tree)
+function ecs.world(scene, handle)
 
 	local self = {}
 	
-	self.entities = assert(entities)
-	self.systems = {}	
+	self.scene = assert(scene)
+	self.handle = handle
+	self.systems = {}
+	self.keyboard = {pressed = {}, lpressed = {}}
+	self.mouse = {pressed = {}, x = 0, y = 0}
+
+	-- 切换场景
+	function self.switch(new_scene, new_handle, effect)
+		local old = self.scene
+		
+		if new_handle then
+			self.handle = new_handle
+		end
+		if effect then
+			effect(old, new_scene)
+		end
+		self.scene = new_scene
+		return old
+	end
+
 
 	local function find_e(e, name)
 		if e.name == name then
@@ -26,24 +45,23 @@ function ecs.world(entities)
 	end
 
 	function self.find_entity(name)
-		return find_e(self.entities, name)
+		return find_e(self.scene, name)
 	end
 
 	function self.add_entity(e)
-		table.insert(self.canvas.list, e)
+		table.insert(self.scene.list, e)
 		return self
 	end
 
 	function self.add_entitys(es)
 		for _,e in ipairs(es) do
-			table.insert(self.canvas.list, e)
+			table.insert(self.scene.list, e)
 		end
 		return self
 	end
 
 	function self.remove_entity(e)
 	end
-
 
 	function self.add_system(system)
 		table.insert(self.systems, system(self))
@@ -59,16 +77,70 @@ function ecs.world(entities)
 		end
 	end
 
-	return setmetatable(self, {__call = function (_, event, ...)
+	local function dispatch(event, ...)
 		for _,sys in ipairs(self.systems) do
 			local handle = sys[event]
 			if handle then
 				handle(...)
 			end
 		end
-	end})
-end
+	end
 
+
+	self.cb = {}
+
+	function self.cb.update(dt)
+		dispatch('update', dt)
+	end
+
+	function self.cb.draw()
+		dispatch('draw')
+	end
+
+	function self.cb.mouse(what, x, y, who)
+		if who == 'left' then
+			if what == 'press' then
+				dispatch('mousedown', x, y)
+			else
+				dispatch('mouseup', x, y)
+			end
+		elseif who == 'right' then
+			if what == 'press' then
+				dispatch('rmousedown', x, y)
+			else
+				dispatch('rmouseup', x, y)
+			end
+		else
+			dispatch('mousemove', x, y)
+		end
+	end
+
+	function self.cb.keyboard(key, what)
+		if what == 'press' then
+			dispatch('keydown', key)
+		else
+			dispatch('keyup', key)
+		end
+	end
+
+	function self.cb.message(char)
+		dispatch('message', char)
+	end
+
+	function self.cb.resume()
+		local f = handle.resume if f then f() end
+	end
+
+	function self.cb.pause()
+		local f = handle.pause if f then f() end
+	end
+
+	function self.cb.exit()
+		local f = handle.exit if f then f() end	
+	end
+
+	return self
+end
 
 local function match(condition, components)
 	for _,name in ipairs(condition) do

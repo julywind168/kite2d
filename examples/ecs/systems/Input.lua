@@ -46,21 +46,14 @@ end
 --
 -- Input system
 --
-local function Input(world, handle)
+local function Input(world)
 
 local self = {name='input'}
 
-
 local tmppressed = nil
 local tmpselected = nil
-local mouse = world.find_entity('mouse')
-local keyboard = world.find_entity('keyboard')
-
-mouse.pressed = {}
-mouse.x = 0
-mouse.y = 0
-keyboard.pressed = {}
-keyboard.lpressed = {}
+local mouse = world.mouse
+local keyboard = world.keyboard
 
 local watchdog = clock(0.05, function ()
 	if not tmpselected or tmpselected.type ~= 'textfield' then return end
@@ -122,12 +115,12 @@ function on.button.mouseup(e)
 end
 
 function on.button.click(e)
-	local f = handle.click and handle.click[e.name]
+	local f = world.handle.click and world.handle.click[e.name]
 	if f then f() end
 end
 
 function on.button.cancel(e)
-	local f = handle.cancel and handle.cancel[e.name]
+	local f = world.handle.cancel and world.handle.cancel[e.name]
 	if f then f() end	
 end
 
@@ -153,37 +146,37 @@ end})
 
 
 function self.mousedown(x, y)
-	local e = TEST(x, y, world.entities)
+	local e = TEST(x, y, world.scene)
 
 	if not e then
 		if tmpselected then
 			on(tmpselected, 'lose_focus')
 			tmpselected = nil
-			local f = handle.select if f then f() end
+			local f = world.handle.select if f then f() end
 		end
 	else
 		if tmpselected and tmpselected ~= e then
 			on(tmpselected, 'lose_focus')
 			tmpselected = nil
-			local f = handle.select if f then f() end
+			local f = world.handle.select if f then f() end
 		end
 		on(e, 'mousedown')
 		tmppressed = e
-		if handle.press then handle.press(e) end
+		if world.handle.press then world.handle.press(e) end
 	end
 
 	mouse.pressed['left'] = true
 end
 
 function self.mouseup(x, y)
-	local e = TEST(x, y, world.entities)
+	local e = TEST(x, y, world.scene)
 	if e and e == tmppressed then
 		on(e, 'mouseup')
 		on(e, 'click')
 		tmppressed = nil
 		if tmpselected ~= e then
 			tmpselected = e
-			local f = handle.select if f then f(e) end
+			local f = world.handle.select if f then f(e) end
 		end
 	else
 		if tmppressed then
@@ -221,7 +214,7 @@ function self.keydown(key)
 		return
 	end
 
-	local f = handle.keydown and handle.keydown[key]
+	local f = world.handle.keydown and world.handle.keydown[key]
 	if f then f() end
 end
 
@@ -246,7 +239,7 @@ function self.keyup(key)
 		return
 	end
 
-	local f = handle.keyup and handle.keyup[key]
+	local f = world.handle.keyup and world.handle.keyup[key]
 	if f then f() end
 end
 
@@ -254,8 +247,8 @@ return self
 
 end
 
-return function (handle)
+return function ()
 	return function (world)
-		return Input(world, handle)
+		return Input(world)
 	end
 end

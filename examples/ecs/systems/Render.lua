@@ -39,7 +39,7 @@ local function Render(world)
 					csr.active = not csr.active
 				end
 			end	
-		end, world.entities)	
+		end, world.scene)
 	end
 
 	local draw = {}
@@ -128,7 +128,7 @@ local function Render(world)
 
 	local root = {x = 0, y = 0, sx = 1, sy = 1, rotate = 0}
 	function self.draw()
-		draw_entity(root, world.entities)
+		draw_entity(root, world.scene)
 	end
 
 	return self
