@@ -16,16 +16,14 @@ local handle = { keydown = {} }
 function handle.keydown.enter()
 	print('do nothing')
 end
-	
-
-
 
 
 local login_handle = { keydown = {} }
 
 function login_handle.keydown.enter()
 	print('enter game ...')
-	world.switch(game_scene, handle)
+	world.switch(game_scene)
+	world.add_listener(handle)
 end
 
 world = util.create_world(login_scene, login_handle)

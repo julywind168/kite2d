@@ -31,7 +31,6 @@ local function in_e(x, y, e)
 	return true
 end
 
-
 local function rect_carsh(e0, e)
 	local w = e.w * e.sx
 	local h = e.h * e.sy
@@ -40,11 +39,19 @@ local function rect_carsh(e0, e)
 	return in_e(x2, y2, e0) or in_e(x2+w, y2, e0) or in_e(x2, y2+h, e0) or in_e(x2+w, y2+h, e0)
 end
 
+local function bird_carsh(bird, pipes)
+	if bird.y - bird.h/2 + 8 < 138 then return true end
 
+	for i,pipe in ipairs(pipes) do
+		if rect_carsh(pipe, bird) then
+			print('pipe'..i, pipe.x, pipe.y)
+			return true
+		end
+	end
+end
 
 
 local world = ecs.world(entities)
-
 local game_layer = entities.list[2]
 local button = world.find_entity('play')
 local textfield = world.find_entity('textfield')
@@ -93,46 +100,17 @@ function handle.keydown.up()
 	bird.rotate = 45
 end
 
-world.add_system(Input(handle))
-	.add_system(Gravity())
-	.add_system(Moving())
-	.add_system(Animation())
-	.add_system(Render())
-	.add_system(Debug())
+function handle.update(dt)
 
-
-
-local function bird_carsh()
-	if bird.y - bird.h/2 + 8 < 138 then return true end
-
-	for i,pipe in ipairs(pipes) do
-		if rect_carsh(pipe, bird) then
-			print('pipe'..i, pipe.x, pipe.y)
-			return true
-		end
-	end
-end
-
-
-local game = {}
-
-function game.update(dt)
-	world('update', dt)
-
-	-- 我们并不想 nick 被旋转
-	bird_nick.rotate = - bird.rotate
-	
-	-- 相机 跟随 bird
+	bird_nick.rotate = - bird.rotate	
 	game_layer.x = 480-bird.x
 
-
-	-- logic
 	if g.state == 'gameing' then
 		g.timec = g.timec + dt
 
 		g.score = 'Score:' .. math.floor(g.timec)
 
-		if bird_carsh() then
+		if bird_carsh(bird, pipes) then
 			print('game over, you dead ...')
 			g.state = 'over'
 			bird.mass = 0
@@ -140,53 +118,18 @@ function game.update(dt)
 			button.active = true
 		end
 	end
-
 	-- update miss
 	g()
 end
 
-function game.draw()
-	world('draw')
-end
+world = world
+	.add_listener(handle)
+	.add_system(Input())
+	.add_system(Gravity())
+	.add_system(Moving())
+	.add_system(Animation())
+	.add_system(Render())
+	.add_system(Debug())
 
-function game.mouse(what, x, y, who)
-	if who == 'left' then
-		if what == 'press' then
-			world('mousedown', x, y)
-		else
-			world('mouseup', x, y)
-		end
-	elseif who == 'right' then
-		if what == 'press' then
-			world('rmousedown', x, y)
-		else
-			world('rmouseup', x, y)
-		end
-	else
-		world('mousemove', x, y)
-	end
-end
 
-function game.keyboard(key, what)
-	if what == 'press' then
-		world('keydown', key)
-	else
-		world('keyup', key)
-	end
-end
-
-function game.message(char)
-	world('message', char)
-end
-
-function game.resume()
-end
-
-function game.pause()
-end
-
-function game.exit()
-	print('see you next version, current is v'..kite.version())
-end
-
-kite.start(game)
+kite.start(world.cb)

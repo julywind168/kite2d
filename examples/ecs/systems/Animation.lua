@@ -23,7 +23,7 @@ local function Animation(world)
 					end  
 				end
 			end
-		end, world.entities)
+		end, world.scene)
 	end
 
 	return self

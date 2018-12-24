@@ -17,7 +17,7 @@ local function Gravity(world)
 				e.speed = math.sqrt(xspeed^2 + yspeed^2)
 				e.direction = math.asin(yspeed/e.speed) * 180/math.pi
 				e.rotate = e.direction
-		end, world.entities)
+		end, world.scene)
 	end
 
 	return self

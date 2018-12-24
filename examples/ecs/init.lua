@@ -18,17 +18,19 @@ function ecs.world(scene, handle)
 	self.mouse = {pressed = {}, x = 0, y = 0}
 
 	-- 切换场景
-	function self.switch(new_scene, new_handle, effect)
+	function self.switch(new_scene, effect)
 		local old = self.scene
 		
-		if new_handle then
-			self.handle = new_handle
-		end
 		if effect then
-			effect(old, new_scene)
+			effect(world, old, new_scene)
+		else
+			self.scene = new_scene			
 		end
-		self.scene = new_scene
-		return old
+	end
+
+	function self.add_listener(handle)
+		self.handle = handle
+		return self
 	end
 
 
@@ -91,6 +93,7 @@ function ecs.world(scene, handle)
 
 	function self.cb.update(dt)
 		dispatch('update', dt)
+		local f = self.handle.update if f then f(dt) end
 	end
 
 	function self.cb.draw()
@@ -128,15 +131,15 @@ function ecs.world(scene, handle)
 	end
 
 	function self.cb.resume()
-		local f = handle.resume if f then f() end
+		local f = self.handle.resume if f then f() end
 	end
 
 	function self.cb.pause()
-		local f = handle.pause if f then f() end
+		local f = self.handle.pause if f then f() end
 	end
 
 	function self.cb.exit()
-		local f = handle.exit if f then f() end	
+		local f = self.handle.exit if f then f() end	
 	end
 
 	return self

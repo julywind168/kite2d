@@ -12,7 +12,7 @@ local function Move(world)
 			e.x = e.x + distance * math.cos(e.direction * math.pi/180)
 			e.y = e.y + distance * math.sin(e.direction * math.pi/180)
 
-		end, world.entities)
+		end, world.scene)
 	end
 
 	return self
