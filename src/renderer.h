@@ -5,6 +5,9 @@
 #include "manager.h"
 
 
+#define MAX_BATCH_SLOT 1024
+
+
 typedef struct
 {
 	Manager *manager;
@@ -17,9 +20,13 @@ typedef struct
 
 	uint32_t drawc;
 
-	void(*draw)(float *, GLuint);
+	void(*draw)(float *, GLuint, uint32_t);
+	void(*print)(float *, GLuint, uint32_t);
 	void(*commit)(void);
 	void(*destroy)(void);
+
+	uint32_t spritec;
+	float vertices[];
 } Renderer;
 
 

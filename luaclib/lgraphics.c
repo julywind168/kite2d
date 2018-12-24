@@ -35,8 +35,6 @@ lprint(lua_State *L) {
 		{0.f, 0.f,	1.f, 0.f},
 	};
 
-	G->renderer->manager->use_text_program(color);
-
 	for (int i = 1; i <= n; ++i) {
 		lua_rawgeti(L, 1, i);
 		ch = lua_touserdata(L, -1);
@@ -53,7 +51,7 @@ lprint(lua_State *L) {
 		ROTATE(x0, y0, angle, posx+w, posy, &vertices[2][0], &vertices[2][1]);
 		ROTATE(x0, y0, angle, posx+w, posy+h, &vertices[3][0], &vertices[3][1]);
 
-		G->renderer->draw(&vertices[0][0], ch->texture);
+		G->renderer->print(&vertices[0][0], ch->texture, color);
 		
 		lua_pop(L, 1);
 		x = x + (ch->advancex >> 6);
@@ -98,8 +96,7 @@ ldraw(lua_State *L) {
 	ROTATE(x, y, rotate, posx+w, posy,   &vertices[2][0], &vertices[2][1]);
 	ROTATE(x, y, rotate, posx+w, posy+h, &vertices[3][0], &vertices[3][1]);
 
-	G->renderer->manager->use_sprite_program(color);
-	G->renderer->draw(&vertices[0][0], texture);
+	G->renderer->draw(&vertices[0][0], texture, color);
     return 0;
 }
 

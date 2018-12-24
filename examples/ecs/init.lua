@@ -7,6 +7,7 @@ local ecs = {}
 
 
 function ecs.world(entities)
+
 	local self = {}
 	
 	self.entities = assert(entities)

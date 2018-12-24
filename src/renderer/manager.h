@@ -22,8 +22,8 @@ typedef struct
 	Program text;
 	uint8_t current;
 
-	void(*use_sprite_program)(uint32_t color);
-	void(*use_text_program)(uint32_t color);
+	bool(*use_sprite_program)(uint32_t color, bool test);
+	bool(*use_text_program)(uint32_t color, bool test);
 	void(*destroy)(void);
 } Manager;
 

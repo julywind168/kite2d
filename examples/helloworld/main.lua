@@ -14,10 +14,12 @@ local gfx = require "kite.graphics"
 local game = {}
 
 function game.update(dt)
+	-- print('fps: ' .. math.floor(1/dt))
+	-- print('cal: ' .. kite.drawcall())
 end
 
 function game.draw()
-	gfx.draw('examples/assert/bg.jpg', 480, 320)
+	gfx.draw('examples/assert/bg.jpg', 480, 320)	
 	gfx.print('hello world 哈哈 O(∩_∩)O~', 48, 480, 320, 0xff0000ff)	
 end
 

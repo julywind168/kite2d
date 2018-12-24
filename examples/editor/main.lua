@@ -25,7 +25,8 @@ local Debug = require 'ecs.systems.Debug'
 local seri = require 'seri'
 local create = require 'ecs.functions'
 
-local flybird_entities = pcall(require, 'out.flybird_entities')
+local load_ok, flybird_entities = pcall(require, 'out.flybird_entities')
+
 
 local file_head = "--[[\n"..[[
 	@Time:	  %s
@@ -295,7 +296,7 @@ local function create_editor_canvas(flybird_entities)
 end
 
 
-local flybird_entities = flybird_entities or create_flybird_entities()
+local flybird_entities = load_ok and flybird_entities or create_flybird_entities()
 local canvas = create_editor_canvas(flybird_entities)
 
 local target = canvas.list[1]

@@ -1,25 +1,66 @@
 #include "game.h"
 #include "renderer.h"
 
+#define ITEM_SIZE sizeof(float)*4*4
+
 extern Game *G;
 static Renderer *renderer;
 
 
-void
-renderer_draw(float *vertices, GLuint texture) {
-	if (texture != renderer->cur_texture) {
-		glBindTexture(GL_TEXTURE_2D, texture);
-		renderer->cur_texture = texture;
-	}
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(float)*4*4, vertices);
-	glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+void flush() {
+	glBufferSubData(GL_ARRAY_BUFFER, 0, ITEM_SIZE*renderer->spritec, renderer->vertices);
+	glDrawElements(GL_TRIANGLES, 6 * renderer->spritec, GL_UNSIGNED_INT, 0);
+	renderer->spritec = 0;
 	renderer->drawc += 1;
 }
 
 
+void
+renderer_draw(float *vertices, GLuint texture, uint32_t color) {
+	if (renderer->spritec == 0) {
+		renderer->manager->use_sprite_program(color, false);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		renderer->cur_texture = texture;
+		memcpy(renderer->vertices, vertices, ITEM_SIZE);
+		renderer->spritec = 1;
+	} else {
+		if(renderer->manager->use_sprite_program(color, true) || (texture != renderer->cur_texture) || (renderer->spritec == MAX_BATCH_SLOT)) {
+			flush();
+			renderer->manager->use_sprite_program(color, false);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			renderer->cur_texture = texture;
+		}
+		memcpy(renderer->vertices + ITEM_SIZE/sizeof(float) * renderer->spritec, vertices, ITEM_SIZE);
+		renderer->spritec += 1;
+	}
+}
+
+
+void
+renderer_print(float *vertices, GLuint texture, uint32_t color) {
+	if (renderer->spritec == 0) {
+		renderer->manager->use_text_program(color, false);
+		glBindTexture(GL_TEXTURE_2D, texture);
+		renderer->cur_texture = texture;
+		memcpy(renderer->vertices, vertices, ITEM_SIZE);
+		renderer->spritec = 1;
+	} else {
+		if(renderer->manager->use_text_program(color, true) || (texture != renderer->cur_texture) || (renderer->spritec == MAX_BATCH_SLOT)) {
+			flush();
+			renderer->manager->use_text_program(color, false);
+			glBindTexture(GL_TEXTURE_2D, texture);
+			renderer->cur_texture = texture;
+		}
+		memcpy(renderer->vertices + ITEM_SIZE/sizeof(float) * renderer->spritec, vertices, ITEM_SIZE);
+		renderer->spritec += 1;
+	}
+}
+
 
 void
 renderer_commit() {
+	if (renderer->spritec > 0)
+		flush();
 	G->drawcall = renderer->drawc;
 	renderer->drawc = 0;
 }
@@ -54,17 +95,25 @@ renderer_init() {
 	FT_Library ft;
 	GLuint vao, vbo, ebo;
 	FT_Init_FreeType(&ft);
-	static GLuint indices[] = {
-		0,1,2,
-		0,2,3
-    };
+
+	static GLuint indices[6 * MAX_BATCH_SLOT];
+
+	for (int i = 0; i < MAX_BATCH_SLOT; ++i)
+	{
+		indices[i*6 + 0] = 0 + i*4;
+		indices[i*6 + 1] = 1 + i*4;
+		indices[i*6 + 2] = 2 + i*4;
+		indices[i*6 + 3] = 0 + i*4;
+		indices[i*6 + 4] = 2 + i*4;
+		indices[i*6 + 5] = 3 + i*4;
+	}
 
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 
 	glGenBuffers(1, &vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(float)*4*4, NULL, GL_DYNAMIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, ITEM_SIZE* MAX_BATCH_SLOT, NULL, GL_DYNAMIC_DRAW);
 
 	glGenBuffers(1, &ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
@@ -95,13 +144,14 @@ renderer_destroy() {
 
 Renderer *
 create_renderer() {
-	renderer = malloc(sizeof(Renderer));
+	renderer = malloc(sizeof(Renderer) +  ITEM_SIZE * MAX_BATCH_SLOT);
 
 	if (renderer_init()) {
 		free(renderer);
 		return NULL;
 	}
 
+	renderer->spritec = 0;
 	renderer->drawc = 0;
 	renderer->manager = create_manager();
 
@@ -115,6 +165,7 @@ create_renderer() {
 	}
 
 	renderer->draw = renderer_draw;
+	renderer->print = renderer_print;
 	renderer->commit = renderer_commit;
 	renderer->destroy = renderer_destroy;
 	return renderer;
