@@ -8,24 +8,27 @@ local util = require 'util'
 
 local login_scene = require 'scene.login'
 local game_scene = require 'scene.game'
-local world
+local world = util.create_world()
 
 -- game handle
-local handle = { keydown = {} }
+local handle = {}
 
-function handle.keydown.enter()
-	print('do nothing')
+function handle.keydown(key)
+	print('do nothing', key)
 end
 
 
-local login_handle = { keydown = {} }
+local login_handle = {}
 
-function login_handle.keydown.enter()
-	print('enter game ...')
-	world.switch(game_scene)
-	world.add_listener(handle)
+function login_handle.keydown(key)
+	if key == 'enter' then
+		world.switch(game_scene, handle, util.switch.fade(1))
+		-- world.switch(game_scene, handle, util.switch.slide('left', 1))
+	end
 end
 
-world = util.create_world(login_scene, login_handle)
+
+world.set_scene(login_scene)
+world.set_handle(login_handle)
 
 kite.start(world.cb)

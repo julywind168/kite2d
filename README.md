@@ -8,10 +8,7 @@ Kite is a simple 2d game engine for Lua
 3. ./kite.exe examples/helloworld
 
 ## Framework
-```
-	
-
-```
+![Framework](https://github.com/HYbutterfly/kite/wiki/image/fmwk.png)
 
 ## Roadmap
 ```

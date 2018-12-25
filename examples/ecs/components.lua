@@ -16,7 +16,6 @@ local description = {
 	simple_button = {'scale', 'touchable', 'uitype'},
 	simple_textfield = {'background', 'mask', 'label', 'cursor', 'selected', 'touchable', 'selectable', 'uitype'},
 	simple_flipbook = {'frames', 'current', 'isloop', 'pause', 'stop', 'playspeed', 'timec'},
-
 	-- system
 	mouse = {'pressed', 'x', 'y'},
 	keyboard = {'pressed', 'lpressed'},
@@ -29,7 +28,6 @@ local description = {
 local dependence = {
 	TRANSFORM = {'position', 'scale', 'rotate'},
 	DRAGG = {'node', 'position', 'rectangle', 'simple_dragg'},
-	CAMERA = {'node', 'TRANSFORM'},
 	SPRITE = {'node', 'TRANSFORM', 'rectangle', 'texture'},
 	LABEL = {'node', 'TRANSFORM', 'rectangle', 'text'},
 	MASK = {'SPRITE', 'group'},

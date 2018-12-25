@@ -25,7 +25,7 @@ local Debug = require 'ecs.systems.Debug'
 local seri = require 'seri'
 local create = require 'ecs.functions'
 
-local load_ok, flybird_entities = pcall(require, 'out.flybird_entities')
+-- local load_ok, flybird_entities = pcall(require, 'out.flybird_entities')
 
 
 local file_head = "--[[\n"..[[
@@ -149,9 +149,6 @@ end
 --
 local function create_flybird_entities()
 	local canvas = create.canvas('canvas')
-	local system_resource = ecs.entity() + Group()
-	system_resource.list[1] = create.keyboard()
-	system_resource.list[2] = create.mouse()
 	
 	local game_layer = create.layer()
 	local ui_layer = create.layer({name = 'flybird_ui_layer'})
@@ -211,9 +208,8 @@ local function create_flybird_entities()
 	ui_layer.list[2] = textfield
 	ui_layer.list[3] = score
 
-	canvas.list[1] = system_resource
-	canvas.list[2] = game_layer
-	canvas.list[3] = ui_layer
+	canvas.list[1] = game_layer
+	canvas.list[2] = ui_layer
 
 	return canvas
 end
@@ -304,11 +300,13 @@ local hierarchy = canvas.list[2].list[1]
 local inspector = canvas.list[2].list[2]
 
 
+dump(canvas)
+
 
 local world = ecs.world(canvas)
 
-local keyboard = world.find_entity('keyboard')
-local mouse = world.find_entity('mouse')
+local keyboard = world.keyboard
+local mouse = world.mouse
 
 local bird = world.find_entity('bird')
 
@@ -342,8 +340,8 @@ function handle.keydown.i()
 	inspector.active = not inspector.active
 end
 
-
-world.add_system(Input(handle))
+world.set_handle(handle)
+world.add_system(Input())
 	.add_system(Moving())
 	.add_system(Animation())
 	.add_system(Render())

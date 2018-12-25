@@ -115,13 +115,11 @@ function on.button.mouseup(e)
 end
 
 function on.button.click(e)
-	local f = world.handle.click and world.handle.click[e.name]
-	if f then f() end
+	world('click', e.name)
 end
 
 function on.button.cancel(e)
-	local f = world.handle.cancel and world.handle.cancel[e.name]
-	if f then f() end	
+	world('cancel', e.name)
 end
 
 -- textfield
@@ -152,17 +150,17 @@ function self.mousedown(x, y)
 		if tmpselected then
 			on(tmpselected, 'lose_focus')
 			tmpselected = nil
-			local f = world.handle.select if f then f() end
+			world('select')
 		end
 	else
 		if tmpselected and tmpselected ~= e then
 			on(tmpselected, 'lose_focus')
 			tmpselected = nil
-			local f = world.handle.select if f then f() end
+			world('select')
 		end
 		on(e, 'mousedown')
 		tmppressed = e
-		if world.handle.press then world.handle.press(e) end
+		world('press', e)
 	end
 
 	mouse.pressed['left'] = true
@@ -176,7 +174,7 @@ function self.mouseup(x, y)
 		tmppressed = nil
 		if tmpselected ~= e then
 			tmpselected = e
-			local f = world.handle.select if f then f(e) end
+			world('select', e)
 		end
 	else
 		if tmppressed then
@@ -214,8 +212,7 @@ function self.keydown(key)
 		return
 	end
 
-	local f = world.handle.keydown and world.handle.keydown[key]
-	if f then f() end
+	world('keydown', key)
 end
 
 function self.keyup(key)
@@ -239,8 +236,7 @@ function self.keyup(key)
 		return
 	end
 
-	local f = world.handle.keyup and world.handle.keyup[key]
-	if f then f() end
+	world('keyup', key)
 end
 
 return self

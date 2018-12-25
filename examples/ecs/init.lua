@@ -11,26 +11,53 @@ function ecs.world(scene, handle)
 
 	local self = {}
 	
-	self.scene = assert(scene)
+	self.scene = scene
 	self.handle = handle
 	self.systems = {}
 	self.keyboard = {pressed = {}, lpressed = {}}
 	self.mouse = {pressed = {}, x = 0, y = 0}
 
+	local watchers = {}
+
+	local function on(event, ...)
+		local f = self.handle and self.handle[event]
+		if f then f(...) end
+	end
+
 	-- 切换场景
-	function self.switch(new_scene, effect)
+	function self.switch(new_scene, new_handle, effect)
 		local old = self.scene
 		
 		if effect then
-			effect(world, old, new_scene)
+			effect(self, old, new_scene, new_handle)
 		else
-			self.scene = new_scene			
+			self.scene = new_scene
+			self.handle = new_handle		
 		end
 	end
 
-	function self.add_listener(handle)
+	function self.set_scene(scene)
+		self.scene = scene
+		return self
+	end
+
+	function self.set_handle(handle)
 		self.handle = handle
 		return self
+	end
+
+	function self.watch(cond, callback, times)
+		local w = { cond = cond, callback = callback, times = times or 1 }
+		local tail = w
+
+		function w.join(cond, callback, times)
+			local w1 = { cond = cond, callback = callback, times = times or 1 }
+			tail.next = w1
+			tail = w1
+		end
+
+		watchers[w] = true
+		return w
 	end
 
 
@@ -88,12 +115,27 @@ function ecs.world(scene, handle)
 		end
 	end
 
-
 	self.cb = {}
 
 	function self.cb.update(dt)
 		dispatch('update', dt)
-		local f = self.handle.update if f then f(dt) end
+		on('update', dt)
+
+		for watcher,_ in pairs(watchers) do
+			if watcher.cond(dt) then
+				watcher.callback()
+				if watcher.times > 0 then
+					watcher.times = watcher.times - 1
+					if watcher.times == 0 then
+						local new_watcher = watcher.next
+						if new_watcher then
+							watchers[new_watcher] = true
+						end
+						watchers[watcher] = nil
+					end
+				end
+			end
+		end
 	end
 
 	function self.cb.draw()
@@ -131,18 +173,20 @@ function ecs.world(scene, handle)
 	end
 
 	function self.cb.resume()
-		local f = self.handle.resume if f then f() end
+		on('resume')
 	end
 
 	function self.cb.pause()
-		local f = self.handle.pause if f then f() end
+		on('pause')
 	end
 
 	function self.cb.exit()
-		local f = self.handle.exit if f then f() end	
+		on('exit')
 	end
 
-	return self
+	return setmetatable(self, {__call = function (_, ...)
+		on(...)
+	end})
 end
 
 local function match(condition, components)
