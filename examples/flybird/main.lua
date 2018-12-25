@@ -73,11 +73,9 @@ local g = Miss { nick = '请修改我', score = 'Score:0', state = 'ready', time
 		.miss('score', score, 'text')
 
 
-local handle = { }
+local handle = { keydown = {}, click = {} }
 
-function handle.click(name)
-	if name ~= 'play' then return end
-	
+function handle.click.play()
 	if g.state == 'over' then
 		g.timec = 0
 		g.score = 'Score:0'
@@ -94,8 +92,7 @@ function handle.click(name)
 	bird.mass = 1
 end
 
-function handle.keydown(key)
-	if key ~= 'up' then return end
+function handle.keydown.up()
 	if g.state ~= 'gameing' then return end
 	
 	bird.speed = math.sqrt(g.speed^2 + g.speed^2)
