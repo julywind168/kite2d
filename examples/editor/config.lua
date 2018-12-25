@@ -12,6 +12,7 @@ application =
 
 MODE = 'EDITOR'
 TARGET = 'flybird'
+VERSION = 2
 
 -- preload
 

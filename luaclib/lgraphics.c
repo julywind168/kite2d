@@ -21,10 +21,10 @@ lprint(lua_State *L) {
 	float x0, y0, x, y, w, h, posx, posy, angle;
 
 	n = luaL_len(L, 1);
-	x0 = luaL_checknumber(L, 2);
-	y0 = luaL_checknumber(L, 3);
-	x = luaL_checknumber(L, 4);
-	y = luaL_checknumber(L, 5);
+	x0 = floor(luaL_checknumber(L, 2));
+	y0 = floor(luaL_checknumber(L, 3));
+	x = floor(luaL_checknumber(L, 4));
+	y = floor(luaL_checknumber(L, 5));
 	angle = luaL_checknumber(L, 6) * (M_PI/180.f);
 	color = luaL_checkinteger(L, 7);
 	
@@ -69,8 +69,8 @@ ldraw(lua_State *L) {
 	float vertices[4][4];
 
 	texture = luaL_checkinteger(L, 1);
-	x = luaL_checknumber(L, 2);
-	y = luaL_checknumber(L, 3);
+	x = floor(luaL_checknumber(L,2));
+	y = floor(luaL_checknumber(L,3));
 	ax = luaL_checknumber(L, 4);
 	ay = luaL_checknumber(L, 5);
 	rotate = luaL_checknumber(L, 6) * M_PI/180.f;

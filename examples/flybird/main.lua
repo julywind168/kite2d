@@ -18,7 +18,7 @@ local Debug = require 'ecs.systems.Debug'
 
 local create = require 'ecs.functions'
 
-local entities = require 'editor.out.flybird_entities_v1'
+local entities = require 'editor.out.flybird_v1'
 
 local function in_e(x, y, e)
 	local w = e.w * e.sx

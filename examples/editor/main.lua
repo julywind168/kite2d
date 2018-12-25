@@ -1,5 +1,6 @@
 ----------------------------------------------------------------------------------------
 --
+-- 编辑前可以在 config.lua 中 指定要编辑的 scene (entities) 和 版本
 -- 简单编辑器, 尝试修改某个 UI 的位置( 拖拽, 或者选中后在属性面板中修改 ) ctrl+s 保存后, 重启看是否编辑成功
 --
 -- tip: 选中物体后, 可以按方向键(up, donw, left, right) 以1像素的步长 调节物体的位置
@@ -153,7 +154,7 @@ local mouse = world.mouse
 local keyboard = world.keyboard
 
 -- Game data
-local g = { outfile = 'examples/editor/out/'..TARGET..'.lua' }
+local g = { outfile = 'examples/editor/out/'..TARGET..'_v'..VERSION..'.lua' }
 
 
 local handle = { keydown = {} }

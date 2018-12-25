@@ -100,8 +100,8 @@ local function Render(world)
 
 		if e.type ~= 'nil' then
 			local f = assert(draw[e.type], e.type)
-			local x =  math.floor(root.x + e.x)
-			local y =  math.floor(root.y + e.y)
+			local x =  root.x + e.x
+			local y =  root.y + e.y
 			local sx =  root.sx * e.sx
 			local sy =  root.sy * e.sy
 			local rotate =  root.rotate + e.rotate
