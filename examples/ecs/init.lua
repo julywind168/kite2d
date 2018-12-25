@@ -19,9 +19,15 @@ function ecs.world(scene, handle)
 
 	local watchers = {}
 
-	local function on(event, ...)
+	local function on(event, key, ...)
 		local f = self.handle and self.handle[event]
-		if f then f(...) end
+		if f then
+			if type(f) == 'table' then
+				f = f[key] if f then f(...) end
+			else
+				f(key, ...)
+			end
+		end
 	end
 
 	-- 切换场景
