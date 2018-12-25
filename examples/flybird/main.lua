@@ -16,9 +16,8 @@ local Gravity = require 'ecs.systems.Gravity'
 local Animation = require 'ecs.systems.Animation'
 local Debug = require 'ecs.systems.Debug'
 
-local create = require 'ecs.functions'
+local canvas = require 'editor.out.flybird_v1'
 
-local entities = require 'editor.out.flybird_v1'
 
 local function in_e(x, y, e)
 	local w = e.w * e.sx
@@ -51,8 +50,8 @@ local function bird_carsh(bird, pipes)
 end
 
 
-local world = ecs.world(entities)
-local game_layer = entities.list[2]
+local world = ecs.world(canvas)
+local game_layer = canvas.list[2]
 local button = world.find_entity('play')
 local textfield = world.find_entity('textfield')
 local score = world.find_entity('score')
@@ -68,7 +67,7 @@ for i=21,40 do
 	table.insert(pipes, game_layer.list[i])
 end
 
-local g = Miss { nick = '请修改我', score = 'Score:0', state = 'ready', timec = 0, speed = 160 }
+local g = Miss { nick = '按up键', score = 'Score:0', state = 'ready', timec = 0, speed = 160 }
 		.miss('nick', textfield.label, 'text', bird_nick, 'text')
 		.miss('score', score, 'text')
 
