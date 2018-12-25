@@ -6,6 +6,7 @@ Kite is a simple 2d game engine for Lua
 1. install mingw64 and gcc, freetype <a href="https://github.com/HYbutterfly/Fantasy/wiki/%E7%8E%AF%E5%A2%83%E6%90%AD%E5%BB%BA">环境搭建</a>
 2. cd kite and make
 3. ./kite.exe examples/helloworld
+4. you can download demo(flybird, etc) form <a href="http://47.107.171.50/">kite home</a> 
 
 ## Framework
 ![Framework](https://github.com/HYbutterfly/kite/wiki/image/fmwk.png)
@@ -33,7 +34,7 @@ n. easy to create RPG and other type game
 
 ## Support
 ```
-qq: 707298413
+qq群: 727056009
 ```
 
 ## Also to see (my server framework for Lua)
