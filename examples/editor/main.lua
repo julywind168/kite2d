@@ -141,7 +141,7 @@ end
 ---------------------------------------------------------------------------------
 -- START
 ---------------------------------------------------------------------------------
-local load_ok, _target = pcall(require, 'out.' .. TARGET)
+local load_ok, _target = pcall(require, 'out.' .. TARGET .. '_v' .. VERSION)
 local target = load_ok and _target or util.create_target(TARGET)
 
 local canvas = util.create_editor_canvas(target)
