@@ -17,12 +17,14 @@ Done:
 * flybird demo
 * simple editor
 * auto-batch
+
 Doing:
 * 9-sprite
 * miss (like vue-bind)
 * a rpg demo
 * stronger editor
 * audio module (openal)
+
 Todo:
 * particle effects
 * socket module
