@@ -18,7 +18,7 @@ manager_use_sprite_program(uint32_t color, bool test) {
 		glUniform4f(manager->sprite.color, R(color), G(color), B(color), A(color));
 		manager->sprite.cur_color = color;
 	}
-	return 0;
+	return false;
 }
 
 
