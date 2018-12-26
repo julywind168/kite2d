@@ -36,10 +36,11 @@ more: <a href="https://github.com/HYbutterfly/kite/wiki/Build-Details">build det
 * Read the doucment: https://github.com/HYbutterfly/kite/wiki
 
 ## Examples
-<img src="https://github.com/HYbutterfly/kite/wiki/image/1.png" align="left" height="333" width="500">
-<img src="https://github.com/HYbutterfly/kite/wiki/image/2.png" align="left" height="333" width="500">
-<br>
+<img src="https://github.com/HYbutterfly/kite/wiki/image/1.png" float="left" height="280" width="420">
+<img src="https://github.com/HYbutterfly/kite/wiki/image/2.png" float="left" height="280" width="420" margin-left="20px">
+<div clear="both">
 you can download demo (flybird, etc) form <a href="http://47.107.171.50/">kite home</a> 
+</div>
 
 ## Donors
 ```
