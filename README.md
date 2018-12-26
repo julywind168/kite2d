@@ -37,7 +37,7 @@ more: <a href="https://github.com/HYbutterfly/kite/wiki/Build-Details">build det
 
 ## Examples
 <div float='left'><img src="https://github.com/HYbutterfly/kite/wiki/image/1.png" height="280" width="420"></div>
-<div float='left' margin-left="20px"><img src="https://github.com/HYbutterfly/kite/wiki/image/2.png" height="280" width="420"></div>
+<div float='left' margin-left="16"><img src="https://github.com/HYbutterfly/kite/wiki/image/2.png" height="280" width="420"></div>
 <div clear="both">
 you can download demo (flybird, etc) form <a href="http://47.107.171.50/">kite home</a> 
 </div>
