@@ -41,8 +41,9 @@ more: <a href="https://github.com/HYbutterfly/kite/wiki/Build-Details">build det
 
 ## Donors
 ```
-1. first donor (no ID)  2018/11/13
+1. *亮                  2018/11/13
 2. Cabrite              2018/11/13
+3. *笑                  2018/12/24
 ```
 
 ## Support
