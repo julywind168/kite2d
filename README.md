@@ -47,8 +47,7 @@ more: <a href="https://github.com/HYbutterfly/kite/wiki/Build-Details">build det
 
 ## Support
 ```
-qq群: 727056009 (入群是免费的)
-如果有人愿意看到一个 kite 是怎么从零写出来的 (视频教程), 可以捐赠 1288 元 (wiki首页的二维码, 付款备注ID) 并加群 
+qq群: 727056009
 ```
 
 ## Also to see (my server framework for Lua)
