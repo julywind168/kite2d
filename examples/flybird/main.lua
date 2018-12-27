@@ -7,7 +7,7 @@
 package.path = 'examples/?.lua;examples/?/init.lua;' .. package.path
 
 local kite = require 'kite'
-local Miss = require 'kite.Miss'
+local miss = require 'kite.miss'
 local ecs = require 'ecs'
 local Render = require 'ecs.systems.Render'
 local Input = require 'ecs.systems.Input'
@@ -67,9 +67,9 @@ for i=21,40 do
 	table.insert(pipes, game_layer.list[i])
 end
 
-local g = Miss { nick = '按up键', score = 'Score:0', state = 'ready', timec = 0, speed = 160 }
-		.miss('nick', textfield.label, 'text', bird_nick, 'text')
-		.miss('score', score, 'text')
+local g = miss.create { nick = '按up键', score = 'Score:0', state = 'ready', timec = 0, speed = 160 }
+		.bind('nick', textfield.label, 'text', bird_nick, 'text')
+		.bind('score', score, 'text')
 
 
 local handle = { keydown = {}, click = {} }
@@ -117,8 +117,6 @@ function handle.update(dt)
 			button.active = true
 		end
 	end
-	-- update miss
-	g()
 end
 
 world = world

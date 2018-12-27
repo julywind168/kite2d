@@ -29,7 +29,7 @@ function login_handle.keydown(key)
 end
 
 timer.create(1, function (count)
-	print('timeout', count)
+	print('timeout', count, os.clock())
 end, -1)
 
 

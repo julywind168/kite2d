@@ -1,5 +1,6 @@
 local core = require "kite.core"
 local timer = require "kite.timer"
+local miss = require "kite.miss"
 
 local mouse_name = {
 	'left',
@@ -74,6 +75,7 @@ function kite.start(callback)
 	cb.update = function (dt)
 		callback.update(dt)
 		timer._update(dt)
+		miss._update(dt)
 	end
 
 	cb.mouse = function(what, x, y, who)

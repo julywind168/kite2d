@@ -1,44 +1,45 @@
-local function Miss(self)
+local M = {}
 
-	local miss = {}
+local miss = {}
 
-	function self.miss(key, ...)
+function M.create(self)
+	local binding = {}
+
+	function self.bind(key, ...)
 		local ui = {...}
-
 		for i=1,#ui,2 do
-			local e = ui[i]
-			local ekey = ui[i+1]
-			e[ekey] = self[key]
+			local t = ui[i]
+			local k = ui[i+1]
+			t[k] = self[key]
 		end
-
-		table.insert(miss, { value = self[key], key = key, ui = ui })
+		table.insert(binding, { value = self[key], key = key, ui = ui })
 		return self
-	end	
+	end
 
-	local function update()
-		for _,m in ipairs(miss) do
+	function self._update()
+		for _,b in ipairs(binding) do
 
-			local v = self[m.key]
-			if v ~= m.value then
-				for i=1,#m.ui,2 do
-					local e = m.ui[i]
-					local ekey = m.ui[i+1]
-					e[ekey] = self[m.key]
+			local v = self[b.key]
+			if v ~= b.value then
+				for i=1,#b.ui,2 do
+					local t = b.ui[i]
+					local k = b.ui[i+1]
+					t[k] = self[b.key]
 				end
-				m.value = v
+				b.value = v
 			else
-				for i=1,#m.ui,2 do
-					local e = m.ui[i]
-					local ekey = m.ui[i+1]
-					local v = e[ekey]
-					if v ~= m.value then
-						for i=1,#m.ui,2 do
-							local e = m.ui[i]
-							local ekey = m.ui[i+1]
+				for i=1,#b.ui,2 do
+					local t = b.ui[i]
+					local k = b.ui[i+1]
+					local v = t[k]
+					if v ~= b.value then
+						for i=1,#b.ui,2 do
+							local t = b.ui[i]
+							local k = b.ui[i+1]
 
-							e[ekey] = v
+							t[k] = v
 						end
-						self[m.key] = v
+						self[b.key] = v
 						return
 					end
 				end
@@ -46,8 +47,23 @@ local function Miss(self)
 		end
 	end
 
-	return setmetatable(self, {__call = update})
+	miss[self] = true
+
+	return self
 end
 
 
-return Miss
+function M.destroy(self)
+	miss[self] = nil
+end
+
+
+function M._update()
+	for m,_ in pairs(miss) do
+		m._update()
+	end
+end
+
+
+
+return M
