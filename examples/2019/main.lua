@@ -5,6 +5,7 @@
 ----------------------------------------------------------------------------------------
 local kite = require 'kite'
 local util = require 'util'
+local timer = require 'kite.timer'
 
 local login_scene = require 'scene.login'
 local game_scene = require 'scene.game'
@@ -26,6 +27,10 @@ function login_handle.keydown(key)
 		-- world.switch(game_scene, handle, util.switch.slide('left', 1))
 	end
 end
+
+timer.create(1, function (count)
+	print('timeout', count)
+end, -1)
 
 
 world.set_scene(login_scene)

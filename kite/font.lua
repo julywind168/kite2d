@@ -1,4 +1,5 @@
 local core = require "font.core"
+local floor = math.floor
 
 
 local function is_exist(filename)
@@ -12,7 +13,7 @@ end
 
 local default = is_exist('C:/Windows/Fonts/msyh.ttc') or
 				is_exist('C:/Windows/Fonts/msyh.ttf') or
-				error('can\'t find font, please run kite in win10/win7')
+				error('can\'t find font, please run kite on win10/win7')
 
 
 
@@ -23,6 +24,7 @@ local fonts = {}
 
 function M.create(name, sz)
 
+	sz = floor(sz)
 	name = name or default
 
 	local cache = fonts[name] and fonts[name][sz]

@@ -6,35 +6,31 @@ extern Game *G;
 static Manager *manager;
 
 
-bool
-manager_use_sprite_program(uint32_t color, bool test) {
+void
+manager_use_sprite_program(uint32_t color) {
 	if (manager->current != PROGRAM_SPRITE) {
-		if (test) return true;
 		glUseProgram(manager->sprite.id);
 		manager->current = PROGRAM_SPRITE;
 	}
 	if (color != manager->sprite.cur_color) {
-		if (test) return true;
 		glUniform4f(manager->sprite.color, R(color), G(color), B(color), A(color));
 		manager->sprite.cur_color = color;
 	}
-	return false;
 }
 
 
-bool
-manager_use_text_program(uint32_t color, bool test) {
+void
+manager_use_text_program(uint32_t color) {
 	if (manager->current != PROGRAM_TEXT) {
-		if (test) return true;
 		glUseProgram(manager->text.id);
 		manager->current = PROGRAM_TEXT;
-	}
-	if (color != manager->text.cur_color) {
-		if (test) return true;		
 		glUniform4f(manager->text.color, R(color), G(color), B(color), A(color));
 		manager->text.cur_color = color;
 	}
-	return false;
+	if (color != manager->text.cur_color) {
+		glUniform4f(manager->text.color, R(color), G(color), B(color), A(color));
+		manager->text.cur_color = color;
+	}
 }
 
 

@@ -9,7 +9,6 @@ local Debug = require 'ecs.systems.Debug'
 local create = require 'ecs.functions'
 
 
-
 local M = {switch = {}}
 
 

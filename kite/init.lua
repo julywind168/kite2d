@@ -1,4 +1,5 @@
 local core = require "kite.core"
+local timer = require "kite.timer"
 
 local mouse_name = {
 	'left',
@@ -58,15 +59,22 @@ local key_event = {
 ------------------------------------------------------------------
 local kite = {}
 
+local timers = {}
+
 function kite.start(callback)
 
 	local cb = {}
 	cb.draw = assert(callback.draw)
-	cb.update = assert(callback.update)
 	
+	assert(callback.update)
 	assert(callback.mouse)
 	assert(callback.keyboard)
 	assert(callback.message)
+
+	cb.update = function (dt)
+		callback.update(dt)
+		timer._update(dt)
+	end
 
 	cb.mouse = function(what, x, y, who)
 		return callback.mouse(mouse_event[what], x, y, who and mouse_name[who])

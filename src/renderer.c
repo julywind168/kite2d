@@ -7,60 +7,58 @@ extern Game *G;
 static Renderer *renderer;
 
 
-void flush() {
-	glBufferSubData(GL_ARRAY_BUFFER, 0, ITEM_SIZE*renderer->spritec, renderer->vertices);
-	glDrawElements(GL_TRIANGLES, 6 * renderer->spritec, GL_UNSIGNED_INT, 0);
-	renderer->spritec = 0;
+void
+renderer_bind_texture(GLuint texture) {
+	if (texture != renderer->cur_texture) {
+		glBindTexture(GL_TEXTURE_2D, texture);
+		renderer->cur_texture = texture;
+	}
+}
+
+
+void
+renderer_flush() {
+	switch (renderer->batch.program) {
+		case PROGRAM_SPRITE: {
+			renderer->manager->use_sprite_program(renderer->batch.color);
+			break;
+		}
+		case PROGRAM_TEXT: {
+			renderer->manager->use_text_program(renderer->batch.color);
+			break;
+		}
+	}
+	if (renderer->batch.texture)
+	renderer_bind_texture(renderer->batch.texture);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, ITEM_SIZE*renderer->batch.count, renderer->batch.vertices);
+	glDrawElements(GL_TRIANGLES, 6 * renderer->batch.count, GL_UNSIGNED_INT, 0);
+	renderer->batch.count = 0;
 	renderer->drawc += 1;
 }
 
 
 void
-renderer_draw(float *vertices, GLuint texture, uint32_t color) {
-	if (renderer->spritec == 0) {
-		renderer->manager->use_sprite_program(color, false);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		renderer->cur_texture = texture;
-		memcpy(renderer->vertices, vertices, ITEM_SIZE);
-		renderer->spritec = 1;
-	} else {
-		if(renderer->manager->use_sprite_program(color, true) || (texture != renderer->cur_texture) || (renderer->spritec == MAX_BATCH_SLOT)) {
-			flush();
-			renderer->manager->use_sprite_program(color, false);
-			glBindTexture(GL_TEXTURE_2D, texture);
-			renderer->cur_texture = texture;
-		}
-		memcpy(renderer->vertices + ITEM_SIZE/sizeof(float) * renderer->spritec, vertices, ITEM_SIZE);
-		renderer->spritec += 1;
+renderer_draw(float *vertices, GLuint texture, uint32_t color, int program) {
+	if (renderer->batch.count == 0) {
+		renderer->batch.program = program;
+		renderer->batch.texture = texture;
+		renderer->batch.color = color;
+	} else if ((program != renderer->batch.program) || (color != renderer->batch.color) ||
+			   (texture != renderer->batch.texture) || (renderer->batch.count == MAX_BATCH_SLOT)) {
+		renderer_flush();
+		renderer->batch.program = program;
+		renderer->batch.texture = texture;
+		renderer->batch.color = color;
 	}
-}
-
-
-void
-renderer_print(float *vertices, GLuint texture, uint32_t color) {
-	if (renderer->spritec == 0) {
-		renderer->manager->use_text_program(color, false);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		renderer->cur_texture = texture;
-		memcpy(renderer->vertices, vertices, ITEM_SIZE);
-		renderer->spritec = 1;
-	} else {
-		if(renderer->manager->use_text_program(color, true) || (texture != renderer->cur_texture) || (renderer->spritec == MAX_BATCH_SLOT)) {
-			flush();
-			renderer->manager->use_text_program(color, false);
-			glBindTexture(GL_TEXTURE_2D, texture);
-			renderer->cur_texture = texture;
-		}
-		memcpy(renderer->vertices + ITEM_SIZE/sizeof(float) * renderer->spritec, vertices, ITEM_SIZE);
-		renderer->spritec += 1;
-	}
+	memcpy(renderer->batch.vertices + ITEM_SIZE/sizeof(float) * renderer->batch.count, vertices, ITEM_SIZE);
+	renderer->batch.count += 1;
 }
 
 
 void
 renderer_commit() {
-	if (renderer->spritec > 0)
-		flush();
+	if (renderer->batch.count > 0)
+		renderer_flush();
 	G->drawcall = renderer->drawc;
 	renderer->drawc = 0;
 }
@@ -126,7 +124,6 @@ renderer_init() {
 	renderer->vao = vao;
 	renderer->vbo = vbo;
 	renderer->ebo = ebo;
-	renderer->cur_texture = 0;
 	return 0;
 }
 
@@ -151,7 +148,7 @@ create_renderer() {
 		return NULL;
 	}
 
-	renderer->spritec = 0;
+	renderer->cur_texture = 0;
 	renderer->drawc = 0;
 	renderer->manager = create_manager();
 
@@ -163,9 +160,9 @@ create_renderer() {
 		free(renderer);
 		return NULL;
 	}
-
+	renderer->bind_texture = renderer_bind_texture;
 	renderer->draw = renderer_draw;
-	renderer->print = renderer_print;
+	renderer->flush = renderer_flush;
 	renderer->commit = renderer_commit;
 	renderer->destroy = renderer_destroy;
 	return renderer;

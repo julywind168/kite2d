@@ -33,6 +33,8 @@ function M.draw(texname, x, y, ax, ay, rotate, color, w, h, texcoord)
 end
 
 
+local count = 0
+
 function M.print(text, size, x, y, color, ax, ay, rotate, fontname, only_width)
 	ax = ax or 0.5
 	ay = ay or 0.5

@@ -8,6 +8,18 @@
 #define MAX_BATCH_SLOT 1024
 
 
+
+typedef struct
+{
+	int program;
+	uint32_t color;
+	GLuint texture;
+
+	uint32_t count;
+	float vertices[];	
+} Batch;
+
+
 typedef struct
 {
 	Manager *manager;
@@ -16,17 +28,17 @@ typedef struct
 	GLuint vao;
 	GLuint vbo;
 	GLuint ebo;
-	GLuint cur_texture;
-
+	
 	uint32_t drawc;
 
-	void(*draw)(float *, GLuint, uint32_t);
-	void(*print)(float *, GLuint, uint32_t);
+	GLuint cur_texture;
+	void(*bind_texture)(GLuint);
+	void(*draw)(float *, GLuint, uint32_t, int);
+	void(*flush)(void);
 	void(*commit)(void);
 	void(*destroy)(void);
 
-	uint32_t spritec;
-	float vertices[];
+	Batch batch;
 } Renderer;
 
 

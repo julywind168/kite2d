@@ -3,6 +3,7 @@
 #include "lgraphics.h"
 #include "lfont.h"
 #include "game.h"
+#include "manager.h"
 
 extern Game * G;
 
@@ -51,7 +52,7 @@ lprint(lua_State *L) {
 		ROTATE(x0, y0, angle, posx+w, posy, &vertices[2][0], &vertices[2][1]);
 		ROTATE(x0, y0, angle, posx+w, posy+h, &vertices[3][0], &vertices[3][1]);
 
-		G->renderer->print(&vertices[0][0], ch->texture, color);
+		G->renderer->draw(&vertices[0][0], ch->texture, color, PROGRAM_TEXT);
 		
 		lua_pop(L, 1);
 		x = x + (ch->advancex >> 6);
@@ -96,7 +97,7 @@ ldraw(lua_State *L) {
 	ROTATE(x, y, rotate, posx+w, posy,   &vertices[2][0], &vertices[2][1]);
 	ROTATE(x, y, rotate, posx+w, posy+h, &vertices[3][0], &vertices[3][1]);
 
-	G->renderer->draw(&vertices[0][0], texture, color);
+	G->renderer->draw(&vertices[0][0], texture, color, PROGRAM_SPRITE);
     return 0;
 }
 
@@ -121,13 +122,12 @@ ltexture(lua_State *L) {
 	data = stbi_load(filename, &width, &height, &channel, STBI_rgb_alpha);
 
 	glGenTextures(1, &texture);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	G->renderer->bind_texture(texture);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 	
-	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(data);
 
 	lua_pushinteger(L, texture);
@@ -139,6 +139,7 @@ ltexture(lua_State *L) {
 // 开始模板绘制 -> draw stencils(sprites) -> 结束模板绘制 -> draw sprites -> 清空模板
 static int
 lstart_stencil(lua_State *L) {
+	G->renderer->flush();
 	glEnable(GL_STENCIL_TEST);
 	glStencilFunc(GL_ALWAYS, 1, 0XFF);
 	glStencilMask(0XFF);
@@ -148,6 +149,7 @@ lstart_stencil(lua_State *L) {
 
 static int
 lstop_stencil(lua_State *L) {
+	G->renderer->flush();
 	glStencilFunc(GL_EQUAL, 1, 0xFF);
 	glStencilMask(0x00);
 	return 0;
@@ -156,6 +158,7 @@ lstop_stencil(lua_State *L) {
 
 static int
 lclear_stencil(lua_State *L) {
+	G->renderer->flush();
 	glClear(GL_STENCIL_BUFFER_BIT);
 	glDisable(GL_STENCIL_TEST);
 	return 0;
