@@ -197,7 +197,7 @@ function handle.keydown.h()
 end
 
 function handle.keydown.i()
-	inspector.active = not hierarchy.active
+	inspector.active = not inspector.active
 end
 
 
