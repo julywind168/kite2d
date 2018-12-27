@@ -28,7 +28,6 @@ renderer_flush() {
 			break;
 		}
 	}
-	if (renderer->batch.texture)
 	renderer_bind_texture(renderer->batch.texture);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, ITEM_SIZE*renderer->batch.count, renderer->batch.vertices);
 	glDrawElements(GL_TRIANGLES, 6 * renderer->batch.count, GL_UNSIGNED_INT, 0);
