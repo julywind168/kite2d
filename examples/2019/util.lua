@@ -21,7 +21,7 @@ function M.switch.fade(time, callback)
 	return function (world, old, new, new_handle)
 
 		world.handle = nil
-		old.list[#old.list] = mask
+		old.list[#old.list+1] = mask
 
 		world.watch(function (dt)
 			if math.ceil(color) >= 0xff then
@@ -33,7 +33,7 @@ function M.switch.fade(time, callback)
 			color = 0xff
 			mask.color = color
 			old.list[#old.list] = nil
-			new.list[#new.list] = mask
+			new.list[#new.list+1] = mask
 			world.set_scene(new)
 		end)
 		.join(function (dt)
@@ -90,6 +90,18 @@ function M.switch.slide(direct, time, callback)
 			world.set_handle(new_handle)
 			if callback then callback() end
 		end)
+	end
+end
+
+function M.find_e(e, name)
+	if e.name == name then
+		return e 
+	end
+	if e.list then
+		for _,_e in ipairs(e.list) do
+			local e = M.find_e(_e, name)
+			if e then return e end
+		end
 	end
 end
 

@@ -45,13 +45,25 @@ local function Render(world)
 	local draw = {}
 
 	function draw.flipbook(x, y, sx, sy, rotate, e)
+
 		local frame = e.frames[e.current]
-		local x = x + frame.x
-		local y = y + frame.y
-		local w = frame.w * frame.sx * sx
-		local h = frame.h * frame.sy * sy
-		local rotate = frame.rotate + rotate
-		gfx.draw(frame.texname, x, y, e.ax, e.ay, rotate, e.color, w, h, frame.texcoord)
+		if #frame > 0 then
+			for _,fm in ipairs(frame) do
+				local x = x + fm.x
+				local y = y + fm.y
+				local w = fm.w * fm.sx * sx
+				local h = fm.h * fm.sy * sy
+				local rotate = fm.rotate + rotate
+				gfx.draw(fm.texname, x, y, e.ax, e.ay, rotate, e.color, w, h, fm.texcoord)
+			end
+		else
+			local x = x + frame.x
+			local y = y + frame.y
+			local w = frame.w * frame.sx * sx
+			local h = frame.h * frame.sy * sy
+			local rotate = frame.rotate + rotate
+			gfx.draw(frame.texname, x, y, e.ax, e.ay, rotate, e.color, w, h, frame.texcoord)
+		end
 	end
 
 	function draw.textfield(x, y, sx, sy, rotate, e)
@@ -85,7 +97,6 @@ local function Render(world)
 			gfx.print(e.text, e.fontsize * sx, x, y-e.bordersize, e.bordercolor, e.ax, e.ay, rotate, e.fontname)
 			gfx.print(e.text, e.fontsize * sx, x, y+e.bordersize, e.bordercolor, e.ax, e.ay, rotate, e.fontname)
 		end
-
 		e.w = gfx.print(e.text, e.fontsize * sx, x, y, e.color, e.ax, e.ay, rotate, e.fontname)
 	end
 
@@ -96,6 +107,7 @@ local function Render(world)
 	draw.button = draw.sprite
 
 	local function draw_entity(root, e)
+
 		if not e.has['node'] or not e.active then return end
 
 		if e.type ~= 'nil' then
@@ -116,8 +128,9 @@ local function Render(world)
 				sy = root.sy * e.sy,
 				rotate = root.rotate + e.rotate,
 			}
-			for _,e in ipairs(e.list) do
-				draw_entity(root, e)
+
+			for _,_e in ipairs(e.list) do
+				draw_entity(root, _e)
 			end
 		end
 

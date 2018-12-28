@@ -6,10 +6,16 @@
 local kite = require 'kite'
 local util = require 'util'
 local timer = require 'kite.timer'
+local miss = require 'kite.miss'
 
 local login_scene = require 'scene.login'
 local game_scene = require 'scene.game'
 local world = util.create_world()
+
+
+
+local g = miss.create { nick = 'NICK' }
+	.bind('nick', util.find_e(login_scene, 'nick_textfield').label, 'text', util.find_e(game_scene, 'player_nick'), 'text')
 
 -- game handle
 local handle = {}
@@ -23,14 +29,12 @@ local login_handle = {}
 
 function login_handle.keydown(key)
 	if key == 'enter' then
-		world.switch(game_scene, handle, util.switch.fade(1))
+		world.switch(game_scene, handle, util.switch.fade(1, function ()
+		end))
 		-- world.switch(game_scene, handle, util.switch.slide('left', 1))
 	end
 end
 
-timer.create(1, function (count)
-	print('timeout', count, os.clock())
-end, -1)
 
 
 world.set_scene(login_scene)

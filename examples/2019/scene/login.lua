@@ -5,7 +5,7 @@ local self = create.canvas{name = 'Canvas'}
 self.list = {
 	create.sprite{x = 480, y = 320, w = 960, h = 640, texname = 'examples/assert/bg.jpg', color = 0xeeeeeeff },
 	create.textfield{ 
-		name = 'nick',
+		name = 'nick_textfield',
 		x = 480,
 		y = 160,
 		w = 200,
