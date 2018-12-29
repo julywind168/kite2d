@@ -5,10 +5,9 @@ require 'ecs.components'
 
 local M = {}
 
-
-function M.flipbook(t)
-	local frames = t.frames
-	for _,frame in ipairs(frames) do
+-- 一个frame 可能是单张 也可能有多张图片
+local function init_frame(frame)
+	if #frame == 0 then
 		frame.texcoord = frame.texcoord or {0,1, 0,0, 1,0, 1,1}
 		local tex = gfx.texture(frame.texname)
 		frame.w = frame.w or tex.w
@@ -18,6 +17,36 @@ function M.flipbook(t)
 		frame.sx = frame.sx or 1
 		frame.sy = frame.sy or 1
 		frame.rotate = frame.rotate or 0
+	else
+		for _,img in ipairs(frame) do
+			img.texcoord = img.texcoord or {0,1, 0,0, 1,0, 1,1}
+			local tex = gfx.texture(img.texname)
+			img.w = img.w or tex.w
+			img.h = img.h or tex.h
+			img.x = img.x or 0
+			img.y = img.y or 0
+			img.sx = img.sx or 1
+			img.sy = img.sy or 1
+			img.rotate = img.rotate or 0
+		end
+	end
+end
+
+
+function M.avatar(t)
+	local actions = t.actions
+	for _,action in pairs(actions) do
+		for _,frame in ipairs(action.frames) do
+			init_frame(frame)
+		end
+	end
+	return ecs.entity(t.name) + Avatar(t)
+end
+
+
+function M.flipbook(t)
+	for _,frame in ipairs(t.frames) do
+		init_frame(frame)
 	end
 	return ecs.entity(t.name) + Flipbook(t)
 end

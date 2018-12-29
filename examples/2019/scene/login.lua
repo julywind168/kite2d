@@ -14,7 +14,7 @@ self.list = {
 		label = {color = 0xffffaaff, fontsize = 24, text = 'NICK'}
 	},
 
-	create.label{x = 480, y = 100, text = '按 enter 键开始游戏...', fontsize = 24}
+	create.label{x = 480, y = 100, text = '按 enter 键开始游戏...', fontsize = 24, bordersize = 1}
 }
 
 

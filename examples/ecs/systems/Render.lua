@@ -44,6 +44,28 @@ local function Render(world)
 
 	local draw = {}
 
+	function draw.avatar(x, y, sx, sy, rotate, e)
+		local flipbook = e.actions[e.cur_action]
+		local frame = flipbook.frames[flipbook.current]
+		if #frame > 0 then
+			for _,fm in ipairs(frame) do
+				local x = x + fm.x
+				local y = y + fm.y
+				local w = fm.w * fm.sx * sx
+				local h = fm.h * fm.sy * sy
+				local rotate = fm.rotate + rotate
+				gfx.draw(fm.texname, x, y, e.ax, e.ay, rotate, e.color, w, h, fm.texcoord)
+			end
+		else
+			local x = x + frame.x
+			local y = y + frame.y
+			local w = frame.w * frame.sx * sx
+			local h = frame.h * frame.sy * sy
+			local rotate = frame.rotate + rotate
+			gfx.draw(frame.texname, x, y, e.ax, e.ay, rotate, e.color, w, h, frame.texcoord)
+		end
+	end
+
 	function draw.flipbook(x, y, sx, sy, rotate, e)
 
 		local frame = e.frames[e.current]

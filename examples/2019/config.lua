@@ -4,7 +4,7 @@ application =
 {
 	window = 
 	{
-		title = '2019',
+		title = '2019 (方向键移动, a键 攻击)',
 		width = 960,
 		height = 640,
 		fullscreen = false

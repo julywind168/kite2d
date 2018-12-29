@@ -93,6 +93,53 @@ function M.switch.slide(direct, time, callback)
 	end
 end
 
+
+function M.create_camera(game_layer, hero, map, window, box)
+
+	local cam_x = -game_layer.x
+	local cam_y = -game_layer.y
+	local x0 = hero.x
+	local y0 = hero.y
+
+	local function update_camera_x()
+		local ox = hero.x - x0
+		if ox < 0 then
+			if cam_x + ox < map[1] then return end
+			if cam_x + window.width/2 - hero.x <= box.w/2 then return end
+		else
+			if cam_x + ox + window.width > map[3] then return end
+			if hero.x - (cam_x + window.width/2)  <= box.w/2 then return end
+		end
+		cam_x = cam_x + ox
+		game_layer.x = -cam_x
+	end
+
+	local function update_camera_y()
+		local oy = hero.y - y0
+		if oy < 0 then
+			if cam_y + oy < map[2] then return end
+			if cam_y + window.height/2 - hero.y <= box.h/2 then return end
+		else
+			if cam_y + oy + window.height > map[4] then return end
+			if hero.y - (cam_y + window.height/2) <= box.h/2 then return end
+		end
+		cam_y = cam_y + oy
+		game_layer.y = -cam_y
+	end
+
+	return function ()
+		if hero.x ~= x0 then
+			update_camera_x()
+		end
+		if hero.y ~= y0 then
+			update_camera_y()
+		end
+		x0 = hero.x
+		y0 = hero.y
+	end
+end
+
+
 function M.find_e(e, name)
 	if e.name == name then
 		return e 
@@ -109,6 +156,7 @@ end
 function M.create_world(...)
 	return ecs.world(...)
 		.add_system(Input())
+		.add_system(Animation())
 		.add_system(Moving())
 		.add_system(Render())
 		.add_system(Debug())

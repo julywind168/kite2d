@@ -16,9 +16,7 @@ local description = {
 	simple_button = {'scale', 'touchable', 'uitype'},
 	simple_textfield = {'background', 'mask', 'label', 'cursor', 'selected', 'touchable', 'selectable', 'uitype'},
 	simple_flipbook = {'frames', 'current', 'isloop', 'pause', 'stop', 'playspeed', 'timec'},
-	-- system
-	mouse = {'pressed', 'x', 'y'},
-	keyboard = {'pressed', 'lpressed'},
+	simple_avatar = {'actions', 'cur_action'},
 }
 
 -- 
@@ -34,6 +32,7 @@ local dependence = {
 	BUTTON = {'SPRITE', 'simple_button'},
 	TEXTFIELD = {'node', 'TRANSFORM', 'rectangle', 'smaple_textfield'},
 	FLIPBOOK = {'node', 'TRANSFORM', 'rectangle', 'simple_flipbook'},
+	AVATAR = {'node', 'TRANSFORM', 'rectangle', 'simple_avatar'},
 }
 
 
@@ -41,18 +40,38 @@ local dependence = {
 -----------------------------------------------------------------------------------------
 -- system component
 -----------------------------------------------------------------------------------------
-function Keyboard() return function()
+function Keyboard() return function ()
 	return 'keyboard', {pressed = {}, lpressed = {}}
 end end
 
 
-function Mouse() return function()
+function Mouse() return function ()
 	return 'mouse', {pressed = {}, x = 0, y = 0}
 end end
 
 -----------------------------------------------------------------------------------------
 -- component family
 -----------------------------------------------------------------------------------------
+function Avatar(t) return function ()
+	return {'AVATAR', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangle', 'simple_avatar'}, {
+		active = t.active ~= false and true or false,
+		type = 'avatar',
+		x = t.x or 0,
+		y = t.y or 0,
+		sx = t.sx or 1,
+		sy = t.sy or 1,
+		rotate = t.rotate or 0,
+		w = t.w or 0,
+		h = t.h or 0,
+		ax = t.ax or 0.5,
+		ay = t.ay or 0.5,
+
+		actions = assert(t.actions),
+		cur_action = assert(t.cur_action),
+	}
+end end
+
+
 function Flipbook(t) return function ()
 	return {'FLIPBOOK', 'TRANSFORM', 'node', 'position', 'scale', 'rotate', 'rectangle', 'simple_flipbook'}, {
 		active = t.active ~= false and true or false,
