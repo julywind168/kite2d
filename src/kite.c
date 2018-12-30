@@ -3,6 +3,7 @@
 #include "lkite.h"
 #include "lgraphics.h"
 #include "lfont.h"
+#include "laudio.h"
 
 #define KITE_UPDATE 1
 #define KITE_DRAW 2
@@ -233,7 +234,8 @@ kite_init(const char *gamedir) {
 	luaL_requiref(L, "kite.core", lib_kite, 0);
 	luaL_requiref(L, "graphics.core", lib_graphics, 0);
 	luaL_requiref(L, "font.core", lib_font, 0);
-	lua_pop(L, 3);
+	luaL_requiref(L, "audio.core", lib_audio, 0);
+	lua_pop(L, 4);
 	if (load_conf(L, gamedir) || load_main(L, gamedir)) {
 		return 1;
 	}

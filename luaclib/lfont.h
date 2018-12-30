@@ -3,8 +3,6 @@
 
 #include "common.h"
 
-#define FT_FACE_SIZE 24
-#define FT_FACE_FSIZE 24.f
 
 
 typedef struct

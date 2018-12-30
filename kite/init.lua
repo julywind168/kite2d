@@ -1,6 +1,7 @@
 local core = require "kite.core"
 local timer = require "kite.timer"
 local miss = require "kite.miss"
+local audio = require "kite.audio"
 
 local mouse_name = {
 	'left',
@@ -71,6 +72,7 @@ function kite.start(callback)
 	assert(callback.mouse)
 	assert(callback.keyboard)
 	assert(callback.message)
+	assert(callback.exit)
 
 	cb.update = function (dt)
 		callback.update(dt)
@@ -96,7 +98,10 @@ function kite.start(callback)
 
 	cb.pause = assert(callback.pause)
 	cb.resume = assert(callback.resume)
-	cb.exit = assert(callback.exit)
+	cb.exit = function ()
+		audio._exit()
+		callback.exit()
+	end
 
 	core.inject(cb)
 end

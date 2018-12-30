@@ -1,5 +1,5 @@
-CFLAGS = -g -O0 -Wall -Isrc -Isrc/renderer -Iluaclib -I3rd/include -I3rd/lua
-LINK = -L3rd/lib -lglfw3 -lgdi32 -lopengl32 -lfreetype
+CFLAGS = -g -O0 -Wall -Isrc -Isrc/renderer -Iluaclib -I3rd/include -I3rd/src -I3rd/lua
+LINK = -L3rd/lib -lglfw3 -lgdi32 -lopengl32 -lfreetype -lopenal
 
 SRC := \
 	src/main.c \
@@ -9,11 +9,13 @@ SRC := \
 	src/util.c \
 	src/renderer.c \
 	src/renderer/manager.c \
+	src/audio.c \
 
 LUACLIB := \
 	luaclib/lkite.c \
 	luaclib/lgraphics.c \
-	luaclib/lfont.c
+	luaclib/lfont.c \
+	luaclib/laudio.c \
 
 
 LUASRC := \
@@ -54,6 +56,7 @@ LUASRC := \
 
 THIRD_PARTY := \
 	3rd/src/glad.c \
+	3rd/src/stb_vorbis.c \
 
 
 .PHONY : kite

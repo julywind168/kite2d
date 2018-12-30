@@ -31,6 +31,7 @@ game_destroy() {
 	G->kite->destroy();
 	G->renderer->destroy();
 	G->window->destroy();
+	G->audio->destroy();
 	free(G);
 }
 
@@ -42,13 +43,16 @@ create_game(const char *gamedir) {
 	G->drawcall = 0;
 	G->time = 0.f;
 
-	G->kite = create_kite(gamedir); 	if (G->kite == NULL) {free(G); exit(EXIT_FAILURE);}
-	G->window = create_window();		if (G->window == NULL) {free(G); exit(EXIT_FAILURE);}
-	G->renderer = create_renderer();	if (G->renderer == NULL) {free(G); exit(EXIT_FAILURE);}
+	G->kite = create_kite(gamedir); 	if (G->kite == NULL)     {free(G); exit(EXIT_FAILURE);}
+	G->window = create_window();		if (G->window == NULL)   {G->kite->destroy(); free(G); exit(EXIT_FAILURE);}
+	G->renderer = create_renderer();	if (G->renderer == NULL) {G->kite->destroy(); G->window->destroy(); free(G); exit(EXIT_FAILURE);}
+	G->audio = create_audio();			if (G->audio == NULL)    {G->kite->destroy(); G->window->destroy(); G->renderer->destroy(); free(G); exit(EXIT_FAILURE);}
 
 	if (G->kite->load()) {
 		G->kite->destroy();
 		G->window->destroy();
+		G->renderer->destroy();
+		G->audio->destroy();
 		free(G);
 		exit(EXIT_FAILURE);
 	}
