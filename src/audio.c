@@ -4,8 +4,6 @@
 static Audio *audio;
 
 
-
-
 void 
 audio_destroy() {
 	alcMakeContextCurrent(NULL);
@@ -13,6 +11,7 @@ audio_destroy() {
 	alcCloseDevice(audio->device);
 	free(audio);
 }
+
 
 Audio *
 create_audio() {

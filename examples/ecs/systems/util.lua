@@ -25,9 +25,7 @@ end
 
 
 function foreach(handle, e)
-	if not e.active then return end
 	handle(e)
-
 	if e.list then
 		for _,e in ipairs(e.list) do
 			foreach(handle, e)

@@ -50,6 +50,8 @@ local function Input(world)
 
 local self = {name='input'}
 
+
+local tmphover = nil
 local tmppressed = nil
 local tmpselected = nil
 local mouse = world.mouse
@@ -84,6 +86,58 @@ end
 
 
 ---------------------------------------------------------------------------
+-- scroll
+---------------------------------------------------------------------------
+local function get_hover()
+	local function f(root, e)
+		return e.has['scroll_view'] and IN(mouse.x, mouse.y, root, e)
+	end
+	local result = {}
+
+	world.eye_foreach(f, function (e)
+		table.insert(result, e)
+	end)
+	return table.remove(result, #result)
+end
+
+function self.scroll(ox, oy)
+	local hover = get_hover()
+	if not hover or #hover.list == 0 then return end
+
+	-- item 向上滚动
+	if oy > 0 then
+		local last = hover.list[#hover.list]
+		local y2 = last.y - last.ay * last.h
+		local bottom = 0 - hover.ay * hover.h
+		if y2 < bottom then
+			local step = math.floor(oy * last.h)
+			if step > bottom - y2 then
+				step = bottom - y2
+			end
+
+			for _,item in ipairs(hover.list) do
+				item.y = item.y + step
+			end
+		end
+	else
+		local head = hover.list[1]
+		local y4 = head.y + (1 - head.ay) * head.h
+		local top = 0 + (1 - hover.ay) * hover.h
+		if y4 > top then
+			local step = math.floor(oy * head.h)
+			if step < top - y4 then
+				step = top - y4
+			end
+
+			for _,item in ipairs(hover.list) do
+				item.y = item.y + step
+			end
+		end
+	end
+end
+
+
+---------------------------------------------------------------------------
 -- mouse move
 ---------------------------------------------------------------------------
 function self.mousemove(x, y)
@@ -101,7 +155,19 @@ end
 ---------------------------------------------------------------------------
 -- mouse touch
 ---------------------------------------------------------------------------
-local on = { button = {}, textfield = {} }
+local on = { button = {}, textfield = {}, switch = {} }
+
+
+-- switch
+function on.switch.click(e)
+	local current = e.current + 1
+	if current > #e.frames then
+		current = 1
+	end
+	e.current = current
+	world('click', e, current)
+end
+
 
 -- button
 function on.button.mousedown(e)

@@ -11,7 +11,7 @@ local miss = require 'kite.miss'
 
 local login_scene = require 'scene.login'
 local game_scene = require 'scene.game'
-local world = util.create_world()
+local world = util.create_world(login_scene)
 
 
 
@@ -24,7 +24,7 @@ local g = miss.create { nick = 'NICK', walk_speed = 180 }
 
 
 -------------------------------------------------------------------------------
--- Login Scene
+-- Game Scene
 -------------------------------------------------------------------------------
 local handle = { keydown = {}, keyup = {} }
 
@@ -92,12 +92,8 @@ function handle.keydown.a()
 	local direct = direction[hero.direction]
 	hero.cur_action = 'attack_'..direct
 	
-	audio.play_effect(hero, "examples/assert/music/attack.ogg")
+	audio.play_effect(hero, "examples/asset/music/attack.ogg")
 end
-
-
-
-
 
 
 local map = {0, 640-7*300, 300*13, 640}
@@ -117,11 +113,10 @@ local login_handle = {}
 function login_handle.keydown(key)
 	if key == 'enter' then
 		world.switch(game_scene, handle, util.switch.fade(1))
-		audio.play_music("examples/assert/music/chuanqi_bg.ogg")
+		audio.play_music("examples/asset/music/chuanqi_bg.ogg")
 	end
 end
 
-world.set_scene(login_scene)
 world.set_handle(login_handle)
 
 kite.start(world.cb)

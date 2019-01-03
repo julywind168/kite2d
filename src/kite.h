@@ -33,6 +33,7 @@ typedef struct
 	void (*mouse)(GLFWwindow*, int, int, int);
 	void (*keyboard)(GLFWwindow*, int, int, int, int);
 	void (*message)(GLFWwindow*, uint32_t);
+	void (*scroll)(GLFWwindow*, double, double);
 	void (*exit)(void);
 
 	void (*destroy)(void);

@@ -141,8 +141,10 @@ static int
 lstart_stencil(lua_State *L) {
 	G->renderer->flush();
 	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_ALWAYS, 1, 0XFF);
 	glStencilMask(0XFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilFunc(GL_ALWAYS, 1, 0XFF);
+	glClearStencil(0);
 	return 0;
 }
 
@@ -150,8 +152,8 @@ lstart_stencil(lua_State *L) {
 static int
 lstop_stencil(lua_State *L) {
 	G->renderer->flush();
-	glStencilFunc(GL_EQUAL, 1, 0xFF);
 	glStencilMask(0x00);
+	glStencilFunc(GL_EQUAL, 1, 0xFF);
 	return 0;
 }
 
@@ -175,7 +177,7 @@ lib_graphics(lua_State *L)
 		{"print", lprint},
 		{"draw", ldraw},
 		{"clear", lclear},
-        {"texture", ltexture},
+		{"texture", ltexture},
 		{NULL, NULL}
 	};
 	luaL_newlib(L, l);

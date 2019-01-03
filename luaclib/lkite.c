@@ -1,7 +1,7 @@
 #include "lkite.h"
 #include "game.h"
 
-#define VERSION "0.03"
+#define VERSION "0.04 (0.0 Anniversary Edition)"
 
 extern Game * G;
 
@@ -53,6 +53,9 @@ linject(lua_State *L) {
 	lua_pushstring(L, "resume");
 	lua_gettable(L, -2);
 	lua_setfield(L, LUA_REGISTRYINDEX, "KITE_RESUME");
+	lua_pushstring(L, "scroll");
+	lua_gettable(L, -2);
+	lua_setfield(L, LUA_REGISTRYINDEX, "KITE_SCROLL");
 	lua_pushstring(L, "exit");
 	lua_gettable(L, -2);
 	lua_setfield(L, LUA_REGISTRYINDEX, "KITE_EXIT");

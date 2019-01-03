@@ -68,6 +68,7 @@ window_init() {
 	glfwSetCursorPosCallback(handle, G->kite->_cursor_move);
 	glfwSetCursorEnterCallback(handle, G->kite->_cursor_enter);
 	glfwSetCharCallback(handle, G->kite->message);
+	glfwSetScrollCallback(handle, G->kite->scroll);
 
 	window->width = width;
 	window->height = height;

@@ -14,8 +14,9 @@ game_run() {
 		G->time = now;
 		G->kite->update(dt);
 
-		glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-		glDisable(GL_STENCIL_TEST);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// glDisable(GL_STENCIL_TEST);
+		
 		G->kite->draw();
 		G->renderer->commit();
 

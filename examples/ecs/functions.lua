@@ -68,9 +68,12 @@ function M.textfield(t)
 end
 
 
-function M.camera(t)
-	t = t or {}
-	return ecs.entity(t.name) + Camera(t)
+function M.switch(t)
+	for _,frame in ipairs(t.frames) do
+		init_frame(frame)
+	end
+	t.type = 'switch'
+	return ecs.entity(t.name) + Node(t) + Transform(t) + Rectangel(t) + SimpleSwitch(t)
 end
 
 
@@ -95,13 +98,26 @@ function M.sprite(t)
 	return ecs.entity(t.name) + Sprite(t)
 end
 
-function M.keyboard()
-	return ecs.entity('keyboard') + Keyboard()
+function M.container(t)
+	return ecs.entity(t.name) + Mask(t)
 end
 
-function M.mouse()
-	return ecs.entity('mouse') + Mouse()
+
+function M.group(t)
+	t = t or {}
+	return ecs.entity(t.name) + Node(t) + Transform(t) + Group(t)
 end
+
+function M.rectgroup(t)
+	t = t or {}
+	return ecs.entity(t.name) + Node(t) + Transform(t) + Group(t) + Rectangel(t)
+end
+
+function M.node(t)
+	t = t or {}
+	return ecs.entity(t.name) + Node(t) + Transform(t)
+end
+
 
 function M.canvas(t)
 	t = t or {}

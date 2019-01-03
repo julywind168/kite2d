@@ -98,6 +98,9 @@ function kite.start(callback)
 
 	cb.pause = assert(callback.pause)
 	cb.resume = assert(callback.resume)
+	cb.scroll = function (ox, oy)
+		callback.scroll(ox, -oy)
+	end
 	cb.exit = function ()
 		audio._exit()
 		callback.exit()

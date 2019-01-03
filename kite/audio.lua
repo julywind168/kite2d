@@ -51,8 +51,6 @@ function M._exit()
 	for _,buffer in pairs(buffers) do
 		core.delete_buffer(buffer)
 	end
-
-	print('clear ...')
 end
 
 

@@ -17,6 +17,7 @@ local description = {
 	simple_textfield = {'background', 'mask', 'label', 'cursor', 'selected', 'touchable', 'selectable', 'uitype'},
 	simple_flipbook = {'frames', 'current', 'isloop', 'pause', 'stop', 'playspeed', 'timec'},
 	simple_avatar = {'actions', 'cur_action'},
+	simple_switch = {'frames', 'current', 'uitype'},
 }
 
 -- 
@@ -34,20 +35,6 @@ local dependence = {
 	FLIPBOOK = {'node', 'TRANSFORM', 'rectangle', 'simple_flipbook'},
 	AVATAR = {'node', 'TRANSFORM', 'rectangle', 'simple_avatar'},
 }
-
-
-
------------------------------------------------------------------------------------------
--- system component
------------------------------------------------------------------------------------------
-function Keyboard() return function ()
-	return 'keyboard', {pressed = {}, lpressed = {}}
-end end
-
-
-function Mouse() return function ()
-	return 'mouse', {pressed = {}, x = 0, y = 0}
-end end
 
 -----------------------------------------------------------------------------------------
 -- component family
@@ -210,19 +197,6 @@ function Label(t) return function()
 end end
 
 
-function Camera(t) return function()
-	return {'CAMERA', 'node', 'TRANSFORM', 'position', 'scale', 'rotate'}, {
-		active = t.active ~= false and true or false,
-		type = 'camera',
-		x = t.x or 0,
-		y = t.y or 0,
-		sx = t.sx or 1,
-		sy = t.sy or 1,
-		rotate = t.rotate or 0,
-	}
-end end
-
-
 function Transform(t) return function()
 	return { 'TRANSFORM', 'position', 'scale', 'rotate' }, {
 		x = t.x or 0,
@@ -236,6 +210,24 @@ end end
 -----------------------------------------------------------------------------------------
 -- single component
 -----------------------------------------------------------------------------------------
+function Layout(t) return function ()
+	t = t or {}
+	return 'layout', {padding_top = t.padding_top or 0, padding_bottom = t.padding_bottom or 0, spacing_y = t.spacing_y or 0, fixed = t.fixed or false}
+end end
+
+
+function ScrollView(t) return function ()
+	t = t or {}
+	return 'scroll_view', {locked = t.locked or false}
+end end
+
+
+function SimpleSwitch(t) return function ()
+	t = t or {}
+	return 'simple_switch', {frames = t.frames or {}, current = t.current or 1, uitype = 'switch'}
+end end
+
+
 function SimpleDragg(t) return function ()
 	t = t or {}
 	return 'simple_dragg', {draggable = t.draggable ~= false and true or false, locked = t.locked or false}
@@ -284,6 +276,7 @@ end end
 
 
 function Rectangel(t) return function ()
+	t = t or {}
 	return 'rectangle', { w = t.w or 0, h = t.h or 0, ax = t.ax or 0.5, ay = t.ay or 0.5 }
 end end
 

@@ -14,6 +14,8 @@ package.path = 'examples/?.lua;examples/?/init.lua;examples/editor/?.lua;' .. pa
 local kite = require 'kite'
 local util = require 'util'
 local seri = require 'seri'
+local timer = require 'kite.timer'  
+local create = require 'ecs.functions'
 
 ---------------------------------------------------------------------------------
 -- UTIL
@@ -39,6 +41,73 @@ local function foreach(f, e)
 		end
 	end
 end
+
+local function hierarchy_manager(hierarchy, target, handle)
+
+	local function init_tag(e)
+		foreach(function (e)
+			e.tag = 'editor'
+			e.locked = true
+		end, e)
+	end
+
+	local function create_item(e)
+		local item = create.rectgroup{ h = 30, ax = 0, ay=1, x = 30,
+			list = {
+				create.label { text = e.name, fontsize = 16, ax=0, y=-12, x = 18, color = 0xccccccff}
+			}
+		}
+
+		if e.list and #e.list > 0 then
+			local switch = create.switch{ name = 'SWITCH', w = 24, h = 24, y=-12, frames = {
+					{texname = 'examples/editor/asset/right_triangle.png'},
+					{texname = 'examples/editor/asset/right_triangle.png', rotate = 270}
+				}}
+			local content = create.rectgroup{name=e.name,  x=0, y =-26, w=0, h=0, ay=1, ax=0, color = 0xffff0088}
+				+ ScrollView()
+				+ Layout{spacing_y = 2}
+
+
+			handle.click[switch] = function (current)
+				if current == 2 then
+					content.active = true
+					timer.create(1, function ()
+						item.h = 30 + content.h
+					end)
+				else
+					content.active = false
+					timer.create(1, function ()
+						item.h = 30
+					end)
+				end			
+			end
+
+			content.active = false
+			item.list[2] = switch
+			item.list[3] = content
+			for _,e in ipairs(e.list) do
+				local sub = create_item(e)
+				table.insert(content.list, sub)
+			end
+		end
+
+		return item
+	end
+
+
+	local content = hierarchy.list[3]
+
+	local item = create_item(target)
+	init_tag(item)
+
+	table.insert(content.list, item)
+
+
+	local self = {}
+
+	return self
+end
+
 
 local function inspector_manager(inspector, mouse, keyboard, handle)
 	local self = {}
@@ -141,7 +210,7 @@ end
 ---------------------------------------------------------------------------------
 -- START
 ---------------------------------------------------------------------------------
-local load_ok, _target = pcall(require, 'out.' .. TARGET .. '_v' .. VERSION)
+-- local load_ok, _target = pcall(require, 'out.' .. TARGET .. '_v' .. VERSION)
 local target = load_ok and _target or util.create_target(TARGET)
 
 local canvas = util.create_editor_canvas(target)
@@ -157,8 +226,9 @@ local keyboard = world.keyboard
 local g = { outfile = 'examples/editor/out/'..TARGET..'_v'..VERSION..'.lua' }
 
 
-local handle = { keydown = {} }
+local handle = { keydown = {}, click = {} }
 
+local hie_mgr = hierarchy_manager(hierarchy, target, handle)
 local ins_mgr = inspector_manager(inspector, mouse, keyboard, handle)
 
 
@@ -198,6 +268,15 @@ end
 
 function handle.keydown.i()
 	inspector.active = not inspector.active
+end
+
+function handle.keydown.t()
+	table.remove(hierarchy.list[3].list, 2)
+end
+
+
+function handle.keydown.escape()
+	kite.exit()
 end
 
 

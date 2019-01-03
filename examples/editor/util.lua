@@ -12,25 +12,25 @@ local create = require 'ecs.functions'
 local target = {}
 
 function target.flybird()
-	local canvas = create.canvas('canvas')
+	local canvas = create.canvas{name = 'canvas'}
 	
-	local game_layer = create.layer()
-	local ui_layer = create.layer()
+	local game_layer = create.layer{ name = 'layer(game)' }
+	local ui_layer = create.layer{ name = 'layer(ui)' }
 
 	-- game layer
 	for i=1,10 do
-		local map = create.sprite{ texname='examples/assert/bg_day.png', x=180+(i-1)*360, y=320, w=360, h=640 }
+		local map = create.sprite{ texname='examples/asset/bg_day.png', x=180+(i-1)*360, y=320, w=360, h=640 }
 		table.insert(game_layer.list, map)
 	end
 
 	for i=1,10 do
-		local map = create.sprite{ texname='examples/assert/land.png', x=180+(i-1)*360, y=69, w=360, h=138 }
+		local map = create.sprite{ texname='examples/asset/land.png', x=180+(i-1)*360, y=69, w=360, h=138 }
 		table.insert(game_layer.list, map)		
 	end
 
 	for i=1,10 do
-		local pipe_up = create.sprite{ texname='examples/assert/pipe_up.png', x=400+(i-1)*100, y=0, ay=0}
-		local pipe_down = create.sprite{ texname='examples/assert/pipe_down.png', x=pipe_up.x+50, y=640, ay=1}
+		local pipe_up = create.sprite{ texname='examples/asset/pipe_up.png', x=400+(i-1)*100, y=0, ay=0}
+		local pipe_down = create.sprite{ texname='examples/asset/pipe_down.png', x=pipe_up.x+50, y=640, ay=1}
 		table.insert(game_layer.list, pipe_up)
 		table.insert(game_layer.list, pipe_down)
 	end
@@ -43,9 +43,9 @@ function target.flybird()
 		h = 48,
 		isloop = true,
 		frames = {
-			{texname='examples/assert/bird0_0.png'},
-			{texname='examples/assert/bird0_1.png'},
-			{texname='examples/assert/bird0_2.png'}
+			{texname='examples/asset/bird0_0.png'},
+			{texname='examples/asset/bird0_1.png'},
+			{texname='examples/asset/bird0_2.png'}
 		}
 	} + Move{speed = 0} + Mass{mass = 0} + Group{
 		list = {create.label{text = 'NICK', x = 0, y = 34, fontsize = 20, bordersize=1}}
@@ -54,7 +54,7 @@ function target.flybird()
 	table.insert(game_layer.list, bird)
 
 	-- ui layer
-	local button = create.button {name = 'play', texname = 'examples/assert/button_play.png', x=480, y=200 }
+	local button = create.button {name = 'play', texname = 'examples/asset/button_play.png', x=480, y=200 }
 	local textfield = create.textfield {
 		name = 'textfield',
 		x = 480,
@@ -86,15 +86,37 @@ function M.create_target(name)
 	return f()
 end
 
+--[[
+container:
+
+	item: lock, switch, label
+		item1
+		item2
+	
+]]
 
 function M.create_editor_canvas(tagert_entities)
+
+	local window = application.window
 	
 	local function create_hierarchy()
-		local bg = create.sprite{ name='hierarchy', color=0x88888888, x=150, y=320-40, w=300, h=600} + Group() + SimpleDragg()
-		bg.list[1] = create.sprite { x=0, y=300-32, ay=1, w=300-8, h=1, color = 0x22222288 }
-		bg.list[2] = create.label { text = 'Hierarchy', x = 0, y = 300-2, ay = 1, fontsize = 28, color = 0x222222cc}
+		local w = window.width/3 if w >=480 then w = 480 end
+		local h = math.floor(w/0.618)
 
+		local bg = create.sprite{ name='hierarchy', color=0x404035ff, x=w/2, y=window.height-100, ay=1, w=w, h=h} + Group() + SimpleDragg()
+		bg.list[1] = create.sprite { x=0, y=-33, ay=1, w=w-16, h=1, ay=1, color = 0x999999ee }
+		bg.list[2] = create.label { text = 'Hierarchy', x = 0, y = -2, ay = 1, fontsize = 28, color = 0xccccccff}
 
+		local content = create.container{name='hierarchy content', x=8-w/2, y =-34-8, w=w-16, h=h-34-8*2, ay=1, ax=0, color = 0xffff0088}
+			+ ScrollView()
+			+ Layout{spacing_y = 2, padding_top=4, fixed = true}
+
+		-- for i=1,20 do
+		-- 	local item = create.label { text = 'item'..i, x = 0, y = 0 --[[-16-(i-1)*32]], fontsize = 28, color = 0xccccccff}
+		-- 	table.insert(content.list, item)
+		-- end
+
+		bg.list[3] = content
 		bg.tag = 'editor'
 		for _,e in ipairs(bg.list) do
 			foreach(function (e)
@@ -106,30 +128,33 @@ function M.create_editor_canvas(tagert_entities)
 	end
 
 	local function create_inspector()
-		local bg = create.sprite{ name='inspector', color=0x88888888, x =960-150, y=320-40, w=300, h=600 } + Group() + SimpleDragg()
-		bg.list[1] = create.sprite { x=0, y=300-32, ay=1, w=300-8, h=1, color = 0x22222288 }
-		bg.list[2] = create.label { text = 'Inspector', x = 0, y = 300-2, ay = 1, fontsize = 28, color = 0x222222cc}
+		local w = window.width/3 if w >=480 then w = 480 end
+		local h = math.floor(w/0.618)
 
-		local content = create.sprite{color=0xdd888888, x=0, y=300-32-20, w=300-8,h=28}+Group{
+		local bg = create.sprite{ name='inspector', color=0x404035ff, x=window.width-w/2, y=window.height-100, ay=1, w=w, h=h } + Group() + SimpleDragg()
+		bg.list[1] = create.sprite { x=0, y=-33, ay=1, w=w-16, h=1, color = 0x999999ee }
+		bg.list[2] = create.label { text = 'Inspector', x = 0, y = -2, ay = 1, fontsize = 28, color = 0xccccccff}
+
+		local content = create.sprite{color=0x404035ff, x=0, y=-34-8, w=w-16, h=h-34-8*2, ay=1}+Group{
 			list = {
-				create.label{text='my name', x=0,y=0, w=300-8, h=28, fontsize=24, color=0x00000088},
-				create.label{text='x',x=-100,y=-33, w=300-8, h=30, fontsize=24, color=0x00000088},
-				create.textfield{x=0,y=-33,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+				create.label{text='my name', x=0, y=-19, w=w-16, h=28, fontsize=24, color=0xccccccff},
+				create.label{text='x',x=-100,y=-19*3, w=w-16, h=30, fontsize=24, color=0xccccccff},
+				create.textfield{x=0,y=-19*3,w=100,h=30,background={color=0x222222ff},label={color=0xddddddff,text='10000',fontsize=24}},
 				
-				create.label{text='y',x=-100,y=-66, w=300-8, h=30, fontsize=24, color=0x00000088},
-				create.textfield{x=0,y=-66,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+				create.label{text='y',x=-100, y=-19*5, w=w-16, h=30, fontsize=24, color=0xccccccff},
+				create.textfield{x=0,y=-19*5,w=100,h=30,background={color=0x222222ff},label={color=0xddddddff,text='10000',fontsize=24}},
 
-				create.label{text='w',x=-100,y=-99, w=300-8, h=30, fontsize=24, color=0x00000088},
-				create.textfield{x=0,y=-99,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+				create.label{text='w',x=-100,y=-19*7, w=w-16, h=30, fontsize=24, color=0xccccccff},
+				create.textfield{x=0,y=-19*7,w=100,h=30,background={color=0x222222ff},label={color=0xddddddff,text='10000',fontsize=24}},
 				
-				create.label{text='h',x=-100,y=-132, w=300-8, h=30, fontsize=24, color=0x00000088},
-				create.textfield{x=0,y=-132,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+				create.label{text='h',x=-100,y=-19*9, w=w-16, h=30, fontsize=24, color=0xccccccff},
+				create.textfield{x=0,y=-19*9,w=100,h=30,background={color=0x222222ff},label={color=0xddddddff,text='10000',fontsize=24}},
 				
-				create.label{text='ax',x=-100,y=-165, w=300-8, h=30, fontsize=24, color=0x00000088},
-				create.textfield{x=0,y=-165,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}},
+				create.label{text='ax',x=-100,y=-19*11, w=w-16, h=30, fontsize=24, color=0xccccccff},
+				create.textfield{x=0,y=-19*11,w=100,h=30,background={color=0x222222ff},label={color=0xddddddff,text='10000',fontsize=24}},
 				
-				create.label{text='ay',x=-100,y=-198, w=300-8, h=30, fontsize=24, color=0x00000088},
-				create.textfield{x=0,y=-198,w=100,h=30,background={color=0x333333aa},label={color=0xffffffff,text='10000',fontsize=24}}
+				create.label{text='ay',x=-100,y=-19*13, w=w-16, h=30, fontsize=24, color=0xccccccff},
+				create.textfield{x=0,y=-19*13,w=100,h=30,background={color=0x222222ff},label={color=0xddddddff,text='10000',fontsize=24}}
 			}
 		}
 
@@ -152,7 +177,10 @@ function M.create_editor_canvas(tagert_entities)
 
 	local editor = create.layer{
 		name = 'LAYER(editor)',
-		list = {create_hierarchy(), create_inspector()}
+		list = {
+			create_hierarchy(),
+			create_inspector(),
+		}
 	}
 
 	local canvas = create.layer {

@@ -30,6 +30,49 @@ function ecs.world(scene, handle)
 		end
 	end
 
+	local function foreach(e, f, callback)
+		if f(e) then
+			callback(e)
+		end
+
+		if e.list then
+			for _,e in ipairs(e.list) do
+				foreach(e, f, callback)
+			end
+		end
+	end
+
+	function self.foreach(f, callback)
+		foreach(self.scene, f, callback)
+	end
+
+
+	local function _foreach(f, callback, root, e, ...)
+		if not e.active then return end
+
+		if f(root, e) then
+			callback(e, ...)
+		end
+
+		if e.list then
+			local root = {
+				x = root.x + e.x,
+				y = root.y + e.y,
+				sx = root.sx * e.sx,
+				sy = root.sy * e.sy,
+				rotate = root.rotate + e.rotate
+			}
+			for _,e in ipairs(e.list) do
+				_foreach(f, callback, root, e, ...)
+			end
+		end
+	end
+
+	function self.eye_foreach(f, callback, ...)
+		local root = {x = 0, y = 0, sx = 1, sy = 1, rotate = 0}
+		_foreach(f, callback, root, self.scene, ...)
+	end
+
 	-- 切换场景
 	function self.switch(new_scene, new_handle, effect)
 		local old = self.scene
@@ -162,7 +205,7 @@ function ecs.world(scene, handle)
 				dispatch('rmouseup', x, y)
 			end
 		else
-			dispatch('mousemove', x, y)
+			dispatch('mouse'..what, x, y)
 		end
 	end
 
@@ -184,6 +227,10 @@ function ecs.world(scene, handle)
 
 	function self.cb.pause()
 		on('pause')
+	end
+
+	function self.cb.scroll(ox, oy)
+		dispatch('scroll', ox, oy)
 	end
 
 	function self.cb.exit()

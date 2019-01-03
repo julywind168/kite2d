@@ -3,7 +3,7 @@ local create = require 'ecs.functions'
 local self = create.canvas{name = 'Canvas'}
 
 self.list = {
-	create.sprite{x = 480, y = 320, w = 960, h = 640, texname = 'examples/assert/bg.jpg', color = 0xeeeeeeff },
+	create.sprite{x = 480, y = 320, w = 960, h = 640, texname = 'examples/asset/bg.jpg', color = 0xeeeeeeff },
 	create.textfield{ 
 		name = 'nick_textfield',
 		x = 480,

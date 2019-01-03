@@ -19,7 +19,7 @@ function game.update(dt)
 end
 
 function game.draw()
-	gfx.draw('examples/assert/bg.jpg', 480, 320)	
+	gfx.draw('examples/asset/bg.jpg', 480, 320)	
 	gfx.print('hello world 哈哈 O(∩_∩)O~', 48, 480, 320, 0xff0000ff)	
 end
 

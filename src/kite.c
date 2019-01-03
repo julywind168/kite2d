@@ -12,7 +12,8 @@
 #define KITE_MESSAGE 5
 #define KITE_PAUSE 6
 #define KITE_RESUME 7
-#define KITE_EXIT 8
+#define KITE_SCROLL 8
+#define KITE_EXIT 9
 
 #define MOUSE_PRESS 1
 #define MOUSE_RELEASE 2
@@ -40,6 +41,16 @@ kite_exit() {
 	lua_State *L = kite->L;
 	lua_pushvalue(L, KITE_EXIT);
 	if (lua_pcall(L, 0, 0, 0) != LUA_OK) on_kite_error(L);
+}
+
+
+void
+kite_scroll(GLFWwindow *window, double ox, double oy) {
+	lua_State *L = kite->L;
+	lua_pushvalue(L, KITE_SCROLL);
+	lua_pushnumber(L, ox);
+	lua_pushnumber(L, oy);
+	if (lua_pcall(L, 2, 0, 0) != LUA_OK) on_kite_error(L);
 }
 
 
@@ -143,7 +154,8 @@ int kite_load() {
 	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_KEYBOARD");
 	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_MESSAGE");
 	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_PAUSE");		
-	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_RESUME");
+	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_RESUME");	
+	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_SCROLL");
 	lua_getfield(L, LUA_REGISTRYINDEX, "KITE_EXIT");
 	return 0;
 }
@@ -263,6 +275,7 @@ create_kite(const char *gamedir) {
 	kite->mouse = kite_mouse;
 	kite->keyboard = kite_keyboard;
 	kite->message = kite_message;
+	kite->scroll = kite_scroll;
 	kite->exit = kite_exit;
 
 	kite->destroy = kite_destroy;

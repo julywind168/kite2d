@@ -34,7 +34,7 @@ function M.create(delay, callback, iteration)
 	local timer = {
 		time = 0,
 		count = 0,
-		delay = delay,
+		delay = delay/1000,
 		callback = callback,
 		iteration = iteration or 1,
 	}

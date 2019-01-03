@@ -18,6 +18,7 @@ renderer_bind_texture(GLuint texture) {
 
 void
 renderer_flush() {
+	if (renderer->batch.count == 0) return;
 	switch (renderer->batch.program) {
 		case PROGRAM_SPRITE: {
 			renderer->manager->use_sprite_program(renderer->batch.color);
@@ -56,8 +57,7 @@ renderer_draw(float *vertices, GLuint texture, uint32_t color, int program) {
 
 void
 renderer_commit() {
-	if (renderer->batch.count > 0)
-		renderer_flush();
+	renderer_flush();
 	G->drawcall = renderer->drawc;
 	renderer->drawc = 0;
 }
@@ -83,9 +83,12 @@ renderer_init() {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_STENCIL_TEST);
-	glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	// glEnable(GL_STENCIL_TEST);
+	// glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+	glEnable(GL_DEPTH_TEST);
+	glDepthMask(GL_FALSE);
+	glDepthFunc(GL_ALWAYS);
+
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// create draw resource
