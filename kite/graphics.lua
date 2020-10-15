@@ -2,7 +2,7 @@ local core = require 'graphics.core'
 local sprite2d = require "sprite2d.core"
 local texmgr = require "kite.manager.texture"
 local program = (require "kite.manager.program").get_sprite_program()
-local helper = require "kite.helper"
+local rotate = require "kite.util".rotate
 
 
 local M = {}
@@ -28,10 +28,10 @@ local function sprite_transform(sp)
 	local y4 = y0 + h/2
 
 	if sp.angle ~= 0 then
-		x1, y1 = helper.rotate(x0, y0, sp.angle, x1, y1)
-		x2, y2 = helper.rotate(x0, y0, sp.angle, x2, y2)
-		x3, y3 = helper.rotate(x0, y0, sp.angle, x3, y3)
-		x4, y4 = helper.rotate(x0, y0, sp.angle, x4, y4)
+		x1, y1 = rotate(x0, y0, sp.angle, x1, y1)
+		x2, y2 = rotate(x0, y0, sp.angle, x2, y2)
+		x3, y3 = rotate(x0, y0, sp.angle, x3, y3)
+		x4, y4 = rotate(x0, y0, sp.angle, x4, y4)
 	end
 
 	return x1,y1, x2,y2, x3,y3, x4,y4

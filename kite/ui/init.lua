@@ -1,7 +1,6 @@
 local kite = require "kite"
+local rotate = require "kite.util".rotate
 local system_touch = require "kite.ui.system.touch"
-local sin = math.sin
-local cos = math.cos
 
 local create = {
 	empty = require "kite.ui.node.empty",
@@ -17,16 +16,111 @@ WORLD.world_xscale = kite.window_width()/application.design_width
 WORLD.world_yscale = kite.window_height()/application.design_height
 
 
+local function create_list(root)
 
-local function ROTATE(x0, y0, a, x1, y1)
-	a = a * math.pi/180
-	local x = (x1 - x0)*cos(a) - (y1 - y0)*sin(a) + x0
-	local y = (x1 - x0)*sin(a) + (y1 - y0)*cos(a) + y0
-	return x, y
-end
+	local list = {root = root}
 
-local function create_list()
-	local list = {}
+	function list.init(items)
+		local n = #items
+		assert(n > 0)
+		list.head = items[1]
+		list.tail = items[n]
+
+		if n > 1 then
+			list.head.next = items[2]
+			list.tail.previous = items[n-1]
+
+			if n > 2 then
+				for i=2,n-1 do
+					local item = items[i]
+					item.previous = items[i-1]
+					item.next = items[i+1]
+				end
+			end
+		end
+	end
+
+	local function find_tail(item)
+		if item.nchild == 0 then
+			return item
+		else
+			local cur = item.next
+			while cur do
+				if cur.lv <= item.lv then
+					return cur.previous
+				end
+				cur = cur.next
+			end
+			return list.tail
+		end
+	end
+
+	-- 向后遍历找 第n个子节点
+	local function find_child(parent, n)
+		local c = 0
+		local cur = parent.next
+
+		while cur do
+			if cur.lv == parent.lv + 1 then
+				c = c + 1
+				if c == n then
+					return cur
+				end
+			end
+			cur = cur.next
+		end
+	end
+
+
+	function list.insert(parent, i, items)
+		local point
+		if i == 1 then
+			point = parent
+		else
+			local child = assert(find_child(parent, i-1))
+			point = find_tail(child)
+		end
+
+		local point_next = point.next
+		local n = #items
+		local first = items[1]
+		local last = items[n]
+		point.next = first
+		last.next = point_next
+
+		if n > 1 then
+			first.next = items[2]
+			last.previous = items[n-1]
+
+			if n > 2 then
+				for i=2,n-1 do
+					local item = items[i]
+					item.previous = items[i-1]
+					item.next = items[i+1]
+				end	
+			end
+		end
+
+		parent.nchild = parent.nchild + 1
+	end
+
+
+	function list.remove(item)
+		local parent = item.parent
+		local tail = find_tail(item)
+		local next_one = tail.next
+		local previous_one = assert(item.previous)
+		
+		previous_one.next = next_one
+
+		if next_one then
+			next_one.previous = previous_one
+		else
+			list.tail = previous_one
+		end
+
+		parent.nchild = parent.nchild - 1
+	end
 
 	function list.foreach(f)
 		local cur = list.head
@@ -52,41 +146,20 @@ local function create_list()
 		end
 	end
 
-
-	function list.append(node)
-		if not list.head then
-			list.head = node
-		end
-
-		local tail = list.tail
-		if tail then
-			tail.next = node
-			node.previous = tail
-			list.tail = node
-		else
-			list.tail = node
-		end
-	end
-
 	-- find node in children with name
 	function list.find(node, name)
-		local current = node
-		while true do
-			local n = current.next
-			if n and n.lv > node.lv then
-				if n.name == name then
-					return n.proxy
+		local cur = node.next
+		while cur do
+			if cur and cur.lv > node.lv then
+				if cur.name == name then
+					return cur.proxy
 				else
-					current = n
+					cur = cur.next
 				end
 			else
 				return
 			end
 		end
-	end
-
-	function list.remove(node)
-		-- body
 	end
 
 	return list
@@ -97,9 +170,10 @@ end
 local M = {}
 
 
-function M.tree(root)
-
-	local list = create_list()
+local function node_init(node, parent_mt, list)
+	
+	local index = 0
+	local mt_array = {}
 
 	local function init(node, parent_mt)
 		node.xscale = node.xscale or 1
@@ -111,6 +185,7 @@ function M.tree(root)
 		local mt = {
 			name = node.name,
 			lv = parent_mt.lv + 1,
+			nchild = #node,
 			node = node,
 			proxy = proxy,
 			parent = parent_mt,
@@ -123,14 +198,18 @@ function M.tree(root)
 			modify = {}
 		}
 		if parent_mt.world_angle ~= 0 then
-			mt.world_x, mt.world_y = ROTATE(parent_mt.world_x, parent_mt.world_y, parent_mt.world_angle, mt.world_x, mt.world_y)
+			mt.world_x, mt.world_y = rotate(parent_mt.world_x, parent_mt.world_y, parent_mt.world_angle, mt.world_x, mt.world_y)
 		end
 		
+		function proxy.tree()
+			return list.root
+		end
+
 		function proxy.find_in_tree(name)
 			local target
-			list.foreach(function (mt)
-				if mt.name == name then
-					target = mt.proxy
+			list.foreach(function (item)
+				if item.name == name then
+					target = item.proxy
 					return true
 				end
 			end)
@@ -145,11 +224,20 @@ function M.tree(root)
 			list.remove(mt)
 		end
 
-		function proxy.add_child(node)
-			-- body
-			-- local sub_list = {}
-			-- init(node, mt, sub_list)
-			-- add sub_list to list
+		function proxy.add_child(child, i)
+			i = i or mt.nchild + 1
+			table.insert(node, i, child)
+
+			local children = node_init(child, mt, list)
+			list.insert(mt, i, children)
+
+			-- dispatch 'ready' event on join tree
+			for _,child in ipairs(children) do
+				local ready = child.proxy["ready"]
+				if ready then
+					ready()
+				end
+			end
 		end
 
 		function proxy.enabletouch()
@@ -163,33 +251,25 @@ function M.tree(root)
 			require(node.script)(proxy, mt)
 		end
 
-		list.append(mt)
+		index = index + 1
+		mt_array[index] = mt
 
 		for i,child in ipairs(node) do
-			init(child, mt)
+			init(child, mt, list)
 		end
 	end
 
+	init(node, parent_mt)
+
+	return mt_array
+end
 
 
-	--[[
-	-- 这段代码是不依赖 android 实现的屏幕旋转, 后来我发现只要在 AndroidManifest 中设置一下就好了, 留作纪念
-	if kite.platform == "android" or kite.platform == "ios" then
-		if application.orientation == "landscape" then
-			WORLD.world_xscale = kite.window_height()/application.design_width
-			WORLD.world_yscale = kite.window_width()/application.design_height
-			root.angle = -90
-			root.x = kite.window_width()/2/WORLD.world_xscale
-			root.y = kite.window_height()/2/WORLD.world_yscale
-		end
-	end]]
-
-
-	init(root, WORLD)
-
+function M.tree(root)
+	local list = create_list(root)
+	list.init(node_init(root, WORLD, list))
 
 	local self = {}
-
 
 	local function draw_node(mt)
 		local parent_mt = mt.parent
@@ -211,7 +291,7 @@ function M.tree(root)
 			mt.world_angle = node.angle + parent_mt.world_angle
 
 			if parent_mt.world_angle ~= 0 then
-				mt.world_x, mt.world_y = ROTATE(parent_mt.world_x, parent_mt.world_y, parent_mt.world_angle, mt.world_x, mt.world_y)
+				mt.world_x, mt.world_y = rotate(parent_mt.world_x, parent_mt.world_y, parent_mt.world_angle, mt.world_x, mt.world_y)
 			end
 
 			if mt.update_transform then

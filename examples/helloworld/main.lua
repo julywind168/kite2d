@@ -28,7 +28,7 @@ local tree = ui.tree {
 		{name="music", type="sprite", x=0, y=0, width=76, height=76, image="image/music.png"}
 	},
 
-	{name="button", type="label", x=0, y=-100, width=200, height=32, text="start game", font="generic", size=28, script="script.button"},
+	{name="button", type="label", x=0, y=-100, width=200, height=32, text="start game", font="generic", size=24, color=0x868686ff, script="script.button"},
 
 	-- bottom
 	{type="sprite", x=0, y=-324+96/2, width=1920, height=96, image="image/footerBg.jpg"},

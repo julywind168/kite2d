@@ -1,6 +1,6 @@
 local gfx = require "kite.graphics"
 local fontmgr = require "kite.manager.font"
-local helper = require "kite.helper"
+local rotate = require "kite.util".rotate
 
 local transform_attr = {x=true, y=true, xscale=true, yscale=true, angle=true}
 
@@ -73,16 +73,18 @@ local function foreach_text(mt, text, font, xalign, yalign, size, f)
 		y = y0 - c.yoffset * yscale - h/2
 
 		if mt.world_angle ~= 0 then
-			x, y = helper.rotate(mt.world_x, mt.world_y, mt.world_angle, x, y)
+			x, y = rotate(mt.world_x, mt.world_y, mt.world_angle, x, y)
 		end
 
 		xadvance = c.xadvance * xscale
-		f(i, x, y, w, h, c.texcoord)
+		f(x, y, w, h, c.texcoord)
 	end
 end
 
 local function sprites_update_transform(sprites, mt, text, font, xalign, yalign, size)
-	local function update_transform(i, x, y, w, h, texcoord)
+	local i = 0
+	local function update_transform(x, y, w, h, texcoord)
+		i = i + 1
 		local sp = sprites[i]
 		sp.x = x
 		sp.y = y
@@ -95,8 +97,10 @@ local function sprites_update_transform(sprites, mt, text, font, xalign, yalign,
 end
 
 local function create_text_sprites(mt, text, font, xalign, yalign, size, color)
+	local i = 0
 	local sprites = {}
-	local function create_sprite(i, x, y, w, h, texcoord)
+	local function create_sprite(x, y, w, h, texcoord)
+		i = i + 1
 		sprites[i] = gfx.sprite{
 			x = x,
 			y = y,

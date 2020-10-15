@@ -91,7 +91,6 @@ renderer_init(uint32_t width, uint32_t height) {
 	glEnable(GL_CULL_FACE);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// create draw resource
 	uint32_t vao, vbo, ebo;

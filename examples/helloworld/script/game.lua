@@ -1,6 +1,3 @@
-local audio = require "kite.manager.audio"
-
-
 return function(self)
 
 
