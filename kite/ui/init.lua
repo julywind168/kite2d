@@ -11,7 +11,7 @@ local create = {
 
 
 -- 你可以编写自己的缩放方案,这里使用最简单的 【填充整个屏幕】 方案
-local WORLD = {world_x=0, world_y=0, world_angle=0, world_xscale=1, world_yscale=1, lv=-1}
+local WORLD = {world_x=0, world_y=0, world_angle=0, world_xscale=1, world_yscale=1, lv=-1, visible = true}
 WORLD.world_xscale = kite.window_width()/application.design_width
 WORLD.world_yscale = kite.window_height()/application.design_height
 
@@ -49,9 +49,12 @@ local function create_list(root)
 				if cur.lv <= item.lv then
 					return cur.previous
 				end
-				cur = cur.next
+				if cur.next == nil then
+					return cur
+				else
+					cur = cur.next
+				end
 			end
-			return list.tail
 		end
 	end
 
@@ -87,6 +90,9 @@ local function create_list(root)
 		local last = items[n]
 		point.next = first
 		last.next = point_next
+		if not point_next then
+			list.tail = last
+		end
 
 		if n > 1 then
 			first.next = items[2]
@@ -103,7 +109,6 @@ local function create_list(root)
 
 		parent.nchild = parent.nchild + 1
 	end
-
 
 	function list.remove(item)
 		local parent = item.parent
@@ -122,11 +127,38 @@ local function create_list(root)
 		parent.nchild = parent.nchild - 1
 	end
 
+	function list.item_show(item)
+		local tail = find_tail(item)
+		local cur = item
+		while cur do
+			cur.visible = cur.node.visible
+			if cur == tail then
+				break
+			else
+				cur = cur.next
+			end
+		end
+	end
+
+	function list.item_hide(item)
+		local tail = find_tail(item)
+		local cur = item
+		while cur do
+			cur.visible = false
+			if cur == tail then
+				break
+			else
+				cur = cur.next
+			end
+		end
+	end
+
+
 	function list.foreach(f)
 		local cur = list.head
 
 		while cur do
-			if f(cur) then
+			if cur.visible and f(cur) then
 				break
 			else
 				cur = cur.next
@@ -138,7 +170,7 @@ local function create_list(root)
 		local cur = list.tail
 
 		while cur do
-			if f(cur) then
+			if cur.visible and f(cur) then
 				break
 			else
 				cur = cur.previous
@@ -176,6 +208,7 @@ local function node_init(node, parent_mt, list)
 	local mt_array = {}
 
 	local function init(node, parent_mt)
+		node.visible = node.visible == nil and true or false
 		node.xscale = node.xscale or 1
 		node.yscale = node.yscale or 1
 		node.angle = node.angle or 0
@@ -184,6 +217,7 @@ local function node_init(node, parent_mt, list)
 
 		local mt = {
 			name = node.name,
+			visible = node.visible and parent_mt.visible or false,	-- 必须父节点和自己都是可见的才是可见的
 			lv = parent_mt.lv + 1,
 			nchild = #node,
 			node = node,
@@ -201,8 +235,29 @@ local function node_init(node, parent_mt, list)
 			mt.world_x, mt.world_y = rotate(parent_mt.world_x, parent_mt.world_y, parent_mt.world_angle, mt.world_x, mt.world_y)
 		end
 		
+		-- proxy base interface
 		function proxy.tree()
 			return list.root
+		end
+
+		function proxy.show()
+			if mt.visible then
+				return
+			end
+			node.visible = true
+			list.item_show(mt)
+		end
+
+		function proxy.hide()
+			if mt.visible == false then
+				return
+			end
+			node.visible = false
+			list.item_hide(mt)
+		end
+
+		function proxy.find(name)
+			return list.find(mt, name)
 		end
 
 		function proxy.find_in_tree(name)
@@ -214,14 +269,6 @@ local function node_init(node, parent_mt, list)
 				end
 			end)
 			return target
-		end
-		
-		function proxy.find(name)
-			return list.find(mt, name)
-		end
-
-		function proxy.remove_self()
-			list.remove(mt)
 		end
 
 		function proxy.add_child(child, i)
@@ -240,6 +287,11 @@ local function node_init(node, parent_mt, list)
 			end
 		end
 
+		function proxy.remove_self()
+			list.remove(mt)
+		end
+
+		-- your extension
 		function proxy.enabletouch()
 			mt.touchable = true
 		end
