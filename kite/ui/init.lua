@@ -1,12 +1,13 @@
 local kite = require "kite"
 local rotate = require "kite.util".rotate
-local system_touch = require "kite.ui.system.touch"
+local system_input = require "kite.ui.system.input"
 
 local create = {
 	empty = require "kite.ui.node.empty",
 	sprite = require "kite.ui.node.sprite",
 	label = require "kite.ui.node.label",
 	button = require "kite.ui.node.button",
+	textfield = require "kite.ui.node.textfield"
 }
 
 
@@ -218,6 +219,7 @@ local function node_init(node, parent_mt, list)
 		local mt = {
 			name = node.name,
 			visible = node.visible and parent_mt.visible or false,	-- 必须父节点和自己都是可见的才是可见的
+			type = node.type,
 			lv = parent_mt.lv + 1,
 			nchild = #node,
 			node = node,
@@ -385,7 +387,7 @@ function M.tree(root)
 	end
 
 	-- add ui system
-	self.add_system(system_touch)
+	self.add_system(system_input)
 
 
 	self.dispatch("ready")

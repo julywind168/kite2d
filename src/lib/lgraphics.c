@@ -55,11 +55,43 @@ ltexture(lua_State *L) {
 	return 3;
 }
 
+// 开始模板绘制 -> draw stencils(sprites) -> 结束模板绘制 -> draw sprites -> 清空模板
+static int
+lstart_stencil(lua_State *L) {
+	G->renderer->flush();
+	glEnable(GL_STENCIL_TEST);
+	glStencilMask(0XFF);
+	glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+	glStencilFunc(GL_ALWAYS, 1, 0XFF);
+	glClearStencil(0);
+	return 0;
+}
+
+
+static int
+lstop_stencil(lua_State *L) {
+	G->renderer->flush();
+	glStencilMask(0x00);
+	glStencilFunc(GL_EQUAL, 1, 0xFF);
+	return 0;
+}
+
+
+static int
+lclear_stencil(lua_State *L) {
+	G->renderer->flush();
+	glClear(GL_STENCIL_BUFFER_BIT);
+	glDisable(GL_STENCIL_TEST);
+	return 0;
+}
 
 int
 lib_graphics(lua_State *L)
 {
 	luaL_Reg l[] = {
+		{"clear_stencil", lclear_stencil},
+		{"stop_stencil", lstop_stencil},
+		{"start_stencil", lstart_stencil},
 		{"draw", ldraw},
 		{"set_clearcolor", lset_clearcolor},
 		{"texture", ltexture},

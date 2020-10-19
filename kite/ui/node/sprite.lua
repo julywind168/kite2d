@@ -1,6 +1,4 @@
 local gfx = require "kite.graphics"
-
-
 local transform_attr = {x=true, y=true, width=true, height=true, xscale=true, yscale=true, angle=true}
 
 

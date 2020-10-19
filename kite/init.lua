@@ -1,5 +1,6 @@
 local core = require "kite.core"
 local audio = require "kite.manager.audio"
+local timer = require "kite.timer"
 
 local mouse_name = {
 	'left',
@@ -68,6 +69,7 @@ function kite.start(callback)
 		callback.draw()
 	end
 	cb.update = function (dt)
+		timer._update(dt)
 		callback.update(dt)
 	end
 
@@ -80,7 +82,7 @@ function kite.start(callback)
 		what = key_event[what]
 		if not key then return end
 
-		callback.keyboard(key, what)
+		callback.keyboard(what, key)
 	end
 
 	cb.textinput = function (code)

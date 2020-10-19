@@ -29,7 +29,7 @@ local tree = ui.tree {
 	},
 
 	{name="button", type="label", x=0, y=-100, width=200, height=32, text="start game", font="generic", size=24, color=0x868686ff, script="script.button"},
-
+	{name="textfield", type="textfield", x=0, y=-200, width=180, height=32, text="", font="generic", size=24, bg_image = "image/white.png", cursor_image="image/white.png"},
 	-- bottom
 	{type="sprite", x=0, y=-324+96/2, width=1920, height=96, image="image/footerBg.jpg"},
 }
@@ -56,9 +56,15 @@ function game.mouse(what, x, y, who)
 end
 
 function game.keyboard(what, key)
+	if what == "press" then
+		tree.dispatch("keydown", key)
+	else
+		tree.dispatch("keyup", key)
+	end
 end
 
 function game.textinput(char)
+	tree.dispatch("textinput", char)
 end
 
 function game.scroll(ox, oy)
