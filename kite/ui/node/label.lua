@@ -17,20 +17,20 @@ local function get_limit_text(text, n)
 end
 
 
-return function (node, mt, proxy)
+return function (node, proxy)
 	node.color = node.color or 0xffffffff
 	node.xalign = node.xalign or "center"
 	node.yalign = node.yalign or "center"
 	
-	mt.world_width = node.width * mt.world_xscale
-	mt.world_height = node.height * mt.world_yscale
+	proxy.world_width = node.width * proxy.world_xscale
+	proxy.world_height = node.height * proxy.world_yscale
 
 	local label = gfx.label {
-		x = mt.world_x,
-		y = mt.world_y,
-		angle = mt.world_angle,
-		xscale = mt.world_xscale,
-		yscale = mt.world_yscale,
+		x = proxy.world_x,
+		y = proxy.world_y,
+		angle = proxy.world_angle,
+		xscale = proxy.world_xscale,
+		yscale = proxy.world_yscale,
 
 		text = node.text,
 		font = node.font,
@@ -40,16 +40,16 @@ return function (node, mt, proxy)
 		yalign = node.yalign
 	}
 
-	function mt.draw()
+	function proxy.draw()
 		label.draw()
 	end
 
-	function mt.update_transform()
-		label.x = mt.world_x
-		label.y = mt.world_y
-		label.xscale = mt.world_xscale
-		label.yscale = mt.world_yscale
-		label.angle = mt.world_angle
+	function proxy.update_transform()
+		label.x = proxy.world_x
+		label.y = proxy.world_y
+		label.xscale = proxy.world_xscale
+		label.yscale = proxy.world_yscale
+		label.angle = proxy.world_angle
 		label.update_transform()
 	end
 
@@ -58,6 +58,12 @@ return function (node, mt, proxy)
 			assert(type(v) == "number" and v >= 0)
 			node.color = v
 			label.set_color(v)
+		elseif k == "width" then
+			node.width = v
+			proxy.world_width = node.width * proxy.world_xscale
+		elseif k == "height" then
+			node.height = v
+			proxy.world_height = node.height * proxy.world_yscale
 		elseif k == "text" then
 			local text = v
 			if limit and utf8.len(text) > limit then
@@ -67,7 +73,8 @@ return function (node, mt, proxy)
 			label.set_text(text)
 		elseif node[k] then
 			if transform_attr[k] then
-				mt.modify[k] = v
+				node[k] = v
+				proxy.modified = true
 			else
 				error(k.." is read-only")
 			end

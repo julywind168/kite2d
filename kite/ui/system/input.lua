@@ -21,15 +21,14 @@ local function try(o, method)
 end
 
 
-return function (list)
+return function (list, tree)
 
-	local keyboard = {
-		pressed = {},
-		lpressed = {}	-- long pressed key
-	}
-
+	local keyboard = tree.keyboard
 	
+	-- press states
 	local target, target_rect
+	local target_pos = {}
+	local mosue_pos = {}
 	local selected, selected_rect
 
 	local tm = timer.create(0.05, function ()
@@ -56,7 +55,7 @@ return function (list)
 
 
 	function on.textinput(char)
-		if selected and selected.editing then
+		if selected and selected.type == "textfield" then
 			selected.update_text(selected.node.text .. char)
 		end
 	end
@@ -75,7 +74,7 @@ return function (list)
 				end
 				return true
 			elseif key == 'enter' then
-				try(textfield.proxy, "lost_focus")
+				try(textfield, "lost_focus")
 				selected = nil
 				return true
 			end
@@ -90,42 +89,48 @@ return function (list)
 
 	function on.mouse_press(x, y)
 		if selected and not point_in_rect(x, y, selected_rect) then
-			try(selected.proxy, "lost_focus")
+			try(selected, "lost_focus")
 			selected = nil
 		end
 
-		list.foreach_from_tail(function (mt)
-			if mt.touchable then
-				local rect = {x = mt.world_x, y = mt.world_y, w = mt.world_width, h = mt.world_height}
+		list.foreach_from_tail(function (proxy)
+			if proxy.touchable then
+				local rect = {x = proxy.world_x, y = proxy.world_y, w = proxy.world_width, h = proxy.world_height}
 				if point_in_rect(x, y, rect) then
-					try(mt.proxy, "touch_began")
-					target = mt
+					target = proxy
 					target_rect = rect
+					target_pos.x = target.node.x
+					target_pos.y = target.node.y
+					mosue_pos.x = x
+					mosue_pos.y = y
+
+					if target ~= selected then
+						selected = target
+						selected_rect = target_rect
+						try(selected, "gained_focus")
+					end
 					return true
 				end
 			end
 		end)
 	end
 
-	-- function on.mouse_move(x, y)
-	--
-	-- end
+	function on.mouse_move(x, y)
+		if target and target.draggable then
+			target.x = target_pos.x + (x - mosue_pos.x)
+			target.y = target_pos.y + (y - mosue_pos.y)
+			try(target, "dragging")
+		end
+	end
 
 	function on.mouse_release(x, y)
 		if target then
-			local proxy = target.proxy
-			try(proxy, "touch_ended")
+			try(target, "touch_ended")
 
 			if point_in_rect(x, y, target_rect) then
-				try(proxy, "on_pressed")
-
-				if target ~= selected then
-					selected = target
-					selected_rect = target_rect
-					try(selected.proxy, "gained_focus")
-				end
+				try(target, "on_pressed")
 			else
-				try(proxy, touch_cancel)
+				try(target, touch_cancel)
 			end
 			target = nil
 			return true

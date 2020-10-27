@@ -58,6 +58,8 @@ local function create_list(root)
 			end
 		end
 	end
+	
+	list.find_tail = find_tail
 
 	-- 向后遍历找 第n个子节点
 	local function find_child(parent, n)
@@ -73,7 +75,7 @@ local function create_list(root)
 			end
 			cur = cur.next
 		end
-	end
+	end	
 
 
 	function list.insert(parent, i, items)
@@ -89,6 +91,7 @@ local function create_list(root)
 		local n = #items
 		local first = items[1]
 		local last = items[n]
+		first.previous = point
 		point.next = first
 		last.next = point_next
 		if not point_next then
@@ -185,7 +188,7 @@ local function create_list(root)
 		while cur do
 			if cur and cur.lv > node.lv then
 				if cur.name == name then
-					return cur.proxy
+					return cur
 				else
 					cur = cur.next
 				end
@@ -203,70 +206,82 @@ end
 local M = {}
 
 
-local function node_init(node, parent_mt, list)
+local function node_init(node, parent_proxy, list, tree)
 	
 	local index = 0
-	local mt_array = {}
+	local proxys = {}
 
-	local function init(node, parent_mt)
-		node.visible = node.visible == nil and true or false
+	local function init(node, parent_proxy)
+		node.visible = (node.visible == nil and true) or node.visible or false
 		node.xscale = node.xscale or 1
 		node.yscale = node.yscale or 1
 		node.angle = node.angle or 0
 		
-		local proxy = {}
-
-		local mt = {
+		local proxy = {
+			node = node,
 			name = node.name,
-			visible = node.visible and parent_mt.visible or false,	-- 必须父节点和自己都是可见的才是可见的
+			visible = node.visible and parent_proxy.visible or false,	-- 必须父节点和自己都是可见的才是可见的
 			type = node.type,
-			lv = parent_mt.lv + 1,
+			lv = parent_proxy.lv + 1,
 			nchild = #node,
 			node = node,
 			proxy = proxy,
-			parent = parent_mt,
+			parent = parent_proxy,
 
-			world_x = node.x * parent_mt.world_xscale + parent_mt.world_x,
-			world_y = node.y * parent_mt.world_yscale + parent_mt.world_y,
-			world_angle = node.angle + parent_mt.world_angle,
-			world_xscale = node.xscale * parent_mt.world_xscale,
-			world_yscale = node.yscale * parent_mt.world_yscale,
+			world_x = node.x * parent_proxy.world_xscale + parent_proxy.world_x,
+			world_y = node.y * parent_proxy.world_yscale + parent_proxy.world_y,
+			world_angle = node.angle + parent_proxy.world_angle,
+			world_xscale = node.xscale * parent_proxy.world_xscale,
+			world_yscale = node.yscale * parent_proxy.world_yscale,
 			modify = {}
 		}
-		if parent_mt.world_angle ~= 0 then
-			mt.world_x, mt.world_y = rotate(parent_mt.world_x, parent_mt.world_y, parent_mt.world_angle, mt.world_x, mt.world_y)
+
+		if parent_proxy.world_angle ~= 0 then
+			proxy.world_x, proxy.world_y = rotate(parent_proxy.world_x, parent_proxy.world_y, parent_proxy.world_angle, proxy.world_x, proxy.world_y)
 		end
 		
 		-- proxy base interface
+		function proxy.list()
+			return list
+		end
+
 		function proxy.tree()
-			return list.root
+			return tree
+		end
+
+		function proxy.keyboard()
+			return tree.keyboard
+		end
+
+		function proxy.world2local_position(x, y)
+			return x - (proxy.world_x - node.x), y - (proxy.world_y - node.y)
 		end
 
 		function proxy.show()
-			if mt.visible then
+			if proxy.visible then
 				return
 			end
 			node.visible = true
-			list.item_show(mt)
+			list.item_show(proxy)
 		end
 
 		function proxy.hide()
-			if mt.visible == false then
+			if proxy.visible == false then
 				return
 			end
 			node.visible = false
-			list.item_hide(mt)
+			list.item_hide(proxy)
 		end
 
 		function proxy.find(name)
-			return list.find(mt, name)
+			return list.find(proxy, name)
 		end
 
 		function proxy.find_in_tree(name)
 			local target
 			list.foreach(function (item)
 				if item.name == name then
-					target = item.proxy
+					target = item
 					return true
 				end
 			end)
@@ -274,88 +289,87 @@ local function node_init(node, parent_mt, list)
 		end
 
 		function proxy.add_child(child, i)
-			i = i or mt.nchild + 1
+			i = i or proxy.nchild + 1
 			table.insert(node, i, child)
 
-			local children = node_init(child, mt, list)
-			list.insert(mt, i, children)
+			local children = node_init(child, proxy, list)
+			list.insert(proxy, i, children)
 
 			-- dispatch 'ready' event on join tree
 			for _,child in ipairs(children) do
-				local ready = child.proxy["ready"]
+				local ready = child["ready"]
 				if ready then
 					ready()
 				end
 			end
+			return children[1], children
 		end
 
 		function proxy.remove_self()
-			list.remove(mt)
+			list.remove(proxy)
 		end
 
 		-- your extension
 		function proxy.enabletouch()
-			mt.touchable = true
+			proxy.touchable = true
 		end
 
 		local f = assert(create[node.type], tostring(node.type))
-		f(node, mt, proxy)
+		f(node, proxy)
 
 		if node.script then
-			require(node.script)(proxy, mt)
+			require(node.script)(proxy)
 		end
 
 		index = index + 1
-		mt_array[index] = mt
+		proxys[index] = proxy
 
 		for i,child in ipairs(node) do
-			init(child, mt, list)
+			init(child, proxy, list)
 		end
 	end
 
-	init(node, parent_mt)
+	init(node, parent_proxy)
 
-	return mt_array
+	return proxys
 end
 
 
 function M.tree(root)
+
+	local self = {
+		keyboard = {
+			pressed = {},
+			lpressed = {}	-- long pressed key
+		}
+	}
+
 	local list = create_list(root)
-	list.init(node_init(root, WORLD, list))
+	list.init(node_init(root, WORLD, list, self))
 
-	local self = {}
+	local function draw_node(proxy)
+		local parent_proxy = proxy.parent
+		local node = proxy.node
 
-	local function draw_node(mt)
-		local parent_mt = mt.parent
-		local node = mt.node
-		mt.modified = false
-		if next(mt.modify) then
-			mt.modified = true
-			for k,v in pairs(mt.modify) do
-				node[k] = v
+		if proxy.modified or parent_proxy.modified then
+			proxy.world_x = parent_proxy.world_x + node.x * parent_proxy.world_xscale
+			proxy.world_y = parent_proxy.world_y + node.y * parent_proxy.world_yscale
+			proxy.world_xscale = node.xscale * parent_proxy.world_xscale
+			proxy.world_yscale = node.yscale * parent_proxy.world_yscale
+			proxy.world_angle = node.angle + parent_proxy.world_angle
+
+			if parent_proxy.world_angle ~= 0 then
+				proxy.world_x, proxy.world_y = rotate(parent_proxy.world_x, parent_proxy.world_y, parent_proxy.world_angle, proxy.world_x, proxy.world_y)
 			end
-			mt.modify = {}
+
+			if proxy.update_transform then
+				proxy.update_transform()
+			end
+			proxy.modified = true
 		end
 
-		if mt.modified or parent_mt.modified then
-			mt.world_x = parent_mt.world_x + node.x * parent_mt.world_xscale
-			mt.world_y = parent_mt.world_y + node.y * parent_mt.world_yscale
-			mt.world_xscale = node.xscale * parent_mt.world_xscale
-			mt.world_yscale = node.yscale * parent_mt.world_yscale
-			mt.world_angle = node.angle + parent_mt.world_angle
-
-			if parent_mt.world_angle ~= 0 then
-				mt.world_x, mt.world_y = rotate(parent_mt.world_x, parent_mt.world_y, parent_mt.world_angle, mt.world_x, mt.world_y)
-			end
-
-			if mt.update_transform then
-				mt.update_transform()
-			end
-			mt.modified = true
-		end
-
-		if mt.draw then
-			mt.draw()
+		if proxy.draw then
+			proxy.draw()
 		end
 	end
 
@@ -367,7 +381,7 @@ function M.tree(root)
 	end
 
 	function self.add_system(system)
-		table.insert(systems, system(list))
+		table.insert(systems, system(list, self))
 	end
 
 	function self.dispatch(event, ...)
@@ -378,7 +392,7 @@ function M.tree(root)
 		end
 		local cur = list.head
 		while cur do
-			local f = cur.proxy[event]
+			local f = cur[event]
 			if f and f(...)then
 				break
 			end

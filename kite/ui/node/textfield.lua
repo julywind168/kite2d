@@ -2,34 +2,40 @@ local gfx = require "kite.graphics"
 local timer = require "kite.timer"
 local transform_attr = {x=true, y=true, width=true, height=true, xscale=true, yscale=true, angle=true}
 
+local function try(o, method, ...)
+	local f = o[method]
+	if f then
+		return f(...)
+	end
+end
 
 local CURSOR_WIDTH = 1		-- 光标宽 1px
 local CURSOR_SPACEX = 3		-- 光标横向占据的空间 3px
 --
 -- 文本输入框 由背景图片,光标图片,文本以及遮罩组成
 --
-return function (node, mt, proxy)
+return function (node, proxy)
 	local cursor_visible = false
 	
-	mt.world_width = node.width * mt.world_xscale
-	mt.world_height = node.height * mt.world_yscale
+	proxy.world_width = node.width * proxy.world_xscale
+	proxy.world_height = node.height * proxy.world_yscale
 
 	local bg = gfx.sprite {
-		x = mt.world_x,
-		y = mt.world_y,
-		width = mt.world_width,
-		height = mt.world_height,
-		angle = mt.world_angle,
+		x = proxy.world_x,
+		y = proxy.world_y,
+		width = proxy.world_width,
+		height = proxy.world_height,
+		angle = proxy.world_angle,
 		image = node.bg_image,
 		color = node.bg_color or 0x222222ff,
 	}
 
 	local label = gfx.label {
-		x = mt.world_x - mt.world_width/2 + CURSOR_SPACEX,
-		y = mt.world_y,
-		angle = mt.world_angle,
-		xscale = mt.world_xscale,
-		yscale = mt.world_yscale,
+		x = proxy.world_x - proxy.world_width/2,
+		y = proxy.world_y,
+		angle = proxy.world_angle,
+		xscale = proxy.world_xscale,
+		yscale = proxy.world_yscale,
 
 		text = node.text,
 		font = node.font,
@@ -39,18 +45,18 @@ return function (node, mt, proxy)
 		yalign = "center"
 	}
 
-	if label.text_width > mt.world_width then
-		label.x = mt.world_x + mt.world_width/2 - CURSOR_SPACEX
+	if label.text_width > proxy.world_width then
+		label.x = proxy.world_x + proxy.world_width/2 - CURSOR_SPACEX
 		label.xalign = "right"
 		label.update_transform()
 	end
 
 	local function label_x()
 		if label.xalign == "left" then
-			return mt.world_x - mt.world_width/2
+			return proxy.world_x - proxy.world_width/2
 		else
 			assert(label.xalign == "right")
-			return mt.world_x + mt.world_width/2 - CURSOR_SPACEX
+			return proxy.world_x + proxy.world_width/2 - CURSOR_SPACEX
 		end
 	end
 
@@ -66,33 +72,34 @@ return function (node, mt, proxy)
 
 	local cursor = gfx.sprite {
 		x = cursor_x(),
-		y = mt.world_y,
+		y = proxy.world_y,
 		width = CURSOR_WIDTH,
 		height = label.text_height,
-		angle = mt.world_angle,
+		angle = proxy.world_angle,
 		image = node.cursor_image,
 		color = node.color or 0xddddddff,	
 	}
 
-	-- mt func (use by framwork)
-	function mt.update_text(text)
+	function proxy.update_text(text)
+		local old_text = node.text
 		node.text = text
 		label.set_text(text)
 
-		if label.text_width > mt.world_width and label.xalign == "left" then
+		if label.text_width > proxy.world_width and label.xalign == "left" then
 			label.xalign = "right"
-			label.x = mt.world_x + mt.world_width/2 - 3
+			label.x = label_x()
 			label.update_transform()
-		elseif label.text_width <= mt.world_width and label.xalign == "right" then
+		elseif label.text_width <= proxy.world_width and label.xalign == "right" then
 			label.xalign = "left"
-			label.x = mt.world_x - mt.world_width/2 + 3
+			label.x = label_x()
 			label.update_transform()
 		end
 		cursor.x = cursor_x()
 		cursor.update_transform()
+		try(proxy, "editing", text, old_text)
 	end
 
-	function mt.draw()
+	function proxy.draw()
 		bg.draw()
 
 		-- use 'bg' for mask
@@ -102,39 +109,39 @@ return function (node, mt, proxy)
 		label.draw()
 		gfx.clear_stencil()
 		
-		if mt.editing and cursor_visible then
+		if proxy.selected and cursor_visible then
 			cursor.draw()
 		end
 	end
 
-	function mt.update_transform()
-		mt.world_width = node.width * mt.world_xscale
-		mt.world_height = node.height * mt.world_yscale
+	function proxy.update_transform()
+		proxy.world_width = node.width * proxy.world_xscale
+		proxy.world_height = node.height * proxy.world_yscale
 
-		bg.x = mt.world_x
-		bg.y = mt.world_y
-		bg.width = mt.world_width
-		bg.height = mt.world_height
-		bg.angle = mt.world_angle
+		bg.x = proxy.world_x
+		bg.y = proxy.world_y
+		bg.width = proxy.world_width
+		bg.height = proxy.world_height
+		bg.angle = proxy.world_angle
 		bg.update_transform()
 
 		label.x = label_x()
-		label.y = mt.world_y
-		label.xscale = mt.world_xscale
-		label.yscale = mt.world_yscale
-		label.angle = mt.world_angle
+		label.y = proxy.world_y
+		label.xscale = proxy.world_xscale
+		label.yscale = proxy.world_yscale
+		label.angle = proxy.world_angle
 		label.update_transform()
 
 		cursor.x = cursor_x()
-		cursor.y = mt.world_y
+		cursor.y = proxy.world_y
 		cursor.width = CURSOR_WIDTH
 		cursor.height = label.text_height
-		cursor.angle = mt.world_angle
+		cursor.angle = proxy.world_angle
 		cursor.update_transform()
 	end
 
 	-- textfield attr
-	mt.touchable = true
+	proxy.touchable = true
 
 	-- blink timer
 	local tm = timer.create(0.5, function ()
@@ -142,13 +149,13 @@ return function (node, mt, proxy)
 	end, -1)
 
 	function proxy.gained_focus()
-		mt.editing = true
+		proxy.selected = true
 		cursor_visible = true
 		tm.resume()
 	end
 
 	function proxy.lost_focus()
-		mt.editing = false
+		proxy.selected = false
 		tm.pause()
 	end
 
@@ -158,9 +165,12 @@ return function (node, mt, proxy)
 			assert(type(v) == "number" and v >= 0)
 			node.color = v
 			sprite.set_color(v)
+		elseif k == "text" then
+			proxy.update_text(tostring(v))
 		elseif node[k] then
 			if transform_attr[k] then
-				mt.modify[k] = v
+				node[k] = v
+				proxy.modified = true
 			else
 				error(k.." is read-only")
 			end

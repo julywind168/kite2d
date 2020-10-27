@@ -2,20 +2,20 @@ local gfx = require "kite.graphics"
 local transform_attr = {x=true, y=true, width=true, height=true, xscale=true, yscale=true, angle=true}
 
 
-return function (node, mt, proxy)
+return function (node, proxy)
 	node.color = node.color or 0xffffffff
 	node.hflip = node.hflip and true or false
 	node.vflip = node.vflip and true or false
 
-	mt.world_width = node.width * mt.world_xscale
-	mt.world_height = node.height * mt.world_yscale
+	proxy.world_width = node.width * proxy.world_xscale
+	proxy.world_height = node.height * proxy.world_yscale
 
 	local sprite = gfx.sprite {
-		x = mt.world_x,
-		y = mt.world_y,
-		width = mt.world_width,
-		height = mt.world_height,
-		angle = mt.world_angle,
+		x = proxy.world_x,
+		y = proxy.world_y,
+		width = proxy.world_width,
+		height = proxy.world_height,
+		angle = proxy.world_angle,
 
 		image = node.image,
 		color = node.color,
@@ -23,20 +23,19 @@ return function (node, mt, proxy)
 		vflip = node.vflip
 	}
 
-	-- mt func (use by framwork)
-	function mt.draw()
+	function proxy.draw()
 		sprite.draw()
 	end
 
-	function mt.update_transform()
-		mt.world_width = node.width * mt.world_xscale
-		mt.world_height = node.height * mt.world_yscale
+	function proxy.update_transform()
+		proxy.world_width = node.width * proxy.world_xscale
+		proxy.world_height = node.height * proxy.world_yscale
 
-		sprite.x = mt.world_x
-		sprite.y = mt.world_y
-		sprite.width = mt.world_width
-		sprite.height = mt.world_height
-		sprite.angle = mt.world_angle
+		sprite.x = proxy.world_x
+		sprite.y = proxy.world_y
+		sprite.width = proxy.world_width
+		sprite.height = proxy.world_height
+		sprite.angle = proxy.world_angle
 		sprite.update_transform()
 	end
 
@@ -58,7 +57,8 @@ return function (node, mt, proxy)
 			sprite.set_color(v)
 		elseif node[k] then
 			if transform_attr[k] then
-				mt.modify[k] = v
+				node[k] = v
+				proxy.modified = true
 			else
 				error(k.." is read-only")
 			end
