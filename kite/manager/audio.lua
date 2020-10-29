@@ -1,21 +1,45 @@
 local kite = require "kite.core"
 local core = require "audio.core"
+local sharetable = require "sharetable.core"
+
+local _sources = sharetable.init("_sources")
+local _buffers = sharetable.init("_buffers")
+
+
+local function gen_soucre(...)
+	local source = core.source(...)
+	table.insert(_sources, source)
+	return source
+end
+
+local function gen_buffer(...)
+	local buffer = core.buffer(...)
+	table.insert(_buffers, buffer)
+	return buffer
+end
+
+-----------------------------------------------------------------
 
 local music_loop = true
-local music = core.source(true)
-local effect = core.source(false)
+local music, effect
 local buffer = {}
 
 
 local function query_buffer(filename)
 	if not buffer[filename] then
-		buffer[filename] = core.buffer(kite.gamedir.."/"..filename)
+		buffer[filename] = gen_buffer(kite.gamedir.."/"..filename)
 	end
 	return buffer[filename]
 end
 
 
 local M = {}
+
+function M.init()
+	music = gen_soucre(true)
+	effect = gen_soucre(false)
+	return M
+end
 
 
 function M.preload(t)
@@ -58,13 +82,14 @@ function M.play_effect(filename)
 	core.play(effect, query_buffer(filename))
 end
 
-
+-- call by main thread
 function M.destroy()
-	core.delete_source(music)
-	core.delete_source(effect)
+	for _,source in ipairs(_sources) do
+		core.delete_source(source)
+	end
 
-	for _,buf in pairs(buffer) do
-		core.delete_buffer(buf)
+	for _,buffer in pairs(_buffers) do
+		core.delete_buffer(buffer)
 	end
 end
 

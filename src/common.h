@@ -8,6 +8,8 @@
 #include <stdbool.h>
 #include <unistd.h>
 #include <assert.h>
+#include <pthread.h>
+#include <stdatomic.h>
 
 #include <stb_image.h>
 
@@ -25,7 +27,9 @@
 	#include <android/log.h>
 	#define LOG(...) ((void)__android_log_print(ANDROID_LOG_WARN, "kite", __VA_ARGS__))
 #else
+	#define GLFW_INCLUDE_NONE
 	#include <glad/glad.h>
+	#include <glfw/glfw3.h>
 	#define LOG(...) fprintf(stderr, __VA_ARGS__); fflush(stderr)
 #endif
 

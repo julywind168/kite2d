@@ -6,6 +6,8 @@
 #include "lmatrix.h"
 #include "lprogram.h"
 #include "laudio.h"
+#include "lthread.h"
+#include "lsharetable.h"
 
 
 struct game *G = NULL;
@@ -178,12 +180,7 @@ load_conf(lua_State *L) {
 
 	int n = strlen(gamedir);
 	char filename[n+12];
-	strcpy(filename, gamedir);
-	
-	if (filename[n-1] == '/')
-		strcpy(filename + strlen(gamedir), "config.lua");
-	else
-		strcpy(filename + strlen(gamedir), "/config.lua");
+	sprintf(filename, "%s/%s", gamedir, "config.lua");
 
 	if (luaL_loadfile(L, filename) || lua_pcall(L, 0, 0, 0)) {
 		LOG("%s\n", lua_tostring(L, -1));
@@ -240,6 +237,8 @@ load_conf(lua_State *L) {
 lua_State *
 create_lua_and_load_conf() {
 	lua_State *L = luaL_newstate();
+	thread_init(L);
+	
 	luaL_openlibs(L);
 	luaL_requiref(L, "kite.core", lib_kite, 0);
 	luaL_requiref(L, "graphics.core", lib_graphics, 0);
@@ -247,7 +246,9 @@ create_lua_and_load_conf() {
 	luaL_requiref(L, "matrix.core", lib_matrix, 0);
 	luaL_requiref(L, "program.core", lib_program, 0);
 	luaL_requiref(L, "audio.core", lib_audio, 0);
-	lua_pop(L, 6);
+	luaL_requiref(L, "thread.core", lib_thread, 0);
+	luaL_requiref(L, "sharetable.core", lib_sharetable, 0);
+	lua_pop(L, 8);
 
 	if (load_conf(L)) {
 		lua_close(L);

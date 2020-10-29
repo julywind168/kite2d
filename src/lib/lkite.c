@@ -1,11 +1,13 @@
+#include <sys/time.h>
+
 #include "lkite.h"
 #include "game.h"
+
 
 #define VERSION "0.5 (dev)"
 
 
 extern struct game *G;
-
 
 
 static int
@@ -78,6 +80,24 @@ linject(lua_State *L) {
 
 
 static int
+ltime(lua_State *L) {
+	struct timeval start;
+	gettimeofday( &start, NULL );
+	lua_pushinteger(L, 1000*start.tv_sec + start.tv_usec/1000);
+	return 1;
+}
+
+
+static int
+lexit(lua_State *L) {
+	#ifdef __DESKTOP__
+		glfwSetWindowShouldClose(G->hwnd, 1);
+	#endif
+	return 0;
+}
+
+
+static int
 lversion(lua_State *L) {
 	lua_pushstring(L, VERSION);
 	return 1;
@@ -93,6 +113,8 @@ lib_kite(lua_State *L)
 			{"window_width", lwindow_width},
 			{"drawcall", ldrawcall},
 			{"inject", linject},
+			{"time", ltime},
+			{"exit", lexit},
 			{"version", lversion},
 			{NULL, NULL}
 	};

@@ -32,7 +32,7 @@ return function (list, tree)
 	local selected, selected_rect
 
 	local tm = timer.create(0.05, function ()
-		if selected and selected.editing and keyboard.lpressed["backspace"] then
+		if selected and selected.type == "textfield" and keyboard.lpressed["backspace"] then
 			local text = selected.node.text
 			if #text > 0 then
 				selected.update_text(text:sub(1, utf8.offset(text, utf8.len(text))-1))
@@ -103,6 +103,7 @@ return function (list, tree)
 					target_pos.y = target.node.y
 					mosue_pos.x = x
 					mosue_pos.y = y
+					try(target, "touch_began")
 
 					if target ~= selected then
 						selected = target

@@ -62,6 +62,9 @@ struct game
 	struct renderer *renderer;
 	struct audio *audio;
 
+#ifdef __DESKTOP__
+	GLFWwindow *hwnd;
+#endif
 
 	void (*on_resize)(int, int);
 	void (*on_resume)(void);

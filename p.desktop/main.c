@@ -1,7 +1,3 @@
-#define GLFW_INCLUDE_NONE
-#include <glad/glad.h>
-#include <glfw/glfw3.h>
-
 #include "common.h"
 #include "game.h"
 #include "util.h"
@@ -157,6 +153,8 @@ main(int argc, char const *argv[])
 		return 1;
 	}
 	glfwSwapInterval(1);
+
+	game->hwnd = hwnd;
 	game->init(width, height);
 
 	// set callback

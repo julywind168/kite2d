@@ -2,7 +2,7 @@
 
 CFLAGS = -s -O1 -Wall
 INCLUDE = -Isrc -Isrc/lib -I3rd -I3rd/glad -I3rd/glfw -I3rd/lua-5.4.0 -I3rd/openal -I3rd/stb
-LINK = -L3rd/glfw -L3rd/lua-5.4.0 -lglfw3 -lgdi32 -lopengl32 -lopenal -llua54
+LINK = -L3rd/glfw -L3rd/lua-5.4.0 -lglfw3 -lgdi32 -lopengl32 -lopenal -llua54 -lpthread
 
 
 SRC := \
@@ -11,6 +11,10 @@ SRC := \
 	src/util.c \
 	src/audio.c \
 	src/renderer.c \
+	src/queue.c \
+	src/charbuffer.c \
+	src/seri.c \
+
 
 
 LUALIB := \
@@ -20,6 +24,8 @@ LUALIB := \
 	src/lib/lmatrix.c \
 	src/lib/lprogram.c \
 	src/lib/laudio.c \
+	src/lib/lthread.c \
+	src/lib/lsharetable.c \
 
 
 THIRD_PARTY := \
@@ -31,4 +37,4 @@ THIRD_PARTY := \
 
 
 kite:
-	gcc $(CFLAGS) $(INCLUDE) $(SRC) $(LUALIB) $(THIRD_PARTY) -o kite.exe $(LINK)
+	gcc $(CFLAGS) $(INCLUDE) $(SRC) $(LUALIB) $(THIRD_PARTY) -o kite.exe $(LINK) -D__DESKTOP__

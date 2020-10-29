@@ -2,7 +2,7 @@
 -- I'm a label
 --
 
-local audio = require "kite.manager.audio"
+local audio = require "kite.thread".query("audio")
 
 
 return function(self)
@@ -17,9 +17,9 @@ self.enabletouch()
 function self.on_pressed()
 	pause = not pause
 	if not pause then
-		audio.play_music("sound/bg.ogg")
+		audio.send("play_bgm")
 	else
-		audio.pause_music()
+		-- audio.pause_music()
 	end
 end
 

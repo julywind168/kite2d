@@ -59,6 +59,12 @@ local key_event = {
 ------------------------------------------------------------------
 local kite = {}
 
+function kite.fork(f)
+	local co = coroutine.create(f)
+	coroutine.resume(co)
+	return co
+end
+
 
 
 function kite.start(callback)

@@ -1,7 +1,11 @@
 local kite = require "kite"
 local ui = require "kite.ui"
 local gfx = require "graphics.core"
+local thread = require "kite.thread"
 local fontmgr = require "kite.manager.font"
+
+local thread_receive = thread.start({}, "noblock")
+local audio = thread.fork("examples/helloworld/thread/audio.lua", "audio")
 
 
 fontmgr.load('generic', 'font/generic.fnt', 'font/generic_0.png')
@@ -40,6 +44,7 @@ local game = {}
 
 
 function game.update(dt)
+	thread_receive()
 	tree.dispatch("update", dt)
 end
 
@@ -77,6 +82,7 @@ function game.resume()
 end
 
 function game.exit()
+	audio.send("exit")
 end
 
 
