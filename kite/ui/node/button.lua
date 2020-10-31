@@ -8,6 +8,7 @@ return function (node, proxy)
 	node.color = node.color or 0xffffffff
 	node.hflip = node.hflip and true or false
 	node.vflip = node.vflip and true or false
+	node.press_scale = node.press_scale or 0.9
 
 	proxy.world_width = node.width * proxy.world_xscale
 	proxy.world_height = node.height * proxy.world_yscale

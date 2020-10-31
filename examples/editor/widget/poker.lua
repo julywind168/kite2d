@@ -1,5 +1,9 @@
---[[
-	@Time:	  2020/10/20 03:31:28
-	@Author:  Kite Editor v0.02
-]]
-return {["y"]=0,[1]={["y"]=7,["x"]=162,["angle"]=0,["xscale"]=1,["yscale"]=1,["height"]=185,["vflip"]=false,["type"]="sprite",["image"]="image/poker/back_big.png",["width"]=142,["hflip"]=false,["color"]=4294967295,["name"]="back",["visible"]=true,},["angle"]=0,["xscale"]=1,["yscale"]=1,["type"]="empty",["x"]=0,["visible"]=true,[2]={["y"]=17,["x"]=162,["angle"]=0,["xscale"]=1,["yscale"]=1,["height"]=185,["vflip"]=false,["type"]="sprite",["image"]="image/poker/face_big.png",["width"]=142,["hflip"]=false,["color"]=4294967295,["name"]="face",["visible"]=true,},}
+return {
+	name="poker", type="empty", x=0, y=0,
+	{name="back", type="sprite", x=0, y=0, width=142, height=185, image="image/poker/back_big.png"},
+	{name="face", type="sprite", x=0, y=0, width=142, height=185, image="image/poker/face_big.png",
+		{name="joker", type="sprite", x=0, y=0, width=142, height=185, image="image/poker/joker_big.png"},
+		{name="color", type="sprite", x=0, y=0, width=32, height=32, image="image/poker/ht.png"},
+		{name="num", type="sprite", x=0, y=0, width=58, height=58, image="image/poker/1.png"}
+	},
+}

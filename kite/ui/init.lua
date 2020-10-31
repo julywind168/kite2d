@@ -75,8 +75,8 @@ local function create_list(root)
 			end
 			cur = cur.next
 		end
-	end	
-
+	end
+	
 
 	function list.insert(parent, i, items)
 		local point
@@ -96,6 +96,8 @@ local function create_list(root)
 		last.next = point_next
 		if not point_next then
 			list.tail = last
+		else
+			point_next.previous = last
 		end
 
 		if n > 1 then
@@ -132,6 +134,11 @@ local function create_list(root)
 	end
 
 	function list.item_show(item)
+		local parent = item.parent
+		if not parent.visible then
+			return
+		end
+
 		local tail = find_tail(item)
 		local cur = item
 		while cur do
@@ -212,6 +219,7 @@ local function node_init(node, parent_proxy, list, tree)
 	local proxys = {}
 
 	local function init(node, parent_proxy)
+		node.name = node.name or "unknow"
 		node.visible = (node.visible == nil and true) or node.visible or false
 		node.xscale = node.xscale or 1
 		node.yscale = node.yscale or 1
@@ -255,6 +263,12 @@ local function node_init(node, parent_proxy, list, tree)
 
 		function proxy.world2local_position(x, y)
 			return x - (proxy.world_x - node.x), y - (proxy.world_y - node.y)
+		end
+
+		function proxy.world_position()
+			local world_x = parent_proxy.world_x + node.x * parent_proxy.world_xscale
+			local world_y = parent_proxy.world_y + node.y * parent_proxy.world_yscale
+			return world_x, world_y
 		end
 
 		function proxy.show()
