@@ -35,8 +35,8 @@ local function hiry_item(node, offset_x, content_width)
 		{name='rect', type='sprite', x=rect_x, y=0, width=rect_w, height=30, image="image/white.png", color=0x66665500},
 		{name="triangle", type='sprite', x=triangle_x, y=0, width=16, height=16, image="image/right_triangle.png", angle=270, visible = triangle_visible},
 		{type="label", xalign='left', x=triangle_x+18, y=0, width=100, height=30, text=node.name, font="generic", size=28, color=0xccccccff},
-		{name='eye_open', type='button', x=380/2-28/2-2, y=0, width=28, height=24, image="image/eye_open.png", visible=node.visible},
-		{name='eye_close', type='button', x=380/2-28/2-2, y=0, width=28, height=24, image="image/eye_close.png", visible=not node.visible},
+		{name='eye_open', type='button', x=380/2-28/2-2, y=0, width=28, height=24, image="image/eye_open.png", visible=node.node.visible},
+		{name='eye_close', type='button', x=380/2-28/2-2, y=0, width=28, height=24, image="image/eye_close.png", visible=not node.node.visible},
 	}
 end
 
@@ -83,8 +83,6 @@ local hiry_content, inspr_name, inspr_x, inspr_y, inspr_w, inspr_h, inspr_xs, in
 
 
 local function update_cross_pos()
-	inspr_x.text = selected.x
-	inspr_y.text = selected.y
 	cross.x, cross.y = cross.world2local_position(selected.world_position())
 end
 
@@ -122,7 +120,6 @@ function self.ready()
 				item.find("rect").color = 0x55555500
 			end
 		end
-		update_cross_pos()
 	end
 
 	-- hierarchy
@@ -192,12 +189,14 @@ function self.ready()
 	function inspr_x.editing(text)
 		if selected then
 			selected.x = safe_tonumber(text)
+			update_cross_pos()
 		end
 	end
 
 	function inspr_y.editing(text)
 		if selected then
 			selected.y = safe_tonumber(text)
+			update_cross_pos()
 		end
 	end
 
@@ -245,7 +244,6 @@ function self.ready()
 		function node.dragging()
 			inspr_x.text = node.x
 			inspr_y.text = node.y
-			update_cross_pos()
 		end
 	end
 
@@ -260,16 +258,16 @@ function self.update()
 	if selected then
 		if keyboard.lpressed['up'] then
 			selected.y = selected.y + 5
-			update_cross_pos()
+			inspr_y.text = selected.y
 		elseif keyboard.lpressed['down'] then
 			selected.y = selected.y - 5
-			update_cross_pos()
+			inspr_y.text = selected.y
 		elseif keyboard.lpressed['left'] then
 			selected.x = selected.x - 5
-			update_cross_pos()
+			inspr_x.text = selected.x
 		elseif keyboard.lpressed['right'] then
 			selected.x = selected.x + 5
-			update_cross_pos()
+			inspr_x.text = selected.x
 		end
 	end
 end
@@ -280,19 +278,19 @@ function self.keyup(key)
 		local step = keyboard.pressed['shift'] and 5 or 1
 		if key == 'up' then
 			selected.y = selected.y + step
-			update_cross_pos()
+			inspr_y.text = selected.y
 			return true
 		elseif key == 'down' then
 			selected.y = selected.y - step
-			update_cross_pos()
+			inspr_y.text = selected.y
 			return true
 		elseif key == 'left' then
 			selected.x = selected.x - step
-			update_cross_pos()
+			inspr_x.text = selected.x
 			return true
 		elseif key == 'right' then
 			selected.x = selected.x + step
-			update_cross_pos()
+			inspr_x.text = selected.x
 			return true
 		end
 	end

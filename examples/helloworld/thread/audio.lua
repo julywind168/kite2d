@@ -1,7 +1,7 @@
 local thread = require "kite.thread"
 local audio = require "kite.manager.audio".init()
 
-audio.preload{"sound/bg.ogg"}
+audio.load{"sound/bg.ogg"}
 
 print("['audio'] bgm loaded")
 

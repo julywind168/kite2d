@@ -1,9 +1,5 @@
-return {
-	name="poker", type="empty", x=0, y=0,
-	{name="back", type="sprite", x=0, y=0, width=142, height=185, image="image/poker/back_big.png"},
-	{name="face", type="sprite", x=0, y=0, width=142, height=185, image="image/poker/face_big.png",
-		{name="joker", type="sprite", x=0, y=0, width=142, height=185, image="image/poker/joker_big.png"},
-		{name="color", type="sprite", x=0, y=0, width=32, height=32, image="image/poker/ht.png"},
-		{name="num", type="sprite", x=0, y=0, width=58, height=58, image="image/poker/1.png"}
-	},
-}
+--[[
+	@Time:	  2020/11/01 09:02:24
+	@Author:  Kite Editor v0.01
+]]
+return {[1]={["vflip"]=false,["xscale"]=1,["yscale"]=1,["hflip"]=false,["color"]=4294967295,["type"]="sprite",["image"]="image/poker/back_big.png",["visible"]=true,["height"]=185,["x"]=0,["y"]=0,["angle"]=0,["width"]=142,["name"]="back",},[2]={[1]={["vflip"]=false,["xscale"]=1,["yscale"]=1,["hflip"]=false,["color"]=4294967295,["type"]="sprite",["image"]="image/poker/joker_big.png",["visible"]=true,["height"]=185,["x"]=0,["y"]=0,["angle"]=0,["width"]=142,["name"]="joker",},[2]={["vflip"]=false,["xscale"]=1,["yscale"]=1,["hflip"]=false,["color"]=4294967295,["type"]="sprite",["image"]="image/poker/ht.png",["visible"]=true,["height"]=32,["x"]=-32,["y"]=0,["angle"]=0,["width"]=32,["name"]="color",},[3]={["vflip"]=false,["xscale"]=1,["yscale"]=1,["hflip"]=false,["color"]=4294967295,["type"]="sprite",["image"]="image/poker/1.png",["visible"]=true,["height"]=58,["x"]=-34,["y"]=51,["angle"]=0,["width"]=58,["name"]="num",},["type"]="sprite",["image"]="image/poker/face_big.png",["visible"]=true,["hflip"]=false,["vflip"]=false,["angle"]=0,["x"]=0,["height"]=185,["width"]=142,["color"]=4294967295,["y"]=0,["yscale"]=1,["xscale"]=1,["name"]="face",},["yscale"]=1,["type"]="empty",["angle"]=0,["x"]=0,["y"]=0,["xscale"]=1,["visible"]=true,["name"]="poker",}

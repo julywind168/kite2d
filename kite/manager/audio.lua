@@ -42,7 +42,7 @@ function M.init()
 end
 
 
-function M.preload(t)
+function M.load(t)
 	for _,filename in ipairs(t) do
 		query_buffer(filename)
 	end

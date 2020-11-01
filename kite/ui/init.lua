@@ -236,6 +236,8 @@ local function node_init(node, parent_proxy, list, tree)
 			proxy = proxy,
 			parent = parent_proxy,
 
+			_x = node.x,	-- 与世界坐标同步更新, 用来计算世界坐标与本地坐标的差值
+			_y = node.y,
 			world_x = node.x * parent_proxy.world_xscale + parent_proxy.world_x,
 			world_y = node.y * parent_proxy.world_yscale + parent_proxy.world_y,
 			world_angle = node.angle + parent_proxy.world_angle,
@@ -262,7 +264,7 @@ local function node_init(node, parent_proxy, list, tree)
 		end
 
 		function proxy.world2local_position(x, y)
-			return x - (proxy.world_x - node.x), y - (proxy.world_y - node.y)
+			return x - (proxy.world_x - proxy._x), y - (proxy.world_y - proxy._y)
 		end
 
 		function proxy.world_position()
@@ -366,6 +368,8 @@ function M.tree(root)
 		local node = proxy.node
 
 		if proxy.modified or parent_proxy.modified then
+			proxy._x = node.x
+			proxy._y = node.y
 			proxy.world_x = parent_proxy.world_x + node.x * parent_proxy.world_xscale
 			proxy.world_y = parent_proxy.world_y + node.y * parent_proxy.world_yscale
 			proxy.world_xscale = node.xscale * parent_proxy.world_xscale

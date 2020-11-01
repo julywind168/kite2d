@@ -25,7 +25,7 @@ function M.query(filename)
 end
 
 
-function M.preload(filename, basedir)
+function M.load(filename, basedir)
 	if type(filename) == "table" then
 		for _,fn in ipairs(filename) do
 			load_texture(fn, basedir)
