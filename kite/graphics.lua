@@ -80,6 +80,19 @@ function M.sprite(sp)
 		sprite2d.set_color(id, color)
 	end
 
+	function sp.set_image(filename, coord)
+		tex = texmgr.query(filename)
+		sprite2d.set_texture(id, tex.id)
+		if coord then
+			sp.set_texcoord(coord)
+		end
+	end
+
+	function sp.set_texcoord(coord)
+		sp.texcoord = coord
+		sprite2d.set_texcoord(id, table.unpack(coord))
+	end
+
 	function sp.update_transform()
 		local x1, y1, x2, y2, x3, y3, x4, y4 = sprite_transform(sp)
 		sprite2d.set_position(id, x1, y1, x2, y2, x3, y3, x4, y4)

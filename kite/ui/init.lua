@@ -1,6 +1,8 @@
 local kite = require "kite"
 local rotate = require "kite.util".rotate
 local system_input = require "kite.ui.system.input"
+local transition = require "kite.ui.transition"
+local animation = require "kite.ui.animation"
 
 local create = {
 	empty = require "kite.ui.node.empty",
@@ -191,6 +193,10 @@ local function create_list(root)
 
 	-- find node in children with name
 	function list.find(node, name)
+		if node.name == name then
+			return node
+		end
+
 		local cur = node.next
 		while cur do
 			if cur and cur.lv > node.lv then
@@ -403,6 +409,11 @@ function M.tree(root)
 	end
 
 	function self.dispatch(event, ...)
+		if event == "update" then
+			transition.update(...)
+			animation.update(...)
+		end
+
 		for _,sys in ipairs(systems) do
 			if sys(event, ...) then
 				return

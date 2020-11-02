@@ -18,6 +18,7 @@ return function (node, proxy)
 		angle = proxy.world_angle,
 
 		image = node.image,
+		texcoord = node.texcoord,
 		color = node.color,
 		hflip = node.hflip,
 		vflip = node.vflip
@@ -55,6 +56,12 @@ return function (node, proxy)
 			assert(type(v) == "number" and v >= 0)
 			node.color = v
 			sprite.set_color(v)
+		elseif k == "image" then
+			node.image = v
+			sprite.set_image(v)
+		elseif k == "texcoord" then
+			node.texcoord = v
+			sprite.set_texcoord(v)
 		elseif node[k] then
 			if transform_attr[k] then
 				node[k] = v
