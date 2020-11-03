@@ -6,6 +6,7 @@ return function (node, proxy)
 	node.color = node.color or 0xffffffff
 	node.hflip = node.hflip and true or false
 	node.vflip = node.vflip and true or false
+	node.anchor = node.anchor or {x = 0.5, y = 0.5}
 
 	proxy.world_width = node.width * proxy.world_xscale
 	proxy.world_height = node.height * proxy.world_yscale
@@ -16,6 +17,7 @@ return function (node, proxy)
 		width = proxy.world_width,
 		height = proxy.world_height,
 		angle = proxy.world_angle,
+		anchor = node.anchor,
 
 		image = node.image,
 		texcoord = node.texcoord,
@@ -62,6 +64,9 @@ return function (node, proxy)
 		elseif k == "texcoord" then
 			node.texcoord = v
 			sprite.set_texcoord(v)
+		elseif k == "anchor" then
+			node.anchor = v
+			sprite.set_anchor(v)
 		elseif node[k] then
 			if transform_attr[k] then
 				node[k] = v

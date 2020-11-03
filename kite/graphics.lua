@@ -18,17 +18,17 @@ local function sprite_transform(sp)
 	local x0 = sp.x
 	local y0 = sp.y
 
-	local x1 = x0 - w/2
-	local y1 = y0 + h/2
+	local x2 = x0 - sp.anchor.x*w
+	local y2 = y0 - sp.anchor.y*h
 
-	local x2 = x0 - w/2
-	local y2 = y0 - h/2
+	local x1 = x2
+	local y1 = y2 + h
 
-	local x3 = x0 + w/2
-	local y3 = y0 - h/2
+	local x3 = x1 + w
+	local y3 = y2
 
-	local x4 = x0 + w/2
-	local y4 = y0 + h/2
+	local x4 = x3
+	local y4 = y1
 
 	if sp.angle ~= 0 then
 		x1, y1 = rotate(x0, y0, sp.angle, x1, y1)
@@ -64,6 +64,7 @@ function M.sprite(sp)
 	sp.texcoord = sp.texcoord or {0,1, 0,0, 1,0, 1,1}
 	sp.hflip = sp.hflip and true or false
 	sp.vflip = sp.vflip and true or false
+	sp.anchor = sp.anchor or {x = 0.5, y = 0.5}
 
 	if sp.hflip then
 		sprite_flip_h(sp)
@@ -91,6 +92,11 @@ function M.sprite(sp)
 	function sp.set_texcoord(coord)
 		sp.texcoord = coord
 		sprite2d.set_texcoord(id, table.unpack(coord))
+	end
+
+	function sp.set_anchor(anchor)
+		sp.anchor = anchor
+		sp.update_transform()
 	end
 
 	function sp.update_transform()
