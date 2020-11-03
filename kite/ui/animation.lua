@@ -3,18 +3,23 @@ local M = {}
 local animation = {}
 
 
---
--- params:{sprite, frames, time, is_loop, on_complete}
---
-function M.create(self)
-	if self.is_loop == nil then
-		self.is_loop = true
-	end
 
-	self.active = true
-	self.frame_time = self.time/#self.frames
-	self.frame = 1
-	self.delta = 0
+function M.create(node, params)
+	local is_loop = params.is_loop == nil and true or params.is_loop
+
+	local frames = assert(params.frames)
+	local time = assert(params.time)
+
+	local self = {
+		sprite = node,
+		active = true,
+		time = time,
+		frames = frames,
+		frame_time = time/#frames,
+		frame = 1,
+		delta = 0,
+		is_loop = is_loop
+	}
 
 	function self.pause()
 		self.active = false
